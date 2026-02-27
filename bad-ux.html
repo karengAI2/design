@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UX Chamber of Horrors — Ai2 Design</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:    #0a3235;
+      --secondary:  #105257;
+      --accent:     #faf2e9;
+      --bg:         #f4ede3;
+      --white:      #ffffff;
+      --text:       #0a3235;
+      --text-muted: #6b7a78;
+      --border:     #d6cfc6;
+      --red:        #f0529c;
+      --gold:       #c08010;
+      --gold-bg:    #fff8e6;
+      --green:      #1a7a4a;
+    }
+
+    body {
+      font-family: 'Manrope', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── PAGE HEADER ────────────────────────────── */
+    .page-header {
+      background: var(--primary);
+      color: var(--accent);
+      padding: clamp(60px, 10vw, 100px) 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 60%, rgba(255,255,255,0.04) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 20%, rgba(255,255,255,0.03) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .header-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      opacity: 0.45;
+      margin-bottom: 20px;
+    }
+
+    .header-title {
+      font-size: clamp(48px, 8vw, 100px);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      margin-bottom: 28px;
+    }
+
+    .header-title em {
+      font-style: normal;
+      opacity: 0.4;
+      display: block;
+      font-weight: 300;
+    }
+
+    .header-desc {
+      max-width: 540px;
+      margin: 0 auto;
+      opacity: 0.6;
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.7;
+    }
+
+    .header-tag {
+      display: inline-block;
+      margin-top: 28px;
+      padding: 6px 14px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 100px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.5;
+    }
+
+    /* ── GALLERY ────────────────────────────────── */
+    .gallery {
+      max-width: 1120px;
+      margin: 56px auto 80px;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 28px;
+    }
+
+    @media (max-width: 560px) {
+      .gallery { grid-template-columns: 1fr; }
+    }
+
+    /* ── EXHIBIT CARD ───────────────────────────── */
+    .exhibit {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(10,50,53,0.06);
+    }
+
+    .exhibit-header {
+      background: var(--primary);
+      color: var(--accent);
+      padding: 18px 26px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .exhibit-num {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.4;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .exhibit-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .exhibit-body {
+      padding: 26px;
+    }
+
+    .exhibit-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    /* ── SHARED COMPONENTS ──────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 22px;
+      border-radius: 9px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.18s;
+      letter-spacing: -0.01em;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--accent);
+    }
+    .btn-primary:hover { background: #0d4448; }
+
+    .btn-danger {
+      background: var(--red);
+      color: #fff;
+    }
+    .btn-danger:hover { background: #a83818; }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text);
+    }
+    .btn-ghost:hover { border-color: #aaa; }
+
+    .field-input {
+      width: 100%;
+      padding: 11px 15px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+      background: var(--white);
+    }
+    .field-input:focus { border-color: var(--primary); }
+
+    /* ──────────────────────────────────────────────
+       EXHIBIT 1 — The Reluctant Button
+    ────────────────────────────────────────────── */
+    .runaway-zone {
+      position: relative;
+      height: 190px;
+      background: var(--bg);
+      border-radius: 12px;
+      border: 2px dashed var(--border);
+      overflow: hidden;
+    }
+
+    #runaway-btn {
+      position: absolute;
+      top: 95px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .catch-counter {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ──────────────────────────────────────────────
+       EXHIBIT 2 — Password Requirements
+    ────────────────────────────────────────────── */
+    .pw-reqs {
+      margin-top: 10px;
+      padding: 12px 15px;
+      background: var(--gold-bg);
+      border-left: 3px solid #e8a835;
+      border-radius: 0 9px 9px 0;
+      font-size: 12px;
+    }
+
+    .pw-reqs-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 5px;
+    }
+
+    .pw-req-item::before {
+      content: "✗ ";
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    .strength-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .strength-bars {
+      display: flex;
+      gap: 3px;
+      flex: 1;
+    }
+
+    .strength-bar {
+      height: 4px;
+      flex: 1;
+      border-radius: 2px;
+      background: #e5e0d8;
+      transition: background 0.3s;
+    }
+
+    .strength-label {
+      font-size: 11px;
+      color: var(--red);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ──────────────────────────────────────────────
+       EXHIBIT 3 — Backwards Volume Slider
+    ────────────────────────────────────────────── */
+    .slider-shell {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .slider-end-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    #vol-slider {
+      flex: 1;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      border-radius: 3px;
+      outline: none;
+      cursor: ew-resize;
+      direction: rtl; /* 👹 The evil is here */
+    }
+
+    #vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: grab;
+      box-shadow: 0 2px 8px rgba(10,50,53,0.3);
+      border: 3px solid var(--white);
+    }
+
+    #vol-slider:active::-webkit-slider-thumb { cursor: grabbing; }
+
+    .vol-readout {
+      font-size: 28px;
+      font-weight: 800;
+      min-width: 52px;
+      text-align: right;
+      letter-spacing: -0.03em;
+    }
+
+    .vol-unit { font-size: 14px; font-weight: 400; }
+
+    .slider-hint {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #b5b0a8;
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* ──────────────────────────────────────────────
+       EXHIBIT 4 — Swapping Yes/No
+    ────────────────────────────────────────────── */
+    .fake-modal {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 6px 24px rgba(10,50,53,0.08);
+    }
+
+    .fake-modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .fake-modal-body {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-bottom: 22px;
+      line-height: 1.6;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      transition: flex-direction 0.3s;
+    }
+
+    .modal-actions .btn { flex: 1; }
+
+    .swap-notice {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #c0c0b8;
+      text-align: center;
+    }
+
+    .swap-notice strong { color: var(--primary); }
+
+    /* ──────────────────────────────────────────────
+       EXHIBIT 5 — Cookie Consent Theatre
+    ────────────────────────────────────────────── */
+    .cookie-banner {
+      background: var(--primary);
+      color: var(--accent);
+      border-radius: 14px;
+      padding: 20px 22px;
+    }
+
+    .cookie-banner p {
+      font-size: 12.5px;
+      opacity: 0.75;
+      line-height: 1.65;
+    }
+
+    .cookie-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    #reject-big-btn {
+      padding: 13px 26px;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: -0.02em;
+    }
+    #reject-big-btn:hover { background: #a83818; }
+
+    #accept-tiny-btn {
+      font-size: 8px;
+      color: rgba(250,242,233,0.22);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: 'Manrope', sans-serif;
+      text-decoration: underline;
+      padding: 2px;
+      line-height: 1;
+    }
+    #accept-tiny-btn:hover { color: rgba(250,242,233,0.38); }
+
+    /* Cookie wizard overlay */
+    .cookie-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,20,20,0.72);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    .cookie-overlay.open { display: flex; }
+
+    .cookie-wizard-panel {
+      background: var(--white);
+      border-radius: 18px;
+      padding: 32px;
+      max-width: 500px;
+      width: 92%;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .wizard-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .wizard-step-label {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+
+    .cookie-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cookie-row-info h4 { font-size: 13.5px; font-weight: 600; }
+    .cookie-row-info p { font-size: 11.5px; color: var(--text-muted); max-width: 310px; }
+
+    .toggle { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: #d0ccc6;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      top: 3px; left: 3px;
+      background: var(--white);
+      border-radius: 50%;
+      transition: left 0.2s;
+    }
+    .toggle input:checked + .toggle-track { background: var(--primary); }
+    .toggle input:checked + .toggle-track::after { left: 23px; }
+
+    .wizard-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 22px;
+    }
+    .wizard-footer .btn { font-size: 13px; padding: 9px 18px; }
+
+    /* ──────────────────────────────────────────────
+       EXHIBIT 6 — Infinite EULA
+    ────────────────────────────────────────────── */
+    .eula-progress-track {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .eula-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      border-radius: 2px;
+      transition: width 0.25s;
+    }
+
+    .eula-text {
+      height: 200px;
+      overflow-y: scroll;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 16px;
+      font-size: 12px;
+      line-height: 1.85;
+      color: #555;
+      scroll-behavior: auto;
+    }
+
+    .eula-text p { margin-bottom: 12px; }
+
+    .eula-check-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .eula-check-row input {
+      width: 16px; height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+    .eula-check-row label {
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .eula-hint {
+      font-size: 11px;
+      color: #c0bcb6;
+      margin-top: 5px;
+      font-style: italic;
+    }
+
+    /* ──────────────────────────────────────────────
+       EXHIBIT 7 — Date Picker From 1900
+    ────────────────────────────────────────────── */
+    .date-picker-widget {
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .dp-nav-row {
+      background: var(--bg);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dp-arrow {
+      width: 32px; height: 32px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      line-height: 1;
+    }
+    .dp-arrow:hover { background: #f0ece6; }
+
+    .dp-month-label {
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+
+    .dp-info {
+      padding: 16px;
+      text-align: center;
+    }
+    .dp-info p { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+    .dp-click-stat { font-size: 14px; font-weight: 600; }
+    .dp-clicks-left {
+      margin-top: 5px;
+      font-size: 11px;
+      color: var(--red);
+      font-weight: 500;
+    }
+
+    /* ──────────────────────────────────────────────
+       EXHIBIT 8 — Cursed Checkboxes
+    ────────────────────────────────────────────── */
+    .cb-list {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .cb-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13.5px;
+      line-height: 1.5;
+      cursor: pointer;
+    }
+
+    .cb-item input {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+
+    .cb-status {
+      margin-top: 14px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-style: italic;
+      min-height: 18px;
+    }
+
+    /* ──────────────────────────────────────────────
+       EXHIBIT 9 — The Vanishing Tooltip
+    ────────────────────────────────────────────── */
+    .tooltip-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 0;
+    }
+
+    .tooltip-host {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .info-badge {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px; height: 22px;
+      background: var(--primary);
+      color: var(--accent);
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: help;
+      flex-shrink: 0;
+    }
+
+    .info-bubble {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a2a;
+      color: #fff;
+      padding: 9px 13px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.12s;
+      z-index: 10;
+      line-height: 1.4;
+      max-width: 240px;
+      white-space: normal;
+      text-align: center;
+    }
+
+    .info-bubble::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #1a1a2a;
+    }
+
+    .tooltip-sub {
+      font-size: 11px;
+      color: #c0bcb6;
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* ── PAGE FOOTER ────────────────────────────── */
+    .page-footer {
+      background: var(--primary);
+      color: var(--accent);
+      text-align: center;
+      padding: 44px 24px;
+    }
+
+    .page-footer p { opacity: 0.5; font-size: 13px; line-height: 1.8; }
+    .page-footer strong { opacity: 1; font-size: 15px; display: block; margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────── -->
+<header class="page-header">
+  <p class="header-eyebrow">Ai2 Design Team Presents</p>
+  <h1 class="header-title">UX Chamber<br><em>of Horrors</em></h1>
+  <p class="header-desc">
+    A curated collection of lovingly crafted interaction design atrocities.
+    Each exhibit is fully functional. Godspeed.
+  </p>
+  <span class="header-tag">9 Exhibits · All Interactive</span>
+</header>
+
+<!-- ── GALLERY ─────────────────────────────────── -->
+<main class="gallery">
+
+  <!-- ── EXHIBIT 01: The Reluctant Button ─── -->
+  <div class="exhibit">
+    <div class="exhibit-header">
+      <span class="exhibit-num">Exhibit 01</span>
+      <h2 class="exhibit-title">The Reluctant Button</h2>
+    </div>
+    <div class="exhibit-body">
+      <p class="exhibit-desc">
+        A button that has sensed your approach and developed strong opinions about being pressed.
+        Move your cursor toward it to observe its avoidance behaviour.
+      </p>
+      <div class="runaway-zone" id="runaway-zone">
+        <button class="btn btn-danger" id="runaway-btn">Do Not Press</button>
+      </div>
+      <p class="catch-counter" id="catch-counter">Successful presses: 0 — it's rooting for you</p>
+    </div>
+  </div>
+
+  <!-- ── EXHIBIT 02: Password Requirements ─── -->
+  <div class="exhibit">
+    <div class="exhibit-header">
+      <span class="exhibit-num">Exhibit 02</span>
+      <h2 class="exhibit-title">Password Requirements</h2>
+    </div>
+    <div class="exhibit-body">
+      <p class="exhibit-desc">
+        Our security team has very high standards. Requirements are updated dynamically as you type
+        to ensure maximum rigour.
+      </p>
+      <input type="password" class="field-input" id="pw-input" placeholder="Create a strong password" autocomplete="off">
+      <div class="pw-reqs" id="pw-reqs">
+        <div class="pw-reqs-label">Current requirement</div>
+        <div class="pw-req-item" id="pw-req-text">Must be exactly 8 characters long</div>
+      </div>
+      <div class="strength-row">
+        <div class="strength-bars">
+          <div class="strength-bar" id="sb1"></div>
+          <div class="strength-bar" id="sb2"></div>
+          <div class="strength-bar" id="sb3"></div>
+          <div class="strength-bar" id="sb4"></div>
+        </div>
+        <span class="strength-label" id="strength-label">Too Weak</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EXHIBIT 03: Backwards Volume Slider ─── -->
+  <div class="exhibit">
+    <div class="exhibit-header">
+      <span class="exhibit-num">Exhibit 03</span>
+      <h2 class="exhibit-title">Volume Control</h2>
+    </div>
+    <div class="exhibit-body">
+      <p class="exhibit-desc">
+        Drag right to decrease volume. Drag left to increase volume.
+        The number shown is accurate. The labels are also accurate. Something here is lying.
+      </p>
+      <div class="slider-shell">
+        <div class="slider-end-labels">
+          <span>🔇 Quiet</span>
+          <span>🔊 Loud</span>
+        </div>
+        <div class="slider-row">
+          <span id="vol-icon" style="font-size:20px">🔊</span>
+          <input type="range" id="vol-slider" min="0" max="100" value="50">
+          <div class="vol-readout"><span id="vol-num">50</span><span class="vol-unit">%</span></div>
+        </div>
+        <p class="slider-hint">Tip: slide toward 🔊 to turn the volume down</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EXHIBIT 04: Swapping Yes/No ─── -->
+  <div class="exhibit">
+    <div class="exhibit-header">
+      <span class="exhibit-num">Exhibit 04</span>
+      <h2 class="exhibit-title">Confirm Action</h2>
+    </div>
+    <div class="exhibit-body">
+      <p class="exhibit-desc">
+        A simple two-option confirmation dialog. The buttons swap positions every 2 seconds
+        to keep you engaged and prevent accidental choices.
+      </p>
+      <div class="fake-modal">
+        <p class="fake-modal-title">Are you sure you want to continue?</p>
+        <p class="fake-modal-body">This action will make a permanent change to your account settings and cannot easily be undone. Please choose carefully.</p>
+        <div class="modal-actions" id="modal-actions">
+          <button class="btn btn-danger" id="yes-btn">Yes, Continue</button>
+          <button class="btn btn-ghost" id="no-btn">No, Cancel</button>
+        </div>
+        <p class="swap-notice">Buttons swap in <strong id="swap-count">2</strong>s for your convenience</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EXHIBIT 05: Cookie Consent Theatre ─── -->
+  <div class="exhibit">
+    <div class="exhibit-header">
+      <span class="exhibit-num">Exhibit 05</span>
+      <h2 class="exhibit-title">Cookie Preferences</h2>
+    </div>
+    <div class="exhibit-body">
+      <p class="exhibit-desc">
+        We respect your privacy choices. "Reject All" opens a streamlined 6-step preference
+        management wizard. The accept button is also present if you look carefully.
+      </p>
+      <div class="cookie-banner" id="cookie-banner">
+        <p>We use cookies and similar tracking technologies to enhance your browsing experience,
+          analyse site traffic, personalise content, and serve targeted advertisements.
+          Your privacy matters to us enormously.</p>
+        <div class="cookie-actions">
+          <button id="reject-big-btn">REJECT ALL COOKIES</button>
+          <button id="accept-tiny-btn">accept all</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EXHIBIT 06: The Infinite EULA ─── -->
+  <div class="exhibit">
+    <div class="exhibit-header">
+      <span class="exhibit-num">Exhibit 06</span>
+      <h2 class="exhibit-title">Terms &amp; Conditions</h2>
+    </div>
+    <div class="exhibit-body">
+      <p class="exhibit-desc">
+        Please read our terms carefully before proceeding. To ensure thoroughness, the scroll
+        position is periodically corrected if you appear to be rushing.
+      </p>
+      <div class="eula-progress-track">
+        <div class="eula-progress-bar" id="eula-bar"></div>
+      </div>
+      <div class="eula-text" id="eula-text">
+        <p><strong>1. ACCEPTANCE OF TERMS.</strong> By accessing and using this service you accept and agree to be bound by these terms and conditions. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services. Any participation will constitute acceptance of this agreement.</p>
+        <p><strong>2. DESCRIPTION OF SERVICE.</strong> The Company provides users with access to a rich collection of resources including communications tools, forums, shopping services, and personalised content through its network of properties (the "Service"). You understand that the Service is provided "AS-IS" and the Company assumes no responsibility for timeliness, deletion, mis-delivery or failure to store any user communications.</p>
+        <p><strong>3. REGISTRATION OBLIGATIONS.</strong> In consideration of your use of the Service, you represent that you are of legal age to form a binding contract and are not barred from receiving services under applicable law. You agree to (a) provide true, accurate, current and complete information and (b) maintain and promptly update this information.</p>
+        <p><strong>4. PRIVACY POLICY.</strong> Registration data and certain other information about you is subject to our Privacy Policy. You understand that through your use of the Service you consent to the collection and use of this information, including the transfer of this information to other countries for storage, processing and use by the Company and its affiliates.</p>
+        <p><strong>5. MEMBER ACCOUNT AND SECURITY.</strong> You are responsible for maintaining the confidentiality of your password and account, and are fully responsible for all activities that occur under your password or account. You agree to immediately notify the Company of any unauthorised use of your password or account.</p>
+        <p><strong>6. MODIFICATIONS TO SERVICE.</strong> The Company reserves the right at any time to modify, suspend, or discontinue the Service with or without notice. You agree that the Company shall not be liable for any modification or discontinuance of the Service.</p>
+        <p><strong>7. FINAL SECTION.</strong> You have almost reached the end of this document. The checkbox below will activate momentarily. Keep scrolling. You are so close. The end is literally the next sentence. ✓ Done.</p>
+      </div>
+      <div class="eula-check-row">
+        <input type="checkbox" id="eula-check" disabled>
+        <label for="eula-check" id="eula-check-label">I have read and agree to the Terms and Conditions</label>
+      </div>
+      <p class="eula-hint" id="eula-hint">Scroll to the bottom to unlock this checkbox</p>
+    </div>
+  </div>
+
+  <!-- ── EXHIBIT 07: Date Picker from 1900 ─── -->
+  <div class="exhibit">
+    <div class="exhibit-header">
+      <span class="exhibit-num">Exhibit 07</span>
+      <h2 class="exhibit-title">Date of Birth</h2>
+    </div>
+    <div class="exhibit-body">
+      <p class="exhibit-desc">
+        Please navigate to your birth month and year using the controls below.
+        We have started you at January 1900 for completeness.
+      </p>
+      <div class="date-picker-widget">
+        <div class="dp-nav-row">
+          <button class="dp-arrow" id="dp-prev">‹</button>
+          <span class="dp-month-label" id="dp-label">January 1900</span>
+          <button class="dp-arrow" id="dp-next">›</button>
+        </div>
+        <div class="dp-info">
+          <p>Navigate to your birth month, then click to select it.</p>
+          <div class="dp-click-stat">Clicks used: <strong id="dp-clicks">0</strong></div>
+          <div class="dp-clicks-left" id="dp-clicks-left">For March 1990: 1,082 more clicks needed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EXHIBIT 08: Cursed Checkboxes ─── -->
+  <div class="exhibit">
+    <div class="exhibit-header">
+      <span class="exhibit-num">Exhibit 08</span>
+      <h2 class="exhibit-title">Communication Preferences</h2>
+    </div>
+    <div class="exhibit-body">
+      <p class="exhibit-desc">
+        Select your preferences below. For consistency, selecting any option will automatically
+        update all the others to maintain a harmonious state.
+      </p>
+      <div class="cb-list" id="cb-list">
+        <label class="cb-item">
+          <input type="checkbox" class="cursed-cb" id="cb1">
+          I agree to receive promotional emails
+        </label>
+        <label class="cb-item">
+          <input type="checkbox" class="cursed-cb" id="cb2">
+          I do NOT agree to receive promotional emails
+        </label>
+        <label class="cb-item">
+          <input type="checkbox" class="cursed-cb" id="cb3">
+          I agree to share my data with third parties
+        </label>
+        <label class="cb-item">
+          <input type="checkbox" class="cursed-cb" id="cb4">
+          I have NOT read the terms and conditions
+        </label>
+        <label class="cb-item">
+          <input type="checkbox" class="cursed-cb" id="cb5">
+          I consent to all of the above options simultaneously
+        </label>
+      </div>
+      <p class="cb-status" id="cb-status">No preferences selected. Your choices are your own.</p>
+    </div>
+  </div>
+
+  <!-- ── EXHIBIT 09: The Vanishing Tooltip ─── -->
+  <div class="exhibit">
+    <div class="exhibit-header">
+      <span class="exhibit-num">Exhibit 09</span>
+      <h2 class="exhibit-title">Helpful Information</h2>
+    </div>
+    <div class="exhibit-body">
+      <p class="exhibit-desc">
+        Critical formatting requirements for this field are available on hover.
+        The tooltip appears briefly while you are hovering the icon, then self-conceals.
+      </p>
+      <div class="tooltip-stage">
+        <div class="tooltip-host">
+          <span>This field is required</span>
+          <div class="info-badge" id="info-badge">
+            i
+            <div class="info-bubble" id="info-tip">
+              This field requires a valid input formatted as MM/DD/YYYY, no dashes, no slashes, letters only, uppercase, divisible by — oh, times up.
+            </div>
+          </div>
+        </div>
+        <input type="text" class="field-input" placeholder="Required field (hover ⓘ for format)" style="width:100%">
+        <p class="tooltip-sub">The tooltip vanishes after ~300ms. Exactly enough time to notice it, not enough to read it.</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── COOKIE WIZARD OVERLAY ─────────────────── -->
+<div class="cookie-overlay" id="cookie-overlay">
+  <div class="cookie-wizard-panel" id="wizard-panel">
+    <!-- rendered by JS -->
+  </div>
+</div>
+
+<!-- ── FOOTER ──────────────────────────────────── -->
+<footer class="page-footer">
+  <p>
+    <strong>UX Chamber of Horrors — Ai2 Design Team</strong>
+    Made with equal parts craft and cruelty.<br>
+    No users were permanently harmed in the making of this page.<br>
+    (Some were mildly frustrated. That was the point.)
+  </p>
+</footer>
+
+<script>
+  /* ────────────────────────────────────────────
+     EXHIBIT 01 — The Reluctant Button
+  ──────────────────────────────────────────── */
+  (function() {
+    const zone  = document.getElementById('runaway-zone');
+    const btn   = document.getElementById('runaway-btn');
+    const counter = document.getElementById('catch-counter');
+    let presses = 0;
+
+    // Initial position (pixels from top-left of zone)
+    let bx = 0, by = 0;
+
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+    function getBtnCenter() {
+      const zr = zone.getBoundingClientRect();
+      const br = btn.getBoundingClientRect();
+      return {
+        x: br.left + br.width / 2 - zr.left,
+        y: br.top  + br.height / 2 - zr.top,
+        w: br.width,
+        h: br.height,
+        zw: zr.width,
+        zh: zr.height
+      };
+    }
+
+    zone.addEventListener('mousemove', function(e) {
+      const zr = zone.getBoundingClientRect();
+      const mx = e.clientX - zr.left;
+      const my = e.clientY - zr.top;
+      const c = getBtnCenter();
+      const dist = Math.hypot(mx - c.x, my - c.y);
+      const RADIUS = 110;
+
+      if (dist < RADIUS) {
+        const angle  = Math.atan2(c.y - my, c.x - mx);
+        const push   = ((RADIUS - dist) / RADIUS) * 130;
+        let nx = c.x + Math.cos(angle) * push;
+        let ny = c.y + Math.sin(angle) * push;
+
+        // Keep within zone bounds (account for button size)
+        nx = clamp(nx, c.w / 2 + 4, c.zw - c.w / 2 - 4);
+        ny = clamp(ny, c.h / 2 + 4, c.zh - c.h / 2 - 4);
+
+        btn.style.left = nx + 'px';
+        btn.style.top  = ny + 'px';
+        btn.style.transform = 'translate(-50%, -50%)';
+      }
+    });
+
+    btn.addEventListener('click', function() {
+      presses++;
+      const msgs = [
+        `${presses} — it finally happened`,
+        `${presses} — caught again`,
+        `${presses} — you're persistent`,
+        `${presses} — okay wow`,
+        `${presses} — please stop`,
+        `${presses} — still going?`,
+        `${presses} — alright, you win`,
+      ];
+      counter.textContent = 'Successful presses: ' + (msgs[presses - 1] || presses);
+      // Teleport to a random edge of the zone after being caught
+      const zr = zone.getBoundingClientRect();
+      const br = btn.getBoundingClientRect();
+      const margin = 50;
+      btn.style.left = clamp(Math.random() * zr.width, margin, zr.width  - margin) + 'px';
+      btn.style.top  = clamp(Math.random() * zr.height, margin, zr.height - margin) + 'px';
+      btn.style.transform = 'translate(-50%, -50%)';
+    });
+  })();
+
+  /* ────────────────────────────────────────────
+     EXHIBIT 02 — Password Requirements
+  ──────────────────────────────────────────── */
+  (function() {
+    const reqs = [
+      'Must be exactly 8 characters long',
+      'Must be between 12 and 15 characters',
+      'Must contain at least 3 emoji characters',
+      'Must not contain any vowels (a, e, i, o, u)',
+      'Must be a perfect palindrome',
+      'Must contain your birth year (we don\'t know it)',
+      'Must include the word "password" (case sensitive)',
+      'Must NOT include the word "password"',
+      'Must consist only of numbers that are also prime',
+      'Must begin and end with the same character',
+      'Must contain all 26 letters of the alphabet',
+      'Must not resemble any of your previous 400 passwords',
+      'Must be composed in iambic pentameter',
+      'Must not contain any consecutive repeating characters',
+      'Must contain ONLY consecutive repeating characters',
+      'Must be your mother\'s maiden name in reverse (with a 4)',
+    ];
+
+    const pwInput  = document.getElementById('pw-input');
+    const reqText  = document.getElementById('pw-req-text');
+    const sbEls    = [1,2,3,4].map(i => document.getElementById('sb' + i));
+    const strLabel = document.getElementById('strength-label');
+    let ri = 0;
+
+    pwInput.addEventListener('input', function() {
+      if (this.value.length > 0) {
+        ri = (ri + 1) % reqs.length;
+        reqText.textContent = reqs[ri];
+      }
+      // Strength meter: always stays at "Too Weak" with one red bar
+      const len = this.value.length;
+      sbEls.forEach((b, i) => {
+        b.style.background = (len > 0 && i === 0) ? '#f0529c' : '#e5e0d8';
+      });
+      strLabel.textContent = len === 0 ? 'Too Weak' : 'Still Too Weak';
+    });
+  })();
+
+  /* ────────────────────────────────────────────
+     EXHIBIT 03 — Backwards Volume Slider
+  ──────────────────────────────────────────── */
+  (function() {
+    const slider  = document.getElementById('vol-slider');
+    const numEl   = document.getElementById('vol-num');
+    const iconEl  = document.getElementById('vol-icon');
+
+    function update() {
+      const v = parseInt(slider.value);
+      // Display raw value — moving right (RTL) decreases the raw value
+      numEl.textContent = v;
+      // Gradient fills from left (but direction:rtl means left = high value visually)
+      slider.style.background =
+        `linear-gradient(to left, var(--primary) ${v}%, #ddd ${v}%)`;
+      // Icons are backwards relative to behaviour
+      iconEl.textContent = v > 66 ? '🔊' : v > 33 ? '🎵' : '🔇';
+    }
+
+    slider.addEventListener('input', update);
+    update();
+  })();
+
+  /* ────────────────────────────────────────────
+     EXHIBIT 04 — Swapping Yes/No
+  ──────────────────────────────────────────── */
+  (function() {
+    const actionsEl  = document.getElementById('modal-actions');
+    const countEl    = document.getElementById('swap-count');
+    const yesBtn     = document.getElementById('yes-btn');
+    const noBtn      = document.getElementById('no-btn');
+    let countdown = 2;
+    let reversed  = false;
+
+    setInterval(function() {
+      countdown--;
+      countEl.textContent = countdown;
+      if (countdown <= 0) {
+        reversed = !reversed;
+        actionsEl.style.flexDirection = reversed ? 'row-reverse' : 'row';
+        countdown = 2;
+      }
+    }, 1000);
+
+    yesBtn.addEventListener('click', function() {
+      alert('Action confirmed! (Hopefully you pressed the right button.)');
+    });
+    noBtn.addEventListener('click', function() {
+      alert('Action cancelled. Or confirmed. The buttons may have swapped mid-click. Hard to say.');
+    });
+  })();
+
+  /* ────────────────────────────────────────────
+     EXHIBIT 05 — Cookie Consent Theatre
+  ──────────────────────────────────────────── */
+  (function() {
+    const overlay  = document.getElementById('cookie-overlay');
+    const panel    = document.getElementById('wizard-panel');
+    let step = 0;
+
+    const steps = [
+      {
+        title: 'Manage Cookie Preferences',
+        sub:   'Step 1 of 6 — Categories',
+        body:  `
+          <div class="cookie-row">
+            <div class="cookie-row-info"><h4>Strictly Necessary</h4><p>Required for the website to function. Cannot be disabled.</p></div>
+            <label class="toggle"><input type="checkbox" checked disabled><span class="toggle-track"></span></label>
+          </div>
+          <div class="cookie-row">
+            <div class="cookie-row-info"><h4>Performance &amp; Analytics</h4><p>Help us understand how visitors interact with our website.</p></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
+          </div>
+          <div class="cookie-row">
+            <div class="cookie-row-info"><h4>Targeting &amp; Advertising</h4><p>Used to deliver personalised advertisements based on your profile.</p></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
+          </div>
+          <div class="cookie-row" style="border:none">
+            <div class="cookie-row-info"><h4>Session Recording</h4><p>Records your screen for our own review and improvement purposes.</p></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
+          </div>`
+      },
+      {
+        title: 'Analytics Sub-Categories',
+        sub:   'Step 2 of 6 — Granular Analytics',
+        body:  `
+          <div class="cookie-row">
+            <div class="cookie-row-info"><h4>Heatmapping</h4><p>Tracks every mouse movement you make on this website.</p></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
+          </div>
+          <div class="cookie-row">
+            <div class="cookie-row-info"><h4>Keystroke Logging</h4><p>Helps us improve form design. Totally standard practice.</p></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
+          </div>
+          <div class="cookie-row" style="border:none">
+            <div class="cookie-row-info"><h4>Behavioural Profiling</h4><p>Builds a detailed profile of your browsing preferences and habits.</p></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
+          </div>`
+      },
+      {
+        title: 'Legitimate Interest',
+        sub:   'Step 3 of 6 — Vendor Purposes',
+        body:  `<p style="font-size:13px;line-height:1.8;color:#555">We and our <strong>847 trusted partners</strong> process your data under legitimate interest as a legal basis. To object to this processing, you must individually review and opt out from each of our 847 partners.<br><br>Would you like to continue to the partner list?</p>`
+      },
+      {
+        title: 'Confirm Your Choices',
+        sub:   'Step 4 of 6 — Review',
+        body:  `<p style="font-size:13px;line-height:1.8;color:#555">You have chosen to opt out of certain cookie categories. Please be aware this may:<br><br>• Degrade your browsing experience significantly<br>• Cause some features to stop working<br>• Make us quite sad<br><br>Your preferences will be remembered for <strong>24 hours</strong>, after which this prompt will reappear.</p>`
+      },
+      {
+        title: 'Are You Absolutely Sure?',
+        sub:   'Step 5 of 6 — Final Confirmation',
+        body:  `<p style="font-size:13px;line-height:1.8;color:#555">We just want to triple-check. By continuing, you acknowledge that:<br><br>• Some content may be less relevant<br>• Your choices may reset unexpectedly<br>• This exact screen may reappear on your next visit<br>• Or on this visit<br>• Actually quite soon</p>`
+      },
+      {
+        title: 'Preferences Saved!',
+        sub:   'Step 6 of 6 — Complete',
+        body:  `<p style="font-size:13px;line-height:1.8;color:#555">Your cookie preferences have been recorded. Thank you for your patience and co-operation.<br><br><strong>Note:</strong> Your settings will take effect after you clear your cache, close all browser windows, wait 72 hours, and restart your router.</p>`
+      },
+    ];
+
+    function render() {
+      const s = steps[step];
+      const isLast = step === steps.length - 1;
+      panel.innerHTML = `
+        <h2 class="wizard-title">${s.title}</h2>
+        <p class="wizard-step-label">${s.sub}</p>
+        ${s.body}
+        <div class="wizard-footer">
+          ${step > 0 && !isLast ? `<button class="btn btn-ghost" id="wiz-back">← Back</button>` : ''}
+          ${isLast
+            ? `<button class="btn btn-primary" id="wiz-close">Close</button>`
+            : `<button class="btn btn-primary" id="wiz-next">Continue →</button>`}
+        </div>`;
+
+      const nextBtn  = document.getElementById('wiz-next');
+      const backBtn  = document.getElementById('wiz-back');
+      const closeBtn = document.getElementById('wiz-close');
+      if (nextBtn)  nextBtn.addEventListener('click',  () => { step++; render(); });
+      if (backBtn)  backBtn.addEventListener('click',  () => { step--; render(); });
+      if (closeBtn) closeBtn.addEventListener('click', () => { overlay.classList.remove('open'); step = 0; });
+    }
+
+    document.getElementById('reject-big-btn').addEventListener('click', function() {
+      step = 0;
+      render();
+      overlay.classList.add('open');
+    });
+
+    document.getElementById('accept-tiny-btn').addEventListener('click', function() {
+      this.textContent = 'accepted ✓';
+      this.style.color = 'rgba(250,242,233,0.55)';
+    });
+  })();
+
+  /* ────────────────────────────────────────────
+     EXHIBIT 06 — Infinite EULA
+  ──────────────────────────────────────────── */
+  (function() {
+    const box     = document.getElementById('eula-text');
+    const bar     = document.getElementById('eula-bar');
+    const check   = document.getElementById('eula-check');
+    const hint    = document.getElementById('eula-hint');
+    let unlocked  = false;
+    let driftTimer;
+
+    function progress() {
+      const max = box.scrollHeight - box.clientHeight;
+      return max > 0 ? (box.scrollTop / max) * 100 : 0;
+    }
+
+    function drift() {
+      if (!unlocked) {
+        box.scrollTop = Math.max(0, box.scrollTop - 45);
+        bar.style.width = Math.max(0, progress()) + '%';
+      }
+    }
+
+    box.addEventListener('scroll', function() {
+      const pct = progress();
+      bar.style.width = pct + '%';
+      clearTimeout(driftTimer);
+      if (!unlocked) {
+        driftTimer = setTimeout(drift, 1200);
+      }
+      if (pct >= 99 && !unlocked) {
+        unlocked = true;
+        check.disabled = false;
+        hint.textContent = 'You may now check the box above.';
+        hint.style.color = 'var(--green)';
+      }
+    });
+  })();
+
+  /* ────────────────────────────────────────────
+     EXHIBIT 07 — Date Picker from 1900
+  ──────────────────────────────────────────── */
+  (function() {
+    const MONTHS = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+    const label     = document.getElementById('dp-label');
+    const clicksEl  = document.getElementById('dp-clicks');
+    const leftEl    = document.getElementById('dp-clicks-left');
+    let year = 1900, month = 0, clicks = 0;
+
+    const TARGET_YEAR = 1990, TARGET_MONTH = 2; // March 1990
+
+    function update() {
+      label.textContent = MONTHS[month] + ' ' + year;
+      clicksEl.textContent = clicks;
+      const cur = year * 12 + month;
+      const tgt = TARGET_YEAR * 12 + TARGET_MONTH;
+      const diff = tgt - cur;
+      if (diff > 0) {
+        leftEl.textContent = 'For March 1990: ' + diff.toLocaleString() + ' more click' + (diff === 1 ? '' : 's') + ' needed';
+        leftEl.style.color = 'var(--red)';
+      } else if (diff === 0) {
+        leftEl.textContent = '🎉 You made it! (Now click a day — oh wait, there are no days)';
+        leftEl.style.color = 'var(--green)';
+      } else {
+        leftEl.textContent = 'You\'ve gone past March 1990 by ' + Math.abs(diff) + ' month' + (Math.abs(diff) === 1 ? '' : 's');
+        leftEl.style.color = 'var(--text-muted)';
+      }
+    }
+
+    document.getElementById('dp-prev').addEventListener('click', function() {
+      clicks++;
+      if (month === 0) { month = 11; if (year > 1900) year--; }
+      else month--;
+      update();
+    });
+
+    document.getElementById('dp-next').addEventListener('click', function() {
+      clicks++;
+      if (month === 11) { month = 0; year++; }
+      else month++;
+      update();
+    });
+
+    update();
+  })();
+
+  /* ────────────────────────────────────────────
+     EXHIBIT 08 — Cursed Checkboxes
+  ──────────────────────────────────────────── */
+  (function() {
+    const cbs    = Array.from(document.querySelectorAll('.cursed-cb'));
+    const status = document.getElementById('cb-status');
+
+    cbs.forEach(function(cb) {
+      cb.addEventListener('change', function() {
+        // Invert all OTHER checkboxes
+        cbs.forEach(function(other) {
+          if (other !== cb) other.checked = !cb.checked;
+        });
+        status.textContent = cb.checked
+          ? 'Preference saved. All contradictory options have been updated accordingly.'
+          : 'Preference cleared. All other options have been thoughtfully inverted for you.';
+      });
+    });
+  })();
+
+  /* ────────────────────────────────────────────
+     EXHIBIT 09 — The Vanishing Tooltip
+  ──────────────────────────────────────────── */
+  (function() {
+    const badge = document.getElementById('info-badge');
+    const tip   = document.getElementById('info-tip');
+    let hideTimer;
+
+    badge.addEventListener('mouseenter', function() {
+      clearTimeout(hideTimer);
+      tip.style.opacity = '1';
+      hideTimer = setTimeout(function() {
+        tip.style.opacity = '0';
+      }, 280); // Just long enough to notice, not long enough to read
+    });
+
+    badge.addEventListener('mouseleave', function() {
+      clearTimeout(hideTimer);
+      tip.style.opacity = '0';
+    });
+  })();
+</script>
+</body>
+</html>
