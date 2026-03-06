@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OlmoEarth Studio – Ingestion Prototype</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; background: #f0ead8; color: #1a1a1a; height: 100vh; display: flex; overflow: hidden; font-size: 13px; line-height: 1.5; }
+
+    /* ── Sidebar ─────────────────────────────────────── */
+    .sidebar { width: 196px; background: #192e2b; display: flex; flex-direction: column; flex-shrink: 0; }
+    .sidebar-logo { padding: 13px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .logo-icon { width: 26px; height: 26px; background: #2ad49c; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: #192e2b; flex-shrink: 0; }
+    .logo-text { color: white; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+    .logo-divider { color: rgba(255,255,255,0.25); margin: 0 2px; }
+    .nav-section { padding: 8px 0; flex: 1; overflow-y: auto; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; color: rgba(255,255,255,0.55); cursor: pointer; font-size: 13px; transition: all 0.12s; border-left: 2px solid transparent; user-select: none; }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.9); }
+    .nav-item.active { background: rgba(42,212,156,0.12); color: #2ad49c; border-left-color: #2ad49c; font-weight: 500; }
+    .nav-icon { width: 16px; text-align: center; font-size: 14px; flex-shrink: 0; }
+    .nav-sub { padding-left: 42px; }
+    .nav-sub .nav-item { padding: 7px 12px 7px 0; font-size: 12px; border-left: none; }
+
+    /* ── Main ────────────────────────────────────────── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+    .topbar { background: #192e2b; color: white; padding: 0 20px; height: 44px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
+    .breadcrumb { font-size: 13px; color: rgba(255,255,255,0.55); display: flex; align-items: center; gap: 5px; }
+    .breadcrumb a { color: rgba(255,255,255,0.55); cursor: pointer; }
+    .breadcrumb a:hover { color: white; }
+    .breadcrumb-sep { opacity: 0.3; }
+    .breadcrumb-current { color: white; }
+    .topbar-right { display: flex; gap: 12px; align-items: center; }
+    .avatar { width: 26px; height: 26px; border-radius: 50%; background: #2ad49c; color: #192e2b; font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+
+    .content-area { flex: 1; overflow-y: auto; padding: 24px; }
+    .view { display: none; }
+    .view.active { display: flex; flex-direction: column; gap: 18px; }
+
+    /* ── Buttons ─────────────────────────────────────── */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.12s; white-space: nowrap; text-decoration: none; }
+    .btn-primary { background: #192e2b; color: white; border-color: #192e2b; }
+    .btn-primary:hover { background: #1f3a36; }
+    .btn-accent { background: #2ad49c; color: #192e2b; border-color: #2ad49c; }
+    .btn-accent:hover { background: #22b589; }
+    .btn-secondary { background: white; color: #2a2a2a; border-color: #ddd8cc; }
+    .btn-secondary:hover { border-color: #aaa49a; }
+    .btn-ghost { background: transparent; color: #666; border: none; }
+    .btn-ghost:hover { color: #222; }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+    .btn-link { background: none; border: none; color: #2ad49c; padding: 0; font-weight: 500; cursor: pointer; font-size: 13px; }
+    .btn-link:hover { text-decoration: underline; }
+
+    /* ── Cards ───────────────────────────────────────── */
+    .card { background: white; border-radius: 8px; border: 1px solid #e0dbd0; }
+
+    /* ── Page header ─────────────────────────────────── */
+    .page-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .page-title { font-size: 20px; font-weight: 600; color: #1a2e2b; letter-spacing: -0.02em; }
+    .page-subtitle { font-size: 13px; color: #888; margin-top: 3px; }
+    .header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+    /* ── Table ───────────────────────────────────────── */
+    .table-toolbar { padding: 10px 14px; border-bottom: 1px solid #f0ebe0; display: flex; align-items: center; gap: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 9px 14px; font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #ede8de; background: #faf8f5; white-space: nowrap; }
+    td { padding: 11px 14px; border-bottom: 1px solid #f5f1ea; color: #2a2a2a; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #faf8f5; cursor: pointer; }
+    .link { color: #1a2e2b; font-weight: 500; cursor: pointer; }
+    .link:hover { text-decoration: underline; }
+    .text-muted { color: #888; }
+    .text-sm { font-size: 12px; }
+    code { font-family: 'SF Mono', 'Monaco', 'Menlo', monospace; font-size: 12px; background: #f0ebe0; padding: 1px 5px; border-radius: 3px; }
+
+    /* ── Badges ──────────────────────────────────────── */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+    .badge-neutral { background: #f0ebe0; color: #666; }
+    .badge-ready { background: #dcfce7; color: #166534; }
+    .badge-processing { background: #fef3c7; color: #92400e; }
+    .badge-error { background: #fee2e2; color: #991b1b; }
+    .badge-info { background: #dbeafe; color: #1e40af; }
+
+    /* ── Tabs ────────────────────────────────────────── */
+    .tabs { display: flex; border-bottom: 1px solid #e0dbd0; }
+    .tab { padding: 9px 14px; font-size: 13px; cursor: pointer; color: #888; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.12s; }
+    .tab:hover { color: #333; }
+    .tab.active { color: #1a2e2b; border-bottom-color: #1a2e2b; font-weight: 500; }
+
+    /* ── Empty state ─────────────────────────────────── */
+    .empty-state { text-align: center; padding: 52px 20px; }
+    .empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.35; }
+    .empty-title { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 6px; }
+    .empty-desc { color: #888; max-width: 380px; margin: 0 auto 20px; line-height: 1.65; }
+
+    /* ── Callout ─────────────────────────────────────── */
+    .callout { display: flex; gap: 10px; padding: 11px 14px; border-radius: 6px; font-size: 13px; line-height: 1.5; }
+    .callout-success { background: #f0fdf8; border: 1px solid #a7f3d0; color: #166534; }
+    .callout-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .callout-warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+
+    /* ── Wizard scaffold ─────────────────────────────── */
+    .wizard-wrap { max-width: 780px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 18px; }
+    .wizard-title { font-size: 19px; font-weight: 600; color: #1a2e2b; letter-spacing: -0.02em; margin-bottom: 2px; }
+    .wizard-subtitle { font-size: 13px; color: #666; }
+
+    /* Stepper */
+    .stepper { display: flex; align-items: center; }
+    .step-item { display: flex; align-items: center; gap: 8px; }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; transition: all 0.2s; }
+    .step-num.pending { background: #e8e3d8; color: #999; }
+    .step-num.active { background: #192e2b; color: white; }
+    .step-num.done { background: #2ad49c; color: #192e2b; font-size: 14px; }
+    .step-label { font-size: 12px; font-weight: 500; color: #aaa; white-space: nowrap; }
+    .step-label.active { color: #1a2e2b; }
+    .step-label.done { color: #888; }
+    .step-connector { flex: 1; height: 1px; background: #e8e3d8; margin: 0 10px; min-width: 20px; }
+    .step-connector.done { background: #2ad49c; }
+
+    /* Wizard footer */
+    .wizard-footer { display: flex; justify-content: space-between; align-items: center; }
+    .wizard-footer-right { display: flex; gap: 8px; }
+
+    /* ── Upload zone ─────────────────────────────────── */
+    .upload-zone { border: 2px dashed #c8c2b4; border-radius: 10px; padding: 44px 24px; text-align: center; transition: all 0.2s; cursor: pointer; background: #faf8f5; }
+    .upload-zone:hover { border-color: #2ad49c; background: #f0fdf8; }
+    .upload-zone.done { border-color: #2ad49c; border-style: solid; background: #f0fdf8; pointer-events: none; }
+    .upload-icon { font-size: 30px; margin-bottom: 10px; }
+    .upload-title { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 5px; }
+    .upload-subtitle { color: #888; font-size: 13px; margin-bottom: 14px; }
+    .format-pills { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+    .format-pill { padding: 3px 9px; background: #f0ebe0; border-radius: 99px; font-size: 11px; font-weight: 500; color: #666; }
+    .file-info-bar { display: flex; align-items: center; gap: 10px; background: white; border: 1px solid #ddd8cc; border-radius: 6px; padding: 10px 14px; margin-top: 12px; }
+    .file-info-name { font-weight: 500; color: #1a2e2b; font-size: 13px; }
+    .file-info-meta { color: #888; font-size: 12px; margin-top: 1px; }
+
+    /* ── Validating ──────────────────────────────────── */
+    .validating-wrap { padding: 36px 24px; text-align: center; }
+    .validating-title { font-size: 16px; font-weight: 600; color: #1a2e2b; margin-bottom: 4px; }
+    .validating-sub { color: #888; margin-bottom: 22px; }
+    .progress-track { background: #f0ebe0; border-radius: 99px; height: 5px; overflow: hidden; margin-bottom: 26px; max-width: 400px; margin-left: auto; margin-right: auto; }
+    .progress-fill { height: 100%; background: #2ad49c; border-radius: 99px; width: 0; transition: width 0.35s ease; }
+    .check-list { display: flex; flex-direction: column; gap: 9px; max-width: 380px; margin: 0 auto; text-align: left; }
+    .check-item { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .check-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; transition: all 0.2s; }
+    .check-icon.idle { background: #ede8de; }
+    .check-icon.running { background: #fef9c3; }
+    .check-icon.ok { background: #dcfce7; color: #166534; }
+    .check-icon.warn { background: #fef3c7; color: #92400e; }
+    .check-text { color: #bbb; font-size: 13px; }
+    .check-text.active { color: #1a2e2b; font-weight: 500; }
+    .check-text.done { color: #888; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { width: 11px; height: 11px; border: 2px solid #e8e3d8; border-top-color: #2ad49c; border-radius: 50%; animation: spin 0.7s linear infinite; }
+
+    /* ── Review / quality ────────────────────────────── */
+    .quality-banner { display: flex; align-items: center; gap: 20px; padding: 16px 20px; background: #f0fdf8; border: 1px solid #a7f3d0; border-radius: 8px; }
+    .quality-score { text-align: center; flex-shrink: 0; }
+    .quality-pct { font-size: 28px; font-weight: 700; color: #166534; line-height: 1; }
+    .quality-label { font-size: 10px; font-weight: 600; color: #166534; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+    .quality-detail { flex: 1; }
+    .quality-headline { font-size: 14px; font-weight: 600; color: #166534; margin-bottom: 6px; }
+    .health-track { height: 7px; background: #d1fae5; border-radius: 99px; overflow: hidden; }
+    .health-fill { height: 100%; background: #2ad49c; border-radius: 99px; }
+    .quality-note { font-size: 12px; color: #888; margin-top: 5px; }
+    .autodetect-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: #f0fdf8; border: 1px solid #a7f3d0; border-radius: 99px; font-size: 11px; color: #166534; font-weight: 500; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .stat-box { padding: 13px 15px; }
+    .stat-val { font-size: 21px; font-weight: 700; color: #1a2e2b; }
+    .stat-lbl { font-size: 11px; color: #888; margin-top: 2px; }
+
+    .section-head { padding: 12px 16px; border-bottom: 1px solid #f0ebe0; display: flex; justify-content: space-between; align-items: center; }
+    .section-label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .issue-row { display: flex; align-items: flex-start; gap: 10px; padding: 11px 16px; border-bottom: 1px solid #f8f4ee; }
+    .issue-row:last-child { border-bottom: none; }
+    .issue-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+    .dot-warn { background: #f59e0b; }
+    .dot-info { background: #3b82f6; }
+    .dot-ok { background: #22c55e; }
+    .issue-body { flex: 1; }
+    .issue-title { font-weight: 500; color: #1a1a1a; margin-bottom: 2px; }
+    .issue-desc { font-size: 12px; color: #888; line-height: 1.5; }
+    .issue-fix { font-size: 12px; color: #2ad49c; font-weight: 500; cursor: pointer; margin-top: 3px; }
+
+    .map-col { display: grid; grid-template-columns: max-content 1fr max-content; gap: 0; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .tag-coord { background: #ede9fe; color: #6d28d9; }
+    .tag-label { background: #dbeafe; color: #1e40af; }
+    .tag-time { background: #fce7f3; color: #9d174d; }
+    .tag-id { background: #f0fdf4; color: #166534; }
+    .tag-meta { background: #f3f4f6; color: #6b7280; }
+
+    .data-preview { overflow-x: auto; }
+    .data-preview table th { font-size: 11px; padding: 8px 12px; }
+    .data-preview table td { padding: 7px 12px; font-size: 12px; font-family: 'SF Mono','Monaco','Menlo',monospace; }
+
+    .class-pills { display: flex; flex-wrap: wrap; gap: 6px; padding: 14px 16px; }
+
+    /* ── Configure ───────────────────────────────────── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px; }
+    .form-input { width: 100%; padding: 8px 11px; border: 1px solid #ddd8cc; border-radius: 6px; font-size: 13px; color: #1a1a1a; background: white; transition: border-color 0.15s; }
+    .form-input:focus { outline: none; border-color: #2ad49c; box-shadow: 0 0 0 3px rgba(42,212,156,0.12); }
+    .form-hint { font-size: 11px; color: #999; margin-top: 4px; line-height: 1.5; }
+    .input-row { display: flex; gap: 8px; align-items: center; }
+    .input-unit { font-size: 13px; color: #888; white-space: nowrap; }
+
+    .source-option { display: flex; align-items: flex-start; gap: 10px; padding: 12px 13px; border: 1.5px solid #ddd8cc; border-radius: 7px; cursor: pointer; transition: all 0.12s; margin-bottom: 7px; }
+    .source-option:last-child { margin-bottom: 0; }
+    .source-option.selected { border-color: #2ad49c; background: #f0fdf8; }
+    .source-option input[type=radio] { margin-top: 2px; flex-shrink: 0; }
+    .source-title { font-weight: 500; color: #1a2e2b; font-size: 13px; }
+    .source-meta { font-size: 11px; color: #888; margin-top: 1px; }
+    .source-badge { margin-left: auto; flex-shrink: 0; }
+
+    /* ── Success ─────────────────────────────────────── */
+    .success-card { padding: 40px 24px; text-align: center; }
+    .success-ring { width: 58px; height: 58px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 26px; }
+    .success-title { font-size: 20px; font-weight: 700; color: #1a2e2b; margin-bottom: 6px; letter-spacing: -0.02em; }
+    .success-desc { color: #666; max-width: 420px; margin: 0 auto 22px; line-height: 1.65; }
+    .summary-box { background: #faf8f5; border: 1px solid #e0dbd0; border-radius: 8px; padding: 16px; text-align: left; max-width: 360px; margin: 0 auto 24px; }
+    .summary-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f0ebe0; font-size: 13px; }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-key { color: #888; }
+    .next-steps { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── Project page datasets list ──────────────────── */
+    .dataset-row { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid #f5f1ea; }
+    .dataset-row:last-child { border-bottom: none; }
+    .dataset-icon { width: 32px; height: 32px; background: #ede9fe; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .dataset-name { font-weight: 500; color: #1a2e2b; font-size: 13px; }
+    .dataset-meta { font-size: 12px; color: #888; margin-top: 1px; }
+    .dataset-status { margin-left: auto; flex-shrink: 0; }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c8c2b4; border-radius: 99px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">O</div>
+    <span class="logo-text">OlmoEarth<span class="logo-divider"> | </span>Studio</span>
+  </div>
+  <nav class="nav-section">
+    <div class="nav-item">
+      <span class="nav-icon">≡</span> My queue
+    </div>
+    <div class="nav-item active" id="nav-projects" onclick="showView('projects')">
+      <span class="nav-icon">⊞</span> Projects
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⬡</span> Model builder
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⊕</span> Map publisher
+    </div>
+    <div style="margin-top: auto;">
+      <div class="nav-item">
+        <span class="nav-icon">○</span> Accounts
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">◎</span> Organizations
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">▣</span> Analytics
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<!-- ═══════════════════ MAIN ═══════════════════════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="breadcrumb" id="breadcrumb">
+      <span class="breadcrumb-current">Projects</span>
+    </div>
+    <div class="topbar-right">
+      <span style="font-size: 12px; color: rgba(255,255,255,0.4);">Karen G.</span>
+      <div class="avatar">KG</div>
+    </div>
+  </div>
+
+  <div class="content-area">
+
+    <!-- ─────────────── VIEW: PROJECTS ─────────────── -->
+    <div class="view active" id="view-projects">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Projects</h1>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="showView('project')">+ New project</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-toolbar">
+          <button class="btn btn-ghost btn-sm">⊟ Manage columns</button>
+          <button class="btn btn-ghost btn-sm">⊿ Filter</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:32px;"><input type="checkbox" /></th>
+              <th>Name ↑</th>
+              <th>Description</th>
+              <th>Data labeled</th>
+              <th>Created</th>
+              <th>Organization</th>
+              <th style="width:32px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr onclick="showView('project')">
+              <td><input type="checkbox" /></td>
+              <td><span class="link">Global Ecosystem Atlas MO4-5 Hyper-Arid Deserts (Africa) Demo</span></td>
+              <td class="text-muted">—</td>
+              <td>0%</td>
+              <td>12/31/2024</td>
+              <td class="text-muted">Ai2 – Admin</td>
+              <td class="text-muted">⋮</td>
+            </tr>
+            <tr onclick="showView('project')">
+              <td><input type="checkbox" /></td>
+              <td><span class="link">Amazon Forest Loss</span></td>
+              <td class="text-muted">Karen's sample project</td>
+              <td>0%</td>
+              <td>11/10/2025</td>
+              <td class="text-muted">Ai2 – Admin</td>
+              <td class="text-muted">⋮</td>
+            </tr>
+            <tr onclick="showView('project')">
+              <td><input type="checkbox" /></td>
+              <td><span class="link">Amboseli Original Labels</span></td>
+              <td class="text-muted">Africa Wildlife Foundation</td>
+              <td>14%</td>
+              <td>7/17/2025</td>
+              <td class="text-muted">African Wildlife Fo...</td>
+              <td class="text-muted">⋮</td>
+            </tr>
+            <tr onclick="showView('project')">
+              <td><input type="checkbox" /></td>
+              <td><span class="link">Artisanal Mining Africa</span></td>
+              <td class="text-muted">—</td>
+              <td>0%</td>
+              <td>9/10/2025</td>
+              <td class="text-muted">Food and Agricultu...</td>
+              <td class="text-muted">⋮</td>
+            </tr>
+            <tr onclick="showView('project')">
+              <td><input type="checkbox" /></td>
+              <td><span class="link">Crop Type Mapping</span></td>
+              <td class="text-muted">—</td>
+              <td>0%</td>
+              <td>11/10/2025</td>
+              <td class="text-muted">Demo</td>
+              <td class="text-muted">⋮</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ─────────────── VIEW: PROJECT ──────────────── -->
+    <div class="view" id="view-project">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Global Ecosystem Atlas MO4-5</h1>
+          <p class="page-subtitle">Hyper-Arid Deserts (Africa) Demo · Created 12/31/2024 · Ai2 – Admin</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary">Project settings</button>
+          <button class="btn btn-accent" onclick="startWizard()">+ Ingest data</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active">Datasets</div>
+        <div class="tab">Models</div>
+        <div class="tab">Tasks</div>
+        <div class="tab">Analytics</div>
+      </div>
+
+      <!-- Dataset list (hidden until after success) -->
+      <div id="dataset-list" style="display:none;" class="card">
+        <div class="section-head">
+          <div class="section-label">1 dataset</div>
+          <button class="btn btn-accent btn-sm" onclick="startWizard()">+ Ingest data</button>
+        </div>
+        <div class="dataset-row">
+          <div class="dataset-icon">📦</div>
+          <div>
+            <div class="dataset-name">OlmoEarth_sample_file_1</div>
+            <div class="dataset-meta">5,226 features · 12 classes · Sentinel-2 · 2022–2023</div>
+          </div>
+          <div class="dataset-status">
+            <span class="badge badge-processing">⟳ Processing</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state (shown by default) -->
+      <div id="dataset-empty" class="card">
+        <div class="empty-state">
+          <div class="empty-icon">⬆</div>
+          <div class="empty-title">No datasets yet</div>
+          <div class="empty-desc">Ingest labeled geospatial data to start building and training models. OlmoEarth will automatically validate and check data quality before creating your dataset.</div>
+          <button class="btn btn-accent" onclick="startWizard()">+ Ingest data</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────── VIEW: WIZARD ───────────────── -->
+    <div class="view" id="view-wizard">
+      <div class="wizard-wrap">
+
+        <!-- Wizard page header -->
+        <div class="page-header">
+          <div>
+            <h1 class="wizard-title">Ingest data</h1>
+            <p class="wizard-subtitle">Upload labeled geospatial data to create a training dataset</p>
+          </div>
+          <button class="btn btn-ghost" onclick="showView('project')">✕ Cancel</button>
+        </div>
+
+        <!-- Stepper -->
+        <div class="stepper" id="stepper">
+          <div class="step-item">
+            <div class="step-num active" id="sn-1">1</div>
+            <div class="step-label active" id="sl-1">Upload</div>
+          </div>
+          <div class="step-connector" id="sc-1"></div>
+          <div class="step-item">
+            <div class="step-num pending" id="sn-2">2</div>
+            <div class="step-label" id="sl-2">Validate</div>
+          </div>
+          <div class="step-connector" id="sc-2"></div>
+          <div class="step-item">
+            <div class="step-num pending" id="sn-3">3</div>
+            <div class="step-label" id="sl-3">Review quality</div>
+          </div>
+          <div class="step-connector" id="sc-3"></div>
+          <div class="step-item">
+            <div class="step-num pending" id="sn-4">4</div>
+            <div class="step-label" id="sl-4">Configure</div>
+          </div>
+        </div>
+
+        <!-- ── STEP 1: UPLOAD ─────────────────── -->
+        <div id="ws-1">
+          <div class="card" style="padding: 20px;">
+            <div class="upload-zone" id="dropzone" onclick="handleUploadClick()">
+              <div class="upload-icon">⬆</div>
+              <div class="upload-title">Drop your file here, or click to browse</div>
+              <div class="upload-subtitle">Bring your labeled data — we'll handle validation automatically</div>
+              <div class="format-pills">
+                <span class="format-pill">CSV</span>
+                <span class="format-pill">GeoJSON</span>
+                <span class="format-pill">Shapefile</span>
+                <span class="format-pill">Parquet</span>
+                <span class="format-pill">KML</span>
+              </div>
+            </div>
+
+            <div id="file-ready" style="display:none; margin-top: 12px;">
+              <div class="file-info-bar">
+                <span style="font-size:20px;">📄</span>
+                <div style="flex:1;">
+                  <div class="file-info-name">OlmoEarth_sample_file (1).csv</div>
+                  <div class="file-info-meta">2.4 MB · CSV · Ready to validate</div>
+                </div>
+                <span style="color:#2ad49c; font-size:18px; font-weight:700;">✓</span>
+              </div>
+            </div>
+
+            <div style="text-align:center; margin-top:14px;">
+              <button class="btn btn-ghost btn-sm">↓ Download sample file</button>
+            </div>
+          </div>
+
+          <div class="callout callout-info" style="margin-top:4px;">
+            <span>ℹ</span>
+            <span>OlmoEarth will automatically detect your coordinate columns, label field, geometry type, and timestamp — no manual setup required.</span>
+          </div>
+
+          <div class="wizard-footer">
+            <button class="btn btn-ghost" onclick="showView('project')">← Back to project</button>
+            <div class="wizard-footer-right">
+              <button class="btn btn-accent" onclick="goValidate()">Validate data →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP 2: VALIDATING ─────────────── -->
+        <div id="ws-2" style="display:none;">
+          <div class="card">
+            <div class="validating-wrap">
+              <div class="validating-title">Analyzing your data...</div>
+              <div class="validating-sub">Checking file format, geometry, labels, and data quality</div>
+              <div class="progress-track">
+                <div class="progress-fill" id="prog"></div>
+              </div>
+              <div class="check-list" id="check-list">
+                <div class="check-item">
+                  <div class="check-icon idle" id="ci-1"></div>
+                  <span class="check-text" id="ct-1">Parsing file format</span>
+                </div>
+                <div class="check-item">
+                  <div class="check-icon idle" id="ci-2"></div>
+                  <span class="check-text" id="ct-2">Detecting coordinate system (CRS)</span>
+                </div>
+                <div class="check-item">
+                  <div class="check-icon idle" id="ci-3"></div>
+                  <span class="check-text" id="ct-3">Reading geometry type</span>
+                </div>
+                <div class="check-item">
+                  <div class="check-icon idle" id="ci-4"></div>
+                  <span class="check-text" id="ct-4">Scanning label columns</span>
+                </div>
+                <div class="check-item">
+                  <div class="check-icon idle" id="ci-5"></div>
+                  <span class="check-text" id="ct-5">Checking for duplicates &amp; null values</span>
+                </div>
+                <div class="check-item">
+                  <div class="check-icon idle" id="ci-6"></div>
+                  <span class="check-text" id="ct-6">Validating timestamps &amp; date range</span>
+                </div>
+                <div class="check-item">
+                  <div class="check-icon idle" id="ci-7"></div>
+                  <span class="check-text" id="ct-7">Generating quality report</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP 3: REVIEW QUALITY ─────────── -->
+        <div id="ws-3" style="display:none; display:flex; flex-direction:column; gap:12px;">
+
+          <!-- Quality banner -->
+          <div class="quality-banner">
+            <div class="quality-score">
+              <div class="quality-pct">99.8%</div>
+              <div class="quality-label">Data health</div>
+            </div>
+            <div class="quality-detail">
+              <div class="quality-headline">5,226 of 5,234 features are ready to use</div>
+              <div class="health-track"><div class="health-fill" style="width:99.8%;"></div></div>
+              <div class="quality-note">8 duplicates will be auto-merged · 0 features excluded</div>
+            </div>
+            <div>
+              <span class="autodetect-pill">✓ Auto-detected</span>
+            </div>
+          </div>
+
+          <!-- Stat boxes -->
+          <div class="stats-grid">
+            <div class="card stat-box">
+              <div class="stat-val">5,234</div>
+              <div class="stat-lbl">Total features</div>
+            </div>
+            <div class="card stat-box">
+              <div class="stat-val">12</div>
+              <div class="stat-lbl">Label classes</div>
+            </div>
+            <div class="card stat-box">
+              <div class="stat-val">Point</div>
+              <div class="stat-lbl">Geometry type</div>
+            </div>
+            <div class="card stat-box">
+              <div class="stat-val">2022–2023</div>
+              <div class="stat-lbl">Date range</div>
+            </div>
+          </div>
+
+          <!-- Issues -->
+          <div class="card">
+            <div class="section-head">
+              <span class="section-label">Issues found · 2</span>
+            </div>
+            <div class="issue-row">
+              <div class="issue-dot dot-warn"></div>
+              <div class="issue-body">
+                <div class="issue-title">8 duplicate coordinates detected</div>
+                <div class="issue-desc">These features share identical lat/lon values. Duplicates will be automatically merged, keeping the first occurrence and discarding the rest.</div>
+                <div class="issue-fix">✓ Auto-fix: merge duplicates</div>
+              </div>
+              <span class="badge badge-processing" style="flex-shrink:0;">Auto-fix</span>
+            </div>
+            <div class="issue-row">
+              <div class="issue-dot dot-info"></div>
+              <div class="issue-body">
+                <div class="issue-title">Column "confidence" contains optional float scores</div>
+                <div class="issue-desc">Values range 0.0–1.0. This isn't required for training, but can be stored as metadata for downstream filtering.</div>
+                <div class="issue-fix">Keep as metadata →</div>
+              </div>
+              <span class="badge badge-info" style="flex-shrink:0;">Optional</span>
+            </div>
+          </div>
+
+          <!-- Column mapping -->
+          <div class="card">
+            <div class="section-head">
+              <span class="section-label">Column mapping · auto-detected</span>
+              <button class="btn btn-ghost btn-sm">Edit mapping</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Your column</th>
+                  <th>Detected type</th>
+                  <th>Maps to</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>lat</code></td>
+                  <td class="text-muted">Float · Latitude pattern</td>
+                  <td><span class="tag tag-coord">Latitude (Y)</span></td>
+                </tr>
+                <tr>
+                  <td><code>lon</code></td>
+                  <td class="text-muted">Float · Longitude pattern</td>
+                  <td><span class="tag tag-coord">Longitude (X)</span></td>
+                </tr>
+                <tr>
+                  <td><code>class_label</code></td>
+                  <td class="text-muted">String · 12 unique values</td>
+                  <td><span class="tag tag-label">Label</span></td>
+                </tr>
+                <tr>
+                  <td><code>timestamp</code></td>
+                  <td class="text-muted">DateTime · ISO 8601</td>
+                  <td><span class="tag tag-time">Date / Time</span></td>
+                </tr>
+                <tr>
+                  <td><code>feature_id</code></td>
+                  <td class="text-muted">String · Unique identifier</td>
+                  <td><span class="tag tag-id">ID</span></td>
+                </tr>
+                <tr>
+                  <td><code>confidence</code></td>
+                  <td class="text-muted">Float · 0.0 – 1.0</td>
+                  <td><span class="tag tag-meta">Metadata</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Data preview -->
+          <div class="card">
+            <div class="section-head">
+              <span class="section-label">Data preview · first 5 rows</span>
+              <button class="btn btn-ghost btn-sm">View all</button>
+            </div>
+            <div class="data-preview">
+              <table>
+                <thead>
+                  <tr>
+                    <th>lat</th>
+                    <th>lon</th>
+                    <th>class_label</th>
+                    <th>timestamp</th>
+                    <th>feature_id</th>
+                    <th>confidence</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>-9.992061</td><td>50.354354</td>
+                    <td><span class="badge badge-neutral">forest</span></td>
+                    <td>2022-03-15</td><td>Z_9_9.992...</td><td>0.94</td>
+                  </tr>
+                  <tr>
+                    <td>-9.980231</td><td>50.575828</td>
+                    <td><span class="badge badge-neutral">agriculture</span></td>
+                    <td>2022-03-15</td><td>Z_9_9.980...</td><td>0.87</td>
+                  </tr>
+                  <tr>
+                    <td>-9.958403</td><td>45.980016</td>
+                    <td><span class="badge badge-neutral">water</span></td>
+                    <td>2022-06-01</td><td>Z_9_9.958...</td><td>0.99</td>
+                  </tr>
+                  <tr>
+                    <td>-9.954239</td><td>45.873868</td>
+                    <td><span class="badge badge-neutral">bare_soil</span></td>
+                    <td>2022-06-01</td><td>Z_9_9.954...</td><td>0.72</td>
+                  </tr>
+                  <tr>
+                    <td>-9.948102</td><td>45.821443</td>
+                    <td><span class="badge badge-neutral">forest</span></td>
+                    <td>2022-09-22</td><td>Z_9_9.948...</td><td>0.91</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Label classes -->
+          <div class="card">
+            <div class="section-head">
+              <span class="section-label">Detected label classes · 12</span>
+            </div>
+            <div class="class-pills">
+              <span class="badge badge-neutral">forest</span>
+              <span class="badge badge-neutral">agriculture</span>
+              <span class="badge badge-neutral">water</span>
+              <span class="badge badge-neutral">urban</span>
+              <span class="badge badge-neutral">wetland</span>
+              <span class="badge badge-neutral">bare_soil</span>
+              <span class="badge badge-neutral">cloud</span>
+              <span class="badge badge-neutral">shadow</span>
+              <span class="badge badge-neutral">grassland</span>
+              <span class="badge badge-neutral">scrubland</span>
+              <span class="badge badge-neutral">snow_ice</span>
+              <span class="badge badge-neutral">mangrove</span>
+            </div>
+          </div>
+
+          <div class="wizard-footer">
+            <button class="btn btn-secondary btn-sm">↓ Download error report</button>
+            <div class="wizard-footer-right">
+              <button class="btn btn-secondary" onclick="goStep(2)">← Back</button>
+              <button class="btn btn-accent" onclick="goStep(4)">Configure dataset →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP 4: CONFIGURE ──────────────── -->
+        <div id="ws-4" style="display:none;">
+          <div class="callout callout-success" style="margin-bottom:4px;">
+            <span>✓</span>
+            <span><strong>5,226 features</strong> passed validation. Just a few settings before we create your dataset.</span>
+          </div>
+
+          <div class="card" style="padding: 22px;">
+            <div class="two-col">
+              <div>
+                <div class="form-group">
+                  <label class="form-label">Dataset name *</label>
+                  <input class="form-input" type="text" value="OlmoEarth_sample_file_1" />
+                  <div class="form-hint">Auto-suggested from filename.</div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Description</label>
+                  <input class="form-input" type="text" placeholder="Optional — describe this dataset" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Buffer size around points</label>
+                  <div class="input-row">
+                    <input class="form-input" type="number" value="500" style="max-width:90px;" />
+                    <span class="input-unit">meters</span>
+                  </div>
+                  <div class="form-hint">Spatial radius for extracting satellite imagery patches around each labeled point. 500 m is a good default for most land-cover tasks.</div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Time range</label>
+                  <div style="margin-bottom:6px;"><span class="autodetect-pill">✓ Auto-detected from data</span></div>
+                  <div class="input-row">
+                    <input class="form-input" type="text" value="2022-01-03" />
+                    <span class="input-unit" style="color:#bbb;">→</span>
+                    <input class="form-input" type="text" value="2023-11-28" />
+                  </div>
+                  <div class="form-hint">Satellite imagery will be acquired for this date range. Detected from timestamps in your file.</div>
+                </div>
+              </div>
+
+              <div>
+                <div class="form-group">
+                  <label class="form-label">Satellite imagery source</label>
+                  <label class="source-option selected" id="src-1" onclick="selectSource(1)">
+                    <input type="radio" name="src" checked />
+                    <div>
+                      <div class="source-title">Sentinel-2 (ESA)</div>
+                      <div class="source-meta">10 m resolution · Free · Global coverage</div>
+                    </div>
+                    <span class="badge badge-ready source-badge">Free</span>
+                  </label>
+                  <label class="source-option" id="src-2" onclick="selectSource(2)">
+                    <input type="radio" name="src" />
+                    <div>
+                      <div class="source-title">Planet NICFI</div>
+                      <div class="source-meta">4.77 m resolution · Partnership required</div>
+                    </div>
+                    <span class="badge badge-neutral source-badge">Partner</span>
+                  </label>
+                  <label class="source-option" id="src-3" onclick="selectSource(3)">
+                    <input type="radio" name="src" />
+                    <div>
+                      <div class="source-title">Commercial (Maxar, etc.)</div>
+                      <div class="source-meta">Up to 30 cm · Contact sales for access</div>
+                    </div>
+                    <span class="badge badge-neutral source-badge">Enterprise</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wizard-footer">
+            <div></div>
+            <div class="wizard-footer-right">
+              <button class="btn btn-secondary" onclick="goStep(3)">← Back</button>
+              <button class="btn btn-accent" onclick="goStep(5)">Create dataset →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP 5: SUCCESS ────────────────── -->
+        <div id="ws-5" style="display:none;">
+          <div class="card success-card">
+            <div class="success-ring">✓</div>
+            <div class="success-title">Dataset created!</div>
+            <div class="success-desc">
+              <strong>OlmoEarth_sample_file_1</strong> is being processed. We're acquiring Sentinel-2 imagery for <strong>5,226 features</strong> across your date range.
+            </div>
+
+            <div class="summary-box">
+              <div style="font-size:11px; font-weight:700; color:#888; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">Processing summary</div>
+              <div class="summary-row"><span class="summary-key">Features ingested</span><strong>5,226</strong></div>
+              <div class="summary-row"><span class="summary-key">Label classes</span><strong>12</strong></div>
+              <div class="summary-row"><span class="summary-key">Imagery source</span><strong>Sentinel-2</strong></div>
+              <div class="summary-row"><span class="summary-key">Buffer size</span><strong>500 m</strong></div>
+              <div class="summary-row"><span class="summary-key">Date range</span><strong>2022-01 → 2023-11</strong></div>
+              <div class="summary-row"><span class="summary-key">Estimated ready</span><strong>~15 min</strong></div>
+            </div>
+
+            <div class="next-steps">
+              <button class="btn btn-secondary" onclick="showProjectWithDataset()">View dataset status</button>
+              <button class="btn btn-accent">Build a model →</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /wizard-wrap -->
+    </div><!-- /view-wizard -->
+
+  </div><!-- /content-area -->
+</div><!-- /main -->
+
+<script>
+  /* ── State ── */
+  let fileLoaded = false;
+
+  /* ── Navigation ── */
+  function showView(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    updateBreadcrumb(name);
+  }
+
+  function updateBreadcrumb(view) {
+    const bc = document.getElementById('breadcrumb');
+    const proj = '<a onclick="showView(\'projects\')">Projects</a><span class="breadcrumb-sep">/</span>';
+    const projName = '<a onclick="showView(\'project\')">Global Ecosystem Atlas MO4-5</a>';
+    if (view === 'projects') {
+      bc.innerHTML = '<span class="breadcrumb-current">Projects</span>';
+    } else if (view === 'project') {
+      bc.innerHTML = proj + '<span class="breadcrumb-current">Global Ecosystem Atlas MO4-5</span>';
+    } else if (view === 'wizard') {
+      bc.innerHTML = proj + projName + '<span class="breadcrumb-sep">/</span><span class="breadcrumb-current">Ingest data</span>';
+    }
+  }
+
+  /* ── Wizard entry ── */
+  function startWizard() {
+    fileLoaded = false;
+    document.getElementById('file-ready').style.display = 'none';
+    const dz = document.getElementById('dropzone');
+    dz.classList.remove('done');
+    dz.innerHTML = `
+      <div class="upload-icon">⬆</div>
+      <div class="upload-title">Drop your file here, or click to browse</div>
+      <div class="upload-subtitle">Bring your labeled data — we'll handle validation automatically</div>
+      <div class="format-pills">
+        <span class="format-pill">CSV</span>
+        <span class="format-pill">GeoJSON</span>
+        <span class="format-pill">Shapefile</span>
+        <span class="format-pill">Parquet</span>
+        <span class="format-pill">KML</span>
+      </div>`;
+
+    // Show step 1 only
+    for (let i = 1; i <= 5; i++) {
+      const el = document.getElementById('ws-' + i);
+      if (el) el.style.display = i === 1 ? 'block' : 'none';
+    }
+    // Fix step 3 dual display
+    document.getElementById('ws-3').style.display = 'none';
+
+    resetStepper();
+    showView('wizard');
+    window.scrollTo(0, 0);
+  }
+
+  /* ── Stepper ── */
+  function resetStepper() {
+    for (let i = 1; i <= 4; i++) {
+      setSN(i, 'pending', String(i));
+      setSL(i, '');
+      if (i < 4) document.getElementById('sc-' + i).className = 'step-connector';
+    }
+    setSN(1, 'active', '1');
+    setSL(1, 'active');
+  }
+
+  function setSN(i, cls, txt) {
+    const el = document.getElementById('sn-' + i);
+    el.className = 'step-num ' + cls;
+    el.textContent = txt;
+  }
+  function setSL(i, cls) {
+    const el = document.getElementById('sl-' + i);
+    el.className = 'step-label' + (cls ? ' ' + cls : '');
+  }
+
+  function updateStepper(active) {
+    for (let i = 1; i <= 4; i++) {
+      if (i < active) {
+        setSN(i, 'done', '✓');
+        setSL(i, 'done');
+        if (i < 4) document.getElementById('sc-' + i).className = 'step-connector done';
+      } else if (i === active) {
+        setSN(i, 'active', String(i));
+        setSL(i, 'active');
+      } else {
+        setSN(i, 'pending', String(i));
+        setSL(i, '');
+        if (i < 4) document.getElementById('sc-' + i).className = 'step-connector';
+      }
+    }
+  }
+
+  /* ── Upload simulation ── */
+  function handleUploadClick() {
+    if (fileLoaded) return;
+    fileLoaded = true;
+
+    const dz = document.getElementById('dropzone');
+    dz.classList.add('done');
+    dz.innerHTML = `
+      <div style="color:#2ad49c; font-size:26px; font-weight:700; margin-bottom:6px;">✓</div>
+      <div style="font-size:14px; font-weight:600; color:#166534;">File ready to validate</div>`;
+
+    document.getElementById('file-ready').style.display = 'block';
+  }
+
+  /* ── Go to validate (step 2) ── */
+  function goValidate() {
+    if (!fileLoaded) {
+      handleUploadClick();
+      setTimeout(runValidation, 300);
+    } else {
+      runValidation();
+    }
+  }
+
+  function runValidation() {
+    showWS(2);
+    updateStepper(2);
+
+    // Reset check icons
+    for (let i = 1; i <= 7; i++) {
+      document.getElementById('ci-' + i).className = 'check-icon idle';
+      document.getElementById('ci-' + i).innerHTML = '';
+      document.getElementById('ct-' + i).className = 'check-text';
+    }
+    document.getElementById('prog').style.width = '0%';
+
+    const timings = [150, 400, 650, 900, 1150, 1450, 1800];
+    const doneAt  = [300, 550, 800, 1050, 1300, 1650, 2100];
+
+    timings.forEach((t, i) => {
+      setTimeout(() => {
+        document.getElementById('ci-' + (i+1)).className = 'check-icon running';
+        document.getElementById('ci-' + (i+1)).innerHTML = '<div class="spinner"></div>';
+        document.getElementById('ct-' + (i+1)).className = 'check-text active';
+        document.getElementById('prog').style.width = ((i / 7) * 100) + '%';
+      }, t);
+      setTimeout(() => {
+        document.getElementById('ci-' + (i+1)).className = 'check-icon ok';
+        document.getElementById('ci-' + (i+1)).innerHTML = '✓';
+        document.getElementById('ct-' + (i+1)).className = 'check-text done';
+      }, doneAt[i]);
+    });
+
+    setTimeout(() => {
+      document.getElementById('prog').style.width = '100%';
+      setTimeout(() => goStep(3), 400);
+    }, 2300);
+  }
+
+  /* ── Generic step navigation ── */
+  function goStep(n) {
+    for (let i = 1; i <= 5; i++) {
+      const el = document.getElementById('ws-' + i);
+      if (!el) continue;
+      el.style.display = 'none';
+    }
+    const target = document.getElementById('ws-' + n);
+    if (target) {
+      target.style.display = n === 3 ? 'flex' : 'block';
+      // flex for step 3 which uses gap
+      if (n === 3) target.style.flexDirection = 'column';
+    }
+
+    if (n <= 4) updateStepper(n);
+    window.scrollTo(0, 0);
+  }
+
+  function showWS(n) { goStep(n); }
+
+  /* ── Source selection ── */
+  function selectSource(n) {
+    for (let i = 1; i <= 3; i++) {
+      document.getElementById('src-' + i).classList.toggle('selected', i === n);
+      document.getElementById('src-' + i).querySelector('input').checked = i === n;
+    }
+  }
+
+  /* ── Success → back to project ── */
+  function showProjectWithDataset() {
+    document.getElementById('dataset-empty').style.display = 'none';
+    document.getElementById('dataset-list').style.display = 'block';
+    showView('project');
+  }
+
+  /* ── Init ── */
+  updateBreadcrumb('projects');
+</script>
+</body>
+</html>
