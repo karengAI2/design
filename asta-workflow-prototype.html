@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OlmoEarth Studio × Asta — Phase 0 Prototype</title>
+<style>
+/* ===== RESET ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+
+/* ===== PROTO BANNER ===== */
+#proto-banner {
+  background: #0f172a; color: #94a3b8; padding: 5px 20px; font-size: 11px;
+  display: flex; align-items: center; gap: 12px; flex-shrink: 0; z-index: 100;
+}
+#proto-banner strong { color: #e2e8f0; }
+#proto-banner .badge { background: #8b5cf6; color: white; padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+#proto-banner .odd-note { color: #8b5cf6; margin-left: auto; font-size: 10px; }
+
+/* ===== APP SHELL ===== */
+#app { display: flex; flex: 1; overflow: hidden; }
+
+/* ===== SIDEBAR ===== */
+#sidebar {
+  width: 196px; min-width: 196px; background: #111827; color: #9ca3af;
+  display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0;
+}
+.sidebar-logo {
+  padding: 14px 14px 12px; border-bottom: 1px solid #1f2937;
+  display: flex; align-items: center; gap: 9px;
+}
+.logo-icon {
+  width: 26px; height: 26px; background: linear-gradient(135deg, #14b8a6, #0d9488);
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 900; font-size: 13px; flex-shrink: 0;
+}
+.logo-name { color: white; font-size: 13px; font-weight: 700; line-height: 1.2; }
+.logo-name span { color: #4b5563; font-size: 10px; font-weight: 400; display: block; }
+.nav-group { padding: 6px 0; }
+.nav-group-label { padding: 8px 14px 3px; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #374151; }
+.nav-item {
+  display: flex; align-items: center; gap: 9px; padding: 7px 14px; cursor: pointer;
+  font-size: 12px; color: #6b7280; border-left: 2px solid transparent; transition: all 0.12s;
+}
+.nav-item:hover { background: #1f2937; color: #d1d5db; }
+.nav-item.active { background: #1f2937; color: #14b8a6; border-left-color: #14b8a6; }
+.nav-item .ni { width: 14px; text-align: center; font-size: 13px; flex-shrink: 0; }
+.nav-item .n-badge {
+  margin-left: auto; background: #f59e0b; color: #1c1917;
+  border-radius: 8px; padding: 1px 5px; font-size: 9px; font-weight: 700;
+}
+.nav-item .n-badge.red { background: #ef4444; color: white; }
+
+/* ===== MAIN CONTENT ===== */
+#main-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; background: #f3f4f6; }
+.main-header {
+  background: white; border-bottom: 1px solid #e5e7eb; padding: 0 18px;
+  height: 44px; display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.breadcrumb { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #9ca3af; }
+.breadcrumb .bc-sep { color: #d1d5db; }
+.breadcrumb .bc-cur { color: #111827; font-weight: 500; }
+.header-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+#screen-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ===== ASTA PANEL ===== */
+#asta-panel {
+  width: 340px; min-width: 340px; background: white; border-left: 1px solid #e5e7eb;
+  display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.2s, min-width 0.2s;
+}
+#asta-panel.collapsed { width: 44px; min-width: 44px; }
+#asta-panel.collapsed .ap-body, #asta-panel.collapsed .ap-footer,
+#asta-panel.collapsed .ap-head-text { display: none; }
+.ap-head {
+  background: #0f172a; color: white; padding: 10px 12px;
+  display: flex; align-items: center; gap: 9px; flex-shrink: 0; cursor: pointer;
+}
+.ap-head:hover { background: #1e293b; }
+.asta-av {
+  width: 28px; height: 28px; background: linear-gradient(135deg, #14b8a6, #0d9488);
+  border-radius: 7px; display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 800; font-size: 12px; flex-shrink: 0;
+}
+.ap-head-text h3 { font-size: 13px; font-weight: 600; }
+.ap-head-text p { font-size: 10px; color: #64748b; margin-top: 1px; }
+.ap-toggle { margin-left: auto; font-size: 14px; color: #475569; }
+.ap-body { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.ap-footer { padding: 10px 12px; border-top: 1px solid #f1f5f9; flex-shrink: 0; }
+.chat-row { display: flex; gap: 5px; }
+.chat-inp {
+  flex: 1; padding: 6px 10px; border: 1px solid #e5e7eb; border-radius: 6px;
+  font-size: 12px; color: #111827; outline: none;
+}
+.chat-inp:focus { border-color: #14b8a6; }
+.chat-send {
+  width: 30px; height: 30px; background: #14b8a6; border: none; border-radius: 6px;
+  color: white; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center;
+}
+
+/* Chat messages */
+.msg { display: flex; flex-direction: column; max-width: 88%; }
+.msg.asta { align-self: flex-start; }
+.msg.user { align-self: flex-end; }
+.msg-lbl { font-size: 9px; color: #9ca3af; margin-bottom: 3px; }
+.msg.user .msg-lbl { text-align: right; }
+.msg-bub { padding: 9px 11px; border-radius: 10px; font-size: 12px; line-height: 1.55; }
+.msg.asta .msg-bub { background: #f3f4f6; color: #1f2937; border-bottom-left-radius: 3px; }
+.msg.user .msg-bub { background: #14b8a6; color: white; border-bottom-right-radius: 3px; }
+.msg.asta .msg-bub.warn { background: #fffbeb; border: 1px solid #fcd34d; }
+.msg.asta .msg-bub.success { background: #d1fae5; border: 1px solid #6ee7b7; }
+
+/* Structured chat controls */
+.chat-opts { display: flex; flex-direction: column; gap: 5px; margin-top: 7px; }
+.copt {
+  background: white; border: 1.5px solid #e5e7eb; border-radius: 7px;
+  padding: 7px 10px; cursor: pointer; font-size: 11px; transition: all 0.12s;
+  display: flex; align-items: flex-start; gap: 7px;
+}
+.copt:hover { border-color: #14b8a6; background: #f0fdfa; }
+.copt.sel { border-color: #14b8a6; background: #f0fdfa; }
+.copt-t { font-weight: 600; color: #111827; font-size: 11px; }
+.copt-d { color: #6b7280; font-size: 10px; margin-top: 1px; }
+.copt-rec { margin-left: auto; background: #d1fae5; color: #065f46; padding: 1px 6px; border-radius: 8px; font-size: 9px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+
+.c-select {
+  width: 100%; padding: 6px 8px; border: 1.5px solid #e5e7eb; border-radius: 6px;
+  font-size: 11px; color: #111827; background: white; cursor: pointer; margin-top: 5px; outline: none;
+}
+.c-select:focus { border-color: #14b8a6; }
+
+.c-toggle {
+  display: flex; align-items: center; gap: 8px; padding: 7px 10px;
+  background: #f9fafb; border-radius: 7px; border: 1.5px solid #e5e7eb; margin-top: 5px;
+}
+.toggle-sw {
+  width: 34px; height: 18px; background: #d1d5db; border-radius: 9px;
+  position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+}
+.toggle-sw.on { background: #14b8a6; }
+.toggle-sw::after {
+  content: ''; width: 14px; height: 14px; background: white; border-radius: 50%;
+  position: absolute; top: 2px; left: 2px; transition: left 0.2s;
+}
+.toggle-sw.on::after { left: 18px; }
+
+.c-summ { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 7px; padding: 8px 10px; margin-top: 5px; }
+.c-summ-row { display: flex; align-items: center; padding: 3px 0; border-bottom: 1px solid #f1f5f9; font-size: 11px; }
+.c-summ-row:last-child { border-bottom: none; }
+.c-summ-row .lbl { color: #64748b; width: 110px; flex-shrink: 0; }
+.c-summ-row .val { color: #0f172a; font-weight: 500; }
+
+.c-act { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 13px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  cursor: pointer; border: none; transition: all 0.12s; text-decoration: none;
+}
+.btn-sm { padding: 4px 9px; font-size: 11px; }
+.btn-xs { padding: 2px 7px; font-size: 10px; }
+.btn-p { background: #14b8a6; color: white; }
+.btn-p:hover { background: #0d9488; }
+.btn-s { background: white; color: #374151; border: 1px solid #d1d5db; }
+.btn-s:hover { background: #f9fafb; }
+.btn-w { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.btn-w:hover { background: #fde68a; }
+.btn-g { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+.btn-d { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+.btn-v { background: #ede9fe; color: #6d28d9; border: 1px solid #c4b5fd; }
+
+/* ===== STATUS BADGES ===== */
+.sbadge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 14px; font-size: 11px; font-weight: 500; }
+.sbadge.run { background: #dbeafe; color: #1d4ed8; }
+.sbadge.wait { background: #fef3c7; color: #b45309; }
+.sbadge.done { background: #d1fae5; color: #065f46; }
+.sbadge.idle { background: #f3f4f6; color: #6b7280; }
+.sdot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.sbadge.run .sdot { animation: pulse 1.4s infinite; }
+.sbadge.wait .sdot { animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+/* ===== MAP ===== */
+.map-wrap { position: relative; background: #7cb87a; overflow: hidden; flex-shrink: 0; }
+.map-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.map-ctrl {
+  position: absolute; top: 8px; left: 8px; display: flex; flex-direction: column; gap: 3px; z-index: 10;
+}
+.map-btn {
+  width: 26px; height: 26px; background: white; border: 1px solid #ccc; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.map-btn:hover { background: #f0f0f0; }
+.map-attr { position: absolute; bottom: 4px; right: 4px; font-size: 9px; color: rgba(0,0,0,0.45); background: rgba(255,255,255,0.75); padding: 1px 4px; border-radius: 2px; z-index: 5; }
+.map-toolbar { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; z-index: 10; }
+.map-cta {
+  position: absolute; bottom: 36px; right: 10px; z-index: 20;
+  background: white; border-radius: 9px; box-shadow: 0 3px 14px rgba(0,0,0,0.14); padding: 12px 14px; max-width: 210px;
+}
+
+/* ===== TABLE ===== */
+.tbl-wrap { background: white; border-top: 1px solid #e5e7eb; flex-shrink: 0; }
+.tbl-toolbar { padding: 7px 14px; display: flex; align-items: center; gap: 7px; border-bottom: 1px solid #e5e7eb; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+.tbl th { background: #f9fafb; padding: 6px 10px; text-align: left; font-weight: 500; color: #6b7280; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+.tbl td { padding: 6px 10px; border-bottom: 1px solid #f3f4f6; color: #374151; }
+.tbl tr:hover td { background: #fafafa; }
+
+/* ===== TRAINING STATUS BAR ===== */
+.train-bar {
+  background: white; border-bottom: 1px solid #e5e7eb; padding: 8px 18px;
+  display: flex; align-items: center; gap: 10px; font-size: 12px; flex-shrink: 0;
+}
+.prog-track { flex: 1; max-width: 260px; }
+.prog-lbl { font-size: 10px; color: #6b7280; margin-bottom: 3px; }
+.prog-bar { height: 5px; background: #e5e7eb; border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; background: #14b8a6; border-radius: 3px; }
+
+/* ===== STEP PROGRESS ===== */
+.steps { display: flex; gap: 5px; margin-bottom: 12px; }
+.step-seg { height: 3px; flex: 1; border-radius: 2px; background: #e5e7eb; }
+.step-seg.done { background: #14b8a6; }
+
+/* ===== INLINE CARDS & TAGS ===== */
+.tag { display: inline-flex; align-items: center; padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 500; }
+.tag-r { background: #fee2e2; color: #b91c1c; }
+.tag-g { background: #d1fae5; color: #065f46; }
+.tag-b { background: #dbeafe; color: #1d4ed8; }
+.tag-o { background: #fef3c7; color: #b45309; }
+.tag-grey { background: #f3f4f6; color: #6b7280; }
+
+.ibox { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 7px; padding: 9px 11px; font-size: 11px; color: #1e40af; margin: 6px 0; }
+.wbox { background: #fffbeb; border: 1px solid #fde68a; border-radius: 7px; padding: 9px 11px; font-size: 11px; color: #92400e; margin: 6px 0; }
+.odd-box { background: #faf5ff; border-left: 3px solid #8b5cf6; padding: 7px 10px; font-size: 10px; color: #6d28d9; border-radius: 0 5px 5px 0; margin: 6px 0; }
+.odd-box strong { color: #4c1d95; }
+
+/* ===== REVIEW UI ===== */
+.rev-card {
+  background: white; border: 2px solid #e5e7eb; border-radius: 7px;
+  overflow: hidden; cursor: pointer; transition: border-color 0.12s; margin-bottom: 7px;
+}
+.rev-card:hover { border-color: #14b8a6; }
+.rev-card.good { border-color: #10b981; }
+.rev-card.bad { border-color: #ef4444; }
+.rev-thumb { height: 80px; position: relative; overflow: hidden; }
+.rev-conf { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.6); color: white; font-size: 9px; padding: 1px 5px; border-radius: 3px; }
+.rev-lowconf { position: absolute; bottom: 5px; left: 5px; background: rgba(245,158,11,0.9); color: white; font-size: 9px; padding: 1px 5px; border-radius: 3px; }
+.rev-info { padding: 5px 8px; }
+.rev-info .ri-l { font-size: 11px; font-weight: 500; color: #374151; }
+.rev-info .ri-s { font-size: 9px; color: #9ca3af; margin-top: 1px; }
+.rev-acts { display: flex; border-top: 1px solid #f3f4f6; }
+.rev-btn { flex: 1; padding: 4px; border: none; background: none; cursor: pointer; font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 2px; }
+.rev-btn.ok { color: #10b981; border-right: 1px solid #f3f4f6; }
+.rev-btn.ok:hover { background: #ecfdf5; }
+.rev-btn.no { color: #ef4444; }
+.rev-btn.no:hover { background: #fef2f2; }
+
+.pred-legend {
+  position: absolute; bottom: 26px; left: 8px; background: rgba(255,255,255,0.92);
+  border-radius: 6px; padding: 7px 9px; font-size: 10px; z-index: 10;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+.leg-row { display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
+.leg-sw { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+/* ===== RESULTS ===== */
+.metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+.metric-box { background: #f8fafc; border-radius: 8px; padding: 10px; text-align: center; }
+.metric-v { font-size: 22px; font-weight: 700; color: #14b8a6; }
+.metric-l { font-size: 10px; color: #6b7280; margin-top: 2px; }
+
+/* ===== SUMMARY SCREEN ===== */
+.summ-screen { flex: 1; overflow-y: auto; padding: 20px; }
+.summ-card { background: white; border: 1px solid #e5e7eb; border-radius: 9px; overflow: hidden; margin-bottom: 12px; }
+.summ-card-h { background: #f8fafc; padding: 10px 14px; font-size: 12px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb; }
+.summ-row { display: flex; align-items: flex-start; padding: 8px 14px; border-bottom: 1px solid #f9fafb; font-size: 12px; }
+.summ-row:last-child { border-bottom: none; }
+.summ-row .sl { color: #6b7280; width: 150px; flex-shrink: 0; padding-top: 1px; }
+.summ-row .sv { color: #111827; font-weight: 500; flex: 1; }
+.summ-row .sc { margin-left: auto; font-size: 10px; background: #dbeafe; color: #1d4ed8; padding: 1px 7px; border-radius: 10px; flex-shrink: 0; }
+
+/* ===== INTERRUPTION OVERLAY ===== */
+.int-overlay {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 30;
+  background: white; border: 2px solid #f59e0b; border-radius: 10px;
+  padding: 12px 16px; max-width: 300px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+/* ===== MONO LOG ===== */
+.log-line { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 10px; line-height: 1.8; }
+.log-ok { color: #10b981; } .log-run { color: #3b82f6; } .log-warn { color: #f59e0b; } .log-dim { color: #9ca3af; }
+
+/* ===== STORYBOARD NAV ===== */
+#snav {
+  background: #0f172a; border-top: 1px solid #1e293b; padding: 0 14px;
+  display: flex; align-items: center; gap: 5px; height: 48px; overflow-x: auto;
+  flex-shrink: 0;
+}
+#snav::-webkit-scrollbar { height: 3px; }
+#snav::-webkit-scrollbar-thumb { background: #334155; }
+.snav-grp { display: flex; align-items: center; gap: 4px; padding: 0 4px; }
+.snav-sep { width: 1px; height: 22px; background: #1e293b; flex-shrink: 0; }
+.snav-lbl { font-size: 9px; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+.snav-btn {
+  background: none; border: 1px solid #1e293b; color: #475569; padding: 3px 9px;
+  border-radius: 14px; cursor: pointer; font-size: 10px; white-space: nowrap; transition: all 0.12s;
+}
+.snav-btn:hover { border-color: #475569; color: #94a3b8; }
+.snav-btn.active { border-color: #14b8a6; color: #14b8a6; background: rgba(20,184,166,0.08); }
+.snav-arrows { margin-left: auto; display: flex; gap: 3px; flex-shrink: 0; }
+.sarr { width: 26px; height: 26px; background: #1e293b; border: none; color: #64748b; border-radius: 5px; cursor: pointer; font-size: 13px; }
+.sarr:hover { background: #334155; color: #e2e8f0; }
+.sarr:disabled { opacity: 0.3; cursor: default; }
+</style>
+</head>
+<body>
+
+<!-- PROTOTYPE BANNER -->
+<div id="proto-banner">
+  <span class="badge">PROTOTYPE</span>
+  <strong>Phase 0 Storyboard</strong> — OlmoEarth Studio × Asta Agent Workflow
+  <span style="color:#334155;">|</span>
+  Click any screen below to jump &nbsp;·&nbsp; Use ← → arrows to step through
+  <span class="odd-note">🟣 Purple callouts = Open Design Decisions (ODDs)</span>
+</div>
+
+<!-- APP SHELL -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">✦</div>
+      <div class="logo-name">OlmoEarth <span>Studio</span></div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-item" onclick="go(0)"><span class="ni">☰</span> My Queue</div>
+      <div class="nav-item" onclick="go(0)"><span class="ni">◫</span> Projects</div>
+      <div class="nav-item" id="ni-tasks" onclick="go(0)"><span class="ni">⊞</span> Project Tasks</div>
+      <div class="nav-item" onclick="go(0)"><span class="ni">⊡</span> Datasets</div>
+      <div class="nav-item" onclick="go(0)"><span class="ni">⚙</span> Annotation Settings</div>
+      <div class="nav-item" onclick="go(0)"><span class="ni">◈</span> Basemaps</div>
+      <div class="nav-item" onclick="go(0)"><span class="ni">↑</span> Image Upload</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">AI &amp; Models</div>
+      <div class="nav-item" id="ni-model" onclick="go(0)">
+        <span class="ni">◉</span> Model Builder
+        <span class="n-badge" id="sb-badge" style="display:none;">!</span>
+      </div>
+      <div class="nav-item" onclick="go(0)"><span class="ni">▦</span> Map Publisher</div>
+    </div>
+    <div class="nav-group" style="margin-top:auto; padding-bottom:8px;">
+      <div class="nav-item"><span class="ni">👤</span> Account</div>
+      <div class="nav-item"><span class="ni">🏢</span> Organizations</div>
+      <div class="nav-item"><span class="ni">📊</span> Analytics</div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+    <div class="main-header" id="main-header"></div>
+    <div id="screen-wrap"></div>
+  </main>
+
+  <!-- ASTA PANEL -->
+  <aside id="asta-panel" class="collapsed">
+    <div class="ap-head" onclick="toggleAsta()">
+      <div class="asta-av">A</div>
+      <div class="ap-head-text">
+        <h3>Asta</h3>
+        <p id="asta-status">AI Training Assistant</p>
+      </div>
+      <span class="ap-toggle" id="ap-arrow">⇤</span>
+    </div>
+    <div class="ap-body" id="ap-body"></div>
+    <div class="ap-footer" id="ap-footer">
+      <div class="chat-row">
+        <input class="chat-inp" type="text" placeholder="Ask Asta anything…" />
+        <button class="chat-send">➤</button>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- STORYBOARD NAV -->
+<div id="snav">
+  <div class="snav-grp">
+    <span class="snav-lbl">Entry</span>
+    <button class="snav-btn" id="sb0" onclick="go(0)">Studio Dashboard</button>
+  </div>
+  <div class="snav-sep"></div>
+  <div class="snav-grp">
+    <span class="snav-lbl">M1 · Goal Setting</span>
+    <button class="snav-btn" id="sb1" onclick="go(1)">Prediction Type</button>
+    <button class="snav-btn" id="sb2" onclick="go(2)">Labels &amp; Temporal</button>
+    <button class="snav-btn" id="sb3" onclick="go(3)">Imagery &amp; Spatial</button>
+    <button class="snav-btn" id="sb4" onclick="go(4)">Review &amp; Confirm</button>
+  </div>
+  <div class="snav-sep"></div>
+  <div class="snav-grp">
+    <span class="snav-lbl">M2 · Mid-Run</span>
+    <button class="snav-btn" id="sb5" onclick="go(5)">Training Running</button>
+    <button class="snav-btn" id="sb6" onclick="go(6)">Data Gap Alert</button>
+  </div>
+  <div class="snav-sep"></div>
+  <div class="snav-grp">
+    <span class="snav-lbl">M3 · Review</span>
+    <button class="snav-btn" id="sb7" onclick="go(7)">Prediction Review</button>
+  </div>
+  <div class="snav-sep"></div>
+  <div class="snav-grp">
+    <span class="snav-lbl">M4 · Results</span>
+    <button class="snav-btn" id="sb8" onclick="go(8)">Results &amp; Next Steps</button>
+  </div>
+  <div class="snav-arrows">
+    <button class="sarr" id="sarr-p" onclick="prev()" disabled>←</button>
+    <button class="sarr" id="sarr-n" onclick="next()">→</button>
+  </div>
+</div>
+
+<script>
+// ─── MAP SVG HELPER ────────────────────────────────────────────────────────
+function mapBase() {
+  return `
+    <rect width="900" height="100%" fill="#6b9e6e"/>
+    <rect x="0" y="0" width="340" height="55%" fill="#5a8c5d" opacity="0.55"/>
+    <rect x="460" y="25%" width="290" height="55%" fill="#4a7c50" opacity="0.5"/>
+    <rect x="90" y="50%" width="220" height="50%" fill="#7db87a" opacity="0.45"/>
+    <rect x="610" y="0" width="290" height="40%" fill="#3d6b3d" opacity="0.5"/>
+    <rect x="195" y="24%" width="82" height="18%" fill="#c8a870" opacity="0.72"/>
+    <rect x="350" y="44%" width="62" height="14%" fill="#c8a870" opacity="0.65"/>
+    <rect x="498" y="10%" width="104" height="22%" fill="#d4a060" opacity="0.62"/>
+    <rect x="698" y="48%" width="124" height="26%" fill="#c8a870" opacity="0.65"/>
+    <path d="M118 0 Q176 80 158 200 Q138 280 178 400" stroke="#4a9ede" stroke-width="18" fill="none" opacity="0.8"/>
+    <path d="M118 0 Q176 80 158 200 Q138 280 178 400" stroke="#7ec8f0" stroke-width="9" fill="none" opacity="0.45"/>
+  `;
+}
+
+function mapGrid() {
+  let g = '';
+  for (let col = 0; col < 8; col++) {
+    for (let row = 0; row < 5; row++) {
+      if ((col + row) % 3 !== 2) {
+        g += `<rect x="${col*108+18}" y="${row*78+8}" width="100" height="70" fill="none" stroke="#ff8c00" stroke-width="1.5" opacity="0.72"/>`;
+      }
+    }
+  }
+  return g;
+}
+
+function mapPredictions() {
+  return `
+    <rect x="195" y="24%" width="82" height="18%" fill="rgba(239,68,68,0.62)" rx="2"/>
+    <rect x="350" y="44%" width="62" height="14%" fill="rgba(239,68,68,0.52)" rx="2"/>
+    <rect x="498" y="10%" width="104" height="22%" fill="rgba(239,68,68,0.57)" rx="2"/>
+    <rect x="698" y="48%" width="124" height="26%" fill="rgba(239,68,68,0.52)" rx="2"/>
+    <rect x="95" y="64%" width="144" height="24%" fill="rgba(34,197,94,0.42)" rx="2"/>
+    <rect x="398" y="68%" width="124" height="22%" fill="rgba(59,130,246,0.47)" rx="2"/>
+    <rect x="195" y="24%" width="82" height="18%" fill="none" stroke="white" stroke-width="2" stroke-dasharray="5 3" rx="2"/>
+  `;
+}
+
+function mapResults() {
+  return `
+    <rect x="195" y="24%" width="82" height="18%" fill="rgba(239,68,68,0.76)" rx="2"/>
+    <rect x="350" y="44%" width="62" height="14%" fill="rgba(239,68,68,0.72)" rx="2"/>
+    <rect x="498" y="10%" width="104" height="22%" fill="rgba(239,68,68,0.73)" rx="2"/>
+    <rect x="698" y="48%" width="124" height="26%" fill="rgba(251,191,36,0.67)" rx="2"/>
+    <rect x="275" y="60%" width="82" height="17%" fill="rgba(239,68,68,0.62)" rx="2"/>
+    <rect x="95" y="64%" width="144" height="24%" fill="rgba(34,197,94,0.52)" rx="2"/>
+    <rect x="398" y="68%" width="124" height="22%" fill="rgba(59,130,246,0.57)" rx="2"/>
+    <rect x="618" y="29%" width="82" height="19%" fill="rgba(239,68,68,0.67)" rx="2"/>
+  `;
+}
+
+function mkMap(mode, h) {
+  const ht = h || '100%';
+  let extras = '';
+  if (mode === 'grid') extras = mapGrid();
+  if (mode === 'pred') extras = mapPredictions();
+  if (mode === 'results') extras = mapResults();
+  return `<svg class="map-svg" viewBox="0 0 900 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">${mapBase()}${extras}</svg>`;
+}
+
+// ─── SCREEN DEFINITIONS ───────────────────────────────────────────────────
+const S = [
+
+// ═══ 0: STUDIO DASHBOARD ═══════════════════════════════════════════════════
+{
+  crumbs: ['Amazon Forest Loss', 'Project Tasks'],
+  navActive: 'ni-tasks',
+  astaClosed: true,
+  astaStatus: 'AI Training Assistant',
+  badge: false,
+  html: () => `
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div class="map-wrap" style="flex:2;min-height:200px;">
+        ${mkMap('grid')}
+        <div class="map-ctrl"><div class="map-btn">+</div><div class="map-btn">−</div></div>
+        <div class="map-toolbar">
+          <button class="btn btn-s btn-sm">Filter area</button>
+          <button class="btn btn-s btn-sm">Hide map</button>
+        </div>
+        <!-- ASTA CTA card -->
+        <div class="map-cta">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div class="asta-av" style="width:24px;height:24px;font-size:11px;border-radius:6px;">A</div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:#111827;">Train with Asta</div>
+              <div style="font-size:10px;color:#6b7280;">AI-guided · no ML needed</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:#374151;margin-bottom:9px;">Let Asta guide you through building a custom model for this project — step by step, in plain language.</div>
+          <button class="btn btn-p btn-sm" style="width:100%;" onclick="go(1)">▶ Start Asta Workflow</button>
+        </div>
+        <div class="map-attr">© OpenStreetMap contributors</div>
+      </div>
+      <div class="tbl-wrap" style="flex:1;overflow-y:auto;">
+        <div class="tbl-toolbar">
+          <span style="font-size:12px;font-weight:500;color:#374151;">6 tasks</span>
+          <button class="btn btn-s btn-sm">▦ Columns</button>
+          <button class="btn btn-s btn-sm">⊟ Filter</button>
+          <div style="margin-left:auto;display:flex;gap:5px;">
+            <button class="btn btn-s btn-sm">My tasks</button>
+            <button class="btn btn-p btn-sm" onclick="go(1)">+ Build Model (Asta)</button>
+          </div>
+        </div>
+        <table class="tbl">
+          <thead><tr><th><input type="checkbox"/></th><th>Name</th><th>Status</th><th>Start time</th><th>End time</th><th>Geometry</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${['Amazon_dataset_138032_0001','Amazon_dataset_138032_0002','Amazon_dataset_138033_0001','Amazon_dataset_138033_0002'].map(n=>`
+            <tr><td><input type="checkbox"/></td>
+            <td style="color:#3b82f6;cursor:pointer;">${n}</td>
+            <td><span class="tag tag-g">Current</span></td>
+            <td>9/1/2026</td><td>9/30/2026</td>
+            <td style="color:#3b82f6;cursor:pointer;">View geometry</td>
+            <td><span style="color:#3b82f6;cursor:pointer;">View geometry</span></td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `,
+  astaHtml: ''
+},
+
+// ═══ 1: M1 — PREDICTION TYPE ════════════════════════════════════════════════
+{
+  crumbs: ['Amazon Forest Loss', 'Model Builder', 'New Model — Step 1 of 5'],
+  navActive: 'ni-model',
+  astaClosed: false,
+  astaStatus: 'Guiding setup · step 1/5',
+  badge: false,
+  html: () => `
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div class="map-wrap" style="flex:2;min-height:190px;">
+        ${mkMap('grid')}
+        <div class="map-ctrl"><div class="map-btn">+</div><div class="map-btn">−</div></div>
+        <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.82);color:white;padding:5px 14px;border-radius:18px;font-size:11px;display:flex;align-items:center;gap:7px;z-index:20;">
+          <div class="asta-av" style="width:18px;height:18px;font-size:9px;border-radius:5px;">A</div>
+          Asta is guiding your setup — answer questions in the panel →
+        </div>
+        <div class="map-attr">© OpenStreetMap contributors</div>
+      </div>
+      <div style="background:white;border-top:1px solid #e5e7eb;padding:14px 18px;overflow-y:auto;flex:1;">
+        <div style="font-size:12px;font-weight:500;color:#374151;margin-bottom:8px;">Step 1 of 5 — Defining Your Goal</div>
+        <div class="steps">${[1,2,3,4,5].map(i=>`<div class="step-seg ${i<=1?'done':''}"></div>`).join('')}</div>
+        <div class="odd-box"><strong>ODD-1A:</strong> Agent shown with access to the current project (Amazon Forest Loss) and existing annotations. Pre-filling recommended options from detected label classes.</div>
+        <div class="odd-box" style="margin-top:5px;"><strong>ODD-1B:</strong> Hybrid wizard model shown here — one question at a time with visible overall progress. User can also type freely in the chat above to skip ahead.</div>
+        <p style="font-size:11px;color:#9ca3af;margin-top:8px;">↗ Respond to Asta's questions in the panel on the right</p>
+      </div>
+    </div>
+  `,
+  astaHtml: `
+    <div class="msg asta">
+      <div class="msg-lbl">Asta</div>
+      <div class="msg-bub">Hi! I'm Asta, your AI training assistant. I'll guide you through building a model for <strong>Amazon Forest Loss</strong> — no ML expertise needed. I'll ask you a few questions and take care of the technical details.</div>
+    </div>
+    <div class="msg asta">
+      <div class="msg-bub">
+        First: <strong>what do you want the model to predict?</strong>
+        <div class="chat-opts">
+          <div class="copt sel" onclick="sel(this)">
+            <div><div class="copt-t">🏷 Classification</div><div class="copt-d">Assign each area to a category (e.g. Forest Loss, No Change, Regrowth)</div></div>
+            <span class="copt-rec">★ Recommended</span>
+          </div>
+          <div class="copt" onclick="sel(this)">
+            <div><div class="copt-t">🖌 Segmentation</div><div class="copt-d">Draw precise pixel-by-pixel boundaries of features</div></div>
+          </div>
+          <div class="copt" onclick="sel(this)">
+            <div><div class="copt-t">📊 Regression</div><div class="copt-d">Predict a number for each area (e.g. canopy cover %, biomass)</div></div>
+          </div>
+        </div>
+        <button class="btn btn-p btn-sm" onclick="go(2)" style="width:100%;margin-top:8px;">Confirm: Classification →</button>
+      </div>
+    </div>
+  `
+},
+
+// ═══ 2: M1 — LABELS & TEMPORAL ══════════════════════════════════════════════
+{
+  crumbs: ['Amazon Forest Loss', 'Model Builder', 'New Model — Step 2 of 5'],
+  navActive: 'ni-model',
+  astaClosed: false,
+  astaStatus: 'Step 2/5 · Labels & temporal',
+  badge: false,
+  html: () => `
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div class="map-wrap" style="flex:2;min-height:190px;">
+        ${mkMap('grid')}
+        <div class="map-ctrl"><div class="map-btn">+</div><div class="map-btn">−</div></div>
+        <div class="map-attr">© OpenStreetMap contributors</div>
+      </div>
+      <div style="background:white;border-top:1px solid #e5e7eb;padding:14px 18px;overflow-y:auto;flex:1;">
+        <div style="font-size:12px;font-weight:500;color:#374151;margin-bottom:8px;">Step 2 of 5 — Labels &amp; Time Range</div>
+        <div class="steps">${[1,2,3,4,5].map(i=>`<div class="step-seg ${i<=2?'done':''}"></div>`).join('')}</div>
+        <div style="background:#f0fdfa;border:1px solid #99f6e4;border-radius:7px;padding:8px 12px;font-size:11px;margin-top:8px;">
+          ✓ <strong>Classification</strong> &nbsp;|&nbsp; Detected classes from your project:
+          <span class="tag tag-r" style="margin:0 3px;">Forest Loss</span>
+          <span class="tag tag-g" style="margin:0 3px;">No Change</span>
+          <span class="tag tag-b" style="margin:0 3px;">Regrowth</span>
+        </div>
+        <p style="font-size:11px;color:#9ca3af;margin-top:8px;">↗ Continue in the Asta panel →</p>
+      </div>
+    </div>
+  `,
+  astaHtml: `
+    <div class="msg user"><div class="msg-lbl">You</div><div class="msg-bub">Classification</div></div>
+    <div class="msg asta">
+      <div class="msg-lbl">Asta</div>
+      <div class="msg-bub">
+        Great. I found these <strong>label classes</strong> in your project:
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin:6px 0;">
+          <span class="tag tag-r">Forest Loss</span>
+          <span class="tag tag-g">No Change</span>
+          <span class="tag tag-b">Regrowth</span>
+        </div>
+        I'll use all three. Does that look right?
+        <div class="c-act">
+          <button class="btn btn-g btn-sm">✓ Yes, use these</button>
+          <button class="btn btn-s btn-sm">✎ Edit classes</button>
+        </div>
+      </div>
+    </div>
+    <div class="msg asta">
+      <div class="msg-bub">
+        Now, <strong>how often do changes happen</strong> in your area? This determines how much satellite imagery I'll use for training.
+        <div class="chat-opts" style="margin-top:6px;">
+          <div class="copt" onclick="sel(this)">
+            <div><div class="copt-t">⚡ Very fast (days–weeks)</div><div class="copt-d">Fires, floods, sudden clearing events</div></div>
+          </div>
+          <div class="copt sel" onclick="sel(this)">
+            <div><div class="copt-t">📅 Seasonal / quarterly</div><div class="copt-d">Deforestation cycles, 3–4 month patterns</div></div>
+            <span class="copt-rec">★ Recommended</span>
+          </div>
+          <div class="copt" onclick="sel(this)">
+            <div><div class="copt-t">🗓 Annual (12 months)</div><div class="copt-d">Slow land cover change, ecosystem monitoring</div></div>
+          </div>
+        </div>
+        <button class="btn btn-p btn-sm" onclick="go(3)" style="width:100%;margin-top:8px;">Confirm: Quarterly →</button>
+      </div>
+    </div>
+  `
+},
+
+// ═══ 3: M1 — IMAGERY & SPATIAL ══════════════════════════════════════════════
+{
+  crumbs: ['Amazon Forest Loss', 'Model Builder', 'New Model — Step 3 of 5'],
+  navActive: 'ni-model',
+  astaClosed: false,
+  astaStatus: 'Step 3/5 · Imagery & spatial',
+  badge: false,
+  html: () => `
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div class="map-wrap" style="flex:2;min-height:190px;">
+        ${mkMap('grid')}
+        <div class="map-ctrl"><div class="map-btn">+</div><div class="map-btn">−</div></div>
+        <div class="map-attr">© OpenStreetMap contributors</div>
+      </div>
+      <div style="background:white;border-top:1px solid #e5e7eb;padding:14px 18px;overflow-y:auto;flex:1;">
+        <div style="font-size:12px;font-weight:500;color:#374151;margin-bottom:8px;">Step 3 of 5 — Imagery &amp; Spatial Context</div>
+        <div class="steps">${[1,2,3,4,5].map(i=>`<div class="step-seg ${i<=3?'done':''}"></div>`).join('')}</div>
+        <div style="background:#f0fdfa;border:1px solid #99f6e4;border-radius:7px;padding:8px 12px;font-size:11px;margin-top:8px;">
+          ✓ Classification &nbsp;|&nbsp; ✓ 3 label classes &nbsp;|&nbsp; ✓ Quarterly (4 timesteps of imagery)
+        </div>
+        <p style="font-size:11px;color:#9ca3af;margin-top:8px;">↗ Continue in the Asta panel →</p>
+      </div>
+    </div>
+  `,
+  astaHtml: `
+    <div class="msg user"><div class="msg-lbl">You</div><div class="msg-bub">Quarterly</div></div>
+    <div class="msg asta">
+      <div class="msg-lbl">Asta</div>
+      <div class="msg-bub">
+        Perfect — I'll use <strong>4 months of Sentinel-2 optical imagery</strong> to capture seasonal patterns.
+        <br/><br/>
+        Would you also like to add <strong>Sentinel-1 radar data</strong>? Radar can see through clouds, which is common over the Amazon.
+        <div class="c-toggle" style="margin-top:7px;">
+          <div class="toggle-sw" id="s1-sw" onclick="this.classList.toggle('on')"></div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:#111827;">Add Sentinel-1 Radar</div>
+            <div style="font-size:10px;color:#6b7280;">Improves cloudy regions · adds ~20% training time</div>
+          </div>
+        </div>
+        <div class="ibox" style="margin-top:6px;">💡 For Amazon forest loss, radar often helps in the wet season when optical data is blocked by cloud cover.</div>
+      </div>
+    </div>
+    <div class="msg asta">
+      <div class="msg-bub">
+        Last question: <strong>how large an area</strong> around each labeled point should I analyze?
+        <select class="c-select">
+          <option>16×16 pixels (160m × 160m) — ★ Recommended for point labels</option>
+          <option>32×32 pixels (320m × 320m)</option>
+          <option>64×64 pixels (640m × 640m)</option>
+          <option>128×128 pixels (1280m × 1280m)</option>
+        </select>
+        <div style="font-size:10px;color:#6b7280;margin-top:4px;">Smaller = faster training, less overfitting. Go larger if conditions >160m away affect your labels.</div>
+        <button class="btn btn-p btn-sm" onclick="go(4)" style="width:100%;margin-top:8px;">Review summary →</button>
+      </div>
+    </div>
+  `
+},
+
+// ═══ 4: M1 — SUMMARY & CONFIRM ══════════════════════════════════════════════
+{
+  crumbs: ['Amazon Forest Loss', 'Model Builder', 'New Model — Review & Confirm'],
+  navActive: 'ni-model',
+  astaClosed: false,
+  astaStatus: 'Ready to start training',
+  badge: false,
+  html: () => `
+    <div class="summ-screen">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+        <div class="asta-av">A</div>
+        <div>
+          <h2 style="font-size:16px;color:#111827;">Review Your Model Setup</h2>
+          <p style="font-size:12px;color:#6b7280;">Here's everything you've told me. Review it, then click Start Training.</p>
+        </div>
+      </div>
+      <div class="summ-card">
+        <div class="summ-card-h">🎯 Your Prediction Goal</div>
+        <div class="summ-row"><span class="sl">What to predict</span><span class="sv">Classify each area as Forest Loss, No Change, or Regrowth</span></div>
+        <div class="summ-row"><span class="sl">Label classes</span><span class="sv"><span class="tag tag-r" style="margin-right:3px;">Forest Loss</span><span class="tag tag-g" style="margin-right:3px;">No Change</span><span class="tag tag-b">Regrowth</span></span></div>
+      </div>
+      <div class="summ-card">
+        <div class="summ-card-h">🛰 Imagery &amp; Data</div>
+        <div class="summ-row"><span class="sl">Satellite data</span><span class="sv">Sentinel-2 optical</span><span class="sc">Default</span></div>
+        <div class="summ-row"><span class="sl">Radar data</span><span class="sv">Not included</span></div>
+        <div class="summ-row"><span class="sl">Time range</span><span class="sv">Last 4 months (quarterly)</span><span class="sc">Recommended</span></div>
+        <div class="summ-row"><span class="sl">Analysis window</span><span class="sv">160m × 160m around each label point</span><span class="sc">Default</span></div>
+      </div>
+      <div class="summ-card">
+        <div class="summ-card-h">⚙ Handled automatically by Asta</div>
+        <div class="summ-row"><span class="sl">Model architecture</span><span class="sv">Auto-selected based on your task type</span></div>
+        <div class="summ-row"><span class="sl">Training duration</span><span class="sv">Estimated 2–4 hours (you'll be notified)</span></div>
+        <div class="summ-row"><span class="sl">Evaluation</span><span class="sv">Asta prepares predictions for your review after training</span></div>
+      </div>
+      <div class="wbox">⚠ <strong>Note:</strong> Your "No Change" class has only 14 labeled examples (vs. 340+ for other classes). Asta may pause during training to ask for more annotations.</div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button class="btn btn-s" onclick="go(3)">← Edit Setup</button>
+        <button class="btn btn-p" style="flex:1;" onclick="go(5)">▶ Start Training</button>
+      </div>
+    </div>
+  `,
+  astaHtml: `
+    <div class="msg asta">
+      <div class="msg-lbl">Asta</div>
+      <div class="msg-bub">I've put together a summary of your setup on the left. Take a moment to review it before we start.
+      <br/><br/>
+      One heads-up: <strong>"No Change"</strong> only has 14 examples — I'd normally want at least 50 per class. I may need to pause during training to ask for more.
+      <br/><br/>
+      Want to add annotations first, or shall we start?
+      </div>
+    </div>
+    <div class="c-act">
+      <button class="btn btn-w btn-sm">+ Add more labels first</button>
+      <button class="btn btn-p btn-sm" onclick="go(5)">Start training →</button>
+    </div>
+  `
+},
+
+// ═══ 5: M2 — TRAINING RUNNING ════════════════════════════════════════════════
+{
+  crumbs: ['Amazon Forest Loss', 'Model Builder', 'amazon-forest-loss-v1'],
+  navActive: 'ni-model',
+  astaClosed: false,
+  astaStatus: 'Training in progress…',
+  badge: false,
+  html: () => `
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div class="train-bar">
+        <span class="sbadge run"><span class="sdot"></span> Training in Progress</span>
+        <div class="prog-track">
+          <div class="prog-lbl">Epoch 3 of 8 — ~2h 12m remaining</div>
+          <div class="prog-bar"><div class="prog-fill" style="width:37%;"></div></div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:5px;">
+          <button class="btn btn-s btn-sm">⏸ Pause</button>
+          <button class="btn btn-s btn-sm">✕ Cancel</button>
+        </div>
+      </div>
+      <div class="map-wrap" style="flex:2;min-height:190px;">
+        ${mkMap('grid')}
+        <div class="map-ctrl"><div class="map-btn">+</div><div class="map-btn">−</div></div>
+        <div class="map-attr">© OpenStreetMap contributors</div>
+      </div>
+      <div class="tbl-wrap" style="flex:1;overflow-y:auto;padding:12px 16px;">
+        <div style="font-size:11px;font-weight:500;color:#6b7280;margin-bottom:6px;">Training log</div>
+        <div class="log-line log-ok">✓ [09:03] Data validation complete — 354 training examples loaded</div>
+        <div class="log-line log-ok">✓ [09:04] Model initialized — OlmoEarth ViT-B/16 backbone</div>
+        <div class="log-line log-ok">✓ [09:06] Epoch 1/8 complete — training loss: 0.892</div>
+        <div class="log-line log-ok">✓ [09:48] Epoch 2/8 complete — training loss: 0.651</div>
+        <div class="log-line log-run">⟳ [11:08] Epoch 3/8 in progress…</div>
+        <div class="log-line log-dim">  [—] Epochs 4–8 pending</div>
+      </div>
+    </div>
+  `,
+  astaHtml: `
+    <div class="msg asta">
+      <div class="msg-lbl">Asta</div>
+      <div class="msg-bub">Training has started! 🚀
+      <br/><br/>
+      I'm on <strong>epoch 3 of 8</strong> right now. Estimated completion in about 2 hours.
+      <br/><br/>
+      You can keep working in Studio — I'll send you a notification if I need a decision, or when it's done.</div>
+    </div>
+    <div class="msg asta">
+      <div class="msg-bub">
+        <div style="font-size:10px;color:#6b7280;margin-bottom:5px;">LIVE STATUS</div>
+        <div class="c-summ" style="margin:0;">
+          <div class="c-summ-row"><span class="lbl">Phase</span><span class="val">Training (epoch 3/8)</span></div>
+          <div class="c-summ-row"><span class="lbl">Training loss</span><span class="val">0.651 ↓ improving</span></div>
+          <div class="c-summ-row"><span class="lbl">Est. remaining</span><span class="val">~2h 12m</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="odd-box"><strong>ODD-2A:</strong> Notification strategy TBD — in-app badge only shown here. Email/push notification as alternative or addition to be decided before visual design.</div>
+    <div class="odd-box" style="margin-top:4px;"><strong>ODD-2B:</strong> Max interruptions per run TBD. ML team to define threshold before productization.</div>
+    <button class="btn btn-s btn-sm" onclick="go(6)" style="width:100%;margin-top:4px;">[→ Simulate interruption]</button>
+  `
+},
+
+// ═══ 6: M2 — DATA GAP INTERRUPTION ══════════════════════════════════════════
+{
+  crumbs: ['Amazon Forest Loss', 'Model Builder', 'amazon-forest-loss-v1'],
+  navActive: 'ni-model',
+  astaClosed: false,
+  astaStatus: '⚠ Waiting for your input',
+  badge: true,
+  html: () => `
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div class="train-bar" style="background:#fffbeb;border-bottom-color:#fde68a;">
+        <span class="sbadge wait"><span class="sdot"></span> Waiting for Input</span>
+        <div class="prog-track">
+          <div class="prog-lbl" style="color:#b45309;">Paused — Asta needs a decision to continue</div>
+          <div class="prog-bar"><div class="prog-fill" style="width:62%;background:#f59e0b;"></div></div>
+        </div>
+        <button class="btn btn-w btn-sm" style="margin-left:auto;">View issue in Asta →</button>
+      </div>
+      <div class="map-wrap" style="flex:2;min-height:190px;">
+        ${mkMap('grid')}
+        <div class="map-ctrl"><div class="map-btn">+</div><div class="map-btn">−</div></div>
+        <!-- Interruption overlay -->
+        <div class="int-overlay">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+            <span style="font-size:16px;">⚠</span>
+            <strong style="font-size:12px;color:#92400e;">Asta needs your help</strong>
+          </div>
+          <p style="font-size:11px;color:#78350f;margin-bottom:9px;">Training is paused. I found a data issue I can't resolve without you. Check the Asta panel for details and options.</p>
+          <button class="btn btn-w btn-sm" style="width:100%;">See options in Asta panel →</button>
+        </div>
+        <div class="map-attr">© OpenStreetMap contributors</div>
+      </div>
+      <div class="tbl-wrap" style="flex:1;overflow-y:auto;padding:12px 16px;">
+        <div class="log-line log-ok">✓ [09:06] Epoch 1/8 — loss: 0.892</div>
+        <div class="log-line log-ok">✓ [09:48] Epoch 2/8 — loss: 0.651</div>
+        <div class="log-line log-ok">✓ [10:36] Epoch 3/8 — loss: 0.532</div>
+        <div class="log-line log-ok">✓ [11:22] Epoch 4/8 — loss: 0.481</div>
+        <div class="log-line log-ok">✓ [12:11] Epoch 5/8 — loss: 0.471</div>
+        <div class="log-line log-warn">⚠ [12:13] <strong>Class imbalance detected</strong> — "No Change" F1: 0.23. Training paused, awaiting decision.</div>
+        <div class="log-line log-dim">  [—] Waiting for user response…</div>
+      </div>
+    </div>
+  `,
+  astaHtml: `
+    <div class="msg asta">
+      <div class="msg-lbl">Asta</div>
+      <div class="msg-bub warn">
+        <strong>⚠ I've hit a problem and need your help.</strong>
+        <br/><br/>
+        I paused training. Here's what I found:
+        <br/><br/>
+        Your <strong>"No Change"</strong> class has very few examples (14) compared to your other classes (340+). Because of this, the model is nearly ignoring "No Change" areas entirely.
+        <br/><br/>
+        This is a data issue — I can't resolve it on my own.
+      </div>
+    </div>
+    <div class="msg asta">
+      <div class="msg-bub">
+        What would you like to do? I can explain any of these in more detail.
+        <div class="chat-opts" style="margin-top:7px;">
+          <div class="copt" onclick="sel(this); setTimeout(()=>go(7),350)">
+            <div><div class="copt-t">📍 Add more "No Change" annotations</div><div class="copt-d">Opens annotation tool. Adding 50+ examples will significantly improve accuracy.</div></div>
+            <span class="copt-rec">★ Best option</span>
+          </div>
+          <div class="copt" onclick="sel(this)">
+            <div><div class="copt-t">⚖ Re-weight classes automatically</div><div class="copt-d">I'll adjust training to compensate for the imbalance. May not fully solve the problem.</div></div>
+          </div>
+          <div class="copt" onclick="sel(this)">
+            <div><div class="copt-t">▶ Continue with current data</div><div class="copt-d">Accept lower "No Change" accuracy. You can improve it in a later review round.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="odd-box"><strong>ODD-2B:</strong> Counter shown here: Interruption 1 of [max TBD]. Max interruptions per run should be agreed with ML team before v1.</div>
+  `
+},
+
+// ═══ 7: M3 — PREDICTION REVIEW ══════════════════════════════════════════════
+{
+  crumbs: ['Amazon Forest Loss', 'Model Builder', 'Prediction Review — Session 1'],
+  navActive: 'ni-model',
+  astaClosed: false,
+  astaStatus: 'Review session in progress',
+  badge: false,
+  html: () => `
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <!-- Review toolbar -->
+      <div style="background:white;border-bottom:1px solid #e5e7eb;padding:7px 16px;display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <span style="font-size:12px;font-weight:600;">Prediction Review</span>
+        <span class="tag tag-b">Session 1</span>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:7px;">
+          <span style="font-size:11px;color:#6b7280;">Reviewed: <strong id="rev-count" style="color:#111827;">0</strong> / 15</span>
+          <button class="btn btn-s btn-sm">⏸ Save &amp; Exit</button>
+          <button class="btn btn-p btn-sm" onclick="go(8)">Submit Review →</button>
+        </div>
+      </div>
+      <!-- Split view -->
+      <div style="display:flex;flex:1;overflow:hidden;">
+        <!-- Map with prediction layer -->
+        <div class="map-wrap" style="flex:1;position:relative;">
+          ${mkMap('pred')}
+          <div class="map-ctrl"><div class="map-btn">+</div><div class="map-btn">−</div></div>
+          <div class="pred-legend">
+            <div style="font-size:10px;font-weight:600;margin-bottom:4px;">Model Predictions</div>
+            <div class="leg-row"><div class="leg-sw" style="background:rgba(239,68,68,0.7);"></div> Forest Loss</div>
+            <div class="leg-row"><div class="leg-sw" style="background:rgba(34,197,94,0.6);"></div> No Change</div>
+            <div class="leg-row"><div class="leg-sw" style="background:rgba(59,130,246,0.6);"></div> Regrowth</div>
+          </div>
+          <div class="map-attr">© OpenStreetMap contributors</div>
+        </div>
+        <!-- Review cards panel -->
+        <div style="width:268px;background:#f9fafb;border-left:1px solid #e5e7eb;overflow-y:auto;padding:9px;">
+          <div style="font-size:11px;font-weight:500;color:#374151;margin-bottom:6px;">Mark each prediction correct or incorrect</div>
+          <div class="odd-box" style="margin-bottom:7px;font-size:9px;"><strong>ODD-3A:</strong> 15 predictions shown (batch size TBD with ML team). <strong>ODD-3B:</strong> Low-confidence cases prioritized here — strategy TBD.</div>
+          ${[
+            {lbl:'Forest Loss', loc:'−3.42, −60.18', conf:'91%', hi:false, clr:'linear-gradient(135deg,#8B4513,#5a3010)'},
+            {lbl:'No Change', loc:'−3.51, −60.24', conf:'67%', hi:false, clr:'linear-gradient(135deg,#5a8c5d,#7cb87a)'},
+            {lbl:'Regrowth', loc:'−3.38, −60.31', conf:'84%', hi:false, clr:'linear-gradient(135deg,#4a7c59,#3d8c5a)'},
+            {lbl:'Forest Loss', loc:'−3.47, −60.15', conf:'78%', hi:false, clr:'linear-gradient(135deg,#7a4020,#5a3010)'},
+            {lbl:'No Change', loc:'−3.55, −60.28', conf:'44%', hi:true, clr:'linear-gradient(135deg,#6b9e6e,#4a7c50)'},
+          ].map((p,i)=>`
+          <div class="rev-card" id="rc${i}">
+            <div class="rev-thumb" style="background:${p.clr};">
+              <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:${p.lbl==='Forest Loss'?'rgba(239,68,68,0.4)':p.lbl==='Regrowth'?'rgba(59,130,246,0.35)':'rgba(34,197,94,0.3)'};"></div>
+              <div class="rev-conf">${p.conf}</div>
+              ${p.hi?'<div class="rev-lowconf">⚠ Low confidence</div>':''}
+            </div>
+            <div class="rev-info"><div class="ri-l">${p.lbl}</div><div class="ri-s">📍 ${p.loc}</div></div>
+            <div class="rev-acts">
+              <button class="rev-btn ok" onclick="markRev(${i},'good')">✓ Correct</button>
+              <button class="rev-btn no" onclick="markRev(${i},'bad')">✗ Wrong</button>
+            </div>
+          </div>`).join('')}
+          <div style="font-size:10px;color:#9ca3af;text-align:center;padding:6px;">+10 more predictions below…</div>
+        </div>
+      </div>
+    </div>
+  `,
+  astaHtml: `
+    <div class="msg asta">
+      <div class="msg-lbl">Asta</div>
+      <div class="msg-bub">Training is complete! 🎉
+      <br/><br/>
+      I've prepared <strong>15 predictions</strong> for you to review. I prioritized the ones where I'm least confident — your feedback on these will improve the model the most.
+      <br/><br/>
+      For each prediction: mark it <strong>correct</strong> if it looks right, or <strong>incorrect</strong> if not. You can also re-draw the correct label inline.</div>
+    </div>
+    <div class="msg asta">
+      <div class="msg-bub">
+        <div style="font-size:10px;color:#6b7280;margin-bottom:5px;">TIPS</div>
+        <div style="font-size:11px;line-height:1.7;">
+          • <strong>✓ Correct</strong> — prediction looks right<br/>
+          • <strong>✗ Wrong</strong> — mark incorrect + optionally re-draw<br/>
+          • Session auto-saves — safe to exit and return<br/>
+          • Yellow badge = low confidence prediction
+        </div>
+      </div>
+    </div>
+    <div class="odd-box"><strong>ODD-3C:</strong> Review UI embedded in Viewer shown here. Dedicated review mode to be considered for larger batches (>20). To discuss with design team.</div>
+  `
+},
+
+// ═══ 8: M4 — RESULTS ════════════════════════════════════════════════════════
+{
+  crumbs: ['Amazon Forest Loss', 'Model Builder', 'amazon-forest-loss-v1 — Results'],
+  navActive: 'ni-model',
+  astaClosed: false,
+  astaStatus: 'Job complete ✓',
+  badge: false,
+  html: () => `
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div class="train-bar">
+        <span class="sbadge done"><span class="sdot"></span> Complete</span>
+        <span style="font-size:12px;color:#374151;margin-left:4px;">amazon-forest-loss-v1 · Training + review cycle done</span>
+        <div style="margin-left:auto;display:flex;gap:5px;">
+          <button class="btn btn-s btn-sm" onclick="go(7)">↻ Another Review Round</button>
+          <button class="btn btn-p btn-sm">✓ Accept Model for Use</button>
+        </div>
+      </div>
+      <!-- Map with results layer -->
+      <div class="map-wrap" style="flex:2;min-height:190px;">
+        ${mkMap('results')}
+        <div class="map-ctrl"><div class="map-btn">+</div><div class="map-btn">−</div></div>
+        <div class="pred-legend">
+          <div style="font-size:10px;font-weight:600;margin-bottom:4px;">Model Output</div>
+          <div class="leg-row"><div class="leg-sw" style="background:rgba(239,68,68,0.76);"></div> Forest Loss (high conf.)</div>
+          <div class="leg-row"><div class="leg-sw" style="background:rgba(251,191,36,0.75);"></div> Forest Loss (low conf.)</div>
+          <div class="leg-row"><div class="leg-sw" style="background:rgba(34,197,94,0.7);"></div> No Change</div>
+          <div class="leg-row"><div class="leg-sw" style="background:rgba(59,130,246,0.7);"></div> Regrowth</div>
+        </div>
+        <div class="map-attr">© OpenStreetMap contributors</div>
+      </div>
+      <!-- Results summary -->
+      <div style="background:white;border-top:1px solid #e5e7eb;flex:1;overflow-y:auto;padding:14px 18px;">
+        <div class="metric-grid">
+          <div class="metric-box"><div class="metric-v">87%</div><div class="metric-l">Overall accuracy</div></div>
+          <div class="metric-box"><div class="metric-v">342</div><div class="metric-l">km² mapped</div></div>
+          <div class="metric-box"><div class="metric-v" style="color:#f59e0b;">62%</div><div class="metric-l">"No Change" accuracy</div></div>
+        </div>
+        <div class="odd-box"><strong>ODD-4B:</strong> Advanced metrics (F1 scores, confusion matrix) are hidden by default here. Would be accessible via an expandable "Show advanced metrics" section for ML-savvy users.</div>
+        <div class="odd-box" style="margin-top:4px;"><strong>ODD-4A:</strong> Out-of-app notification (email/push) on completion — linked to ODD-2A. Both should be decided as a single notification strategy before v1.</div>
+      </div>
+    </div>
+  `,
+  astaHtml: `
+    <div class="msg asta">
+      <div class="msg-lbl">Asta</div>
+      <div class="msg-bub success"><strong>✓ Your model is ready!</strong></div>
+    </div>
+    <div class="msg asta">
+      <div class="msg-bub">
+        Your model correctly identified forest loss in <strong>87% of the test areas</strong>. It's performing well in the dense forest interior.
+        <br/><br/>
+        <strong>Where it struggled:</strong> "No Change" areas near waterways and seasonal floodplains — they can look visually similar to forest loss during dry periods.
+        <br/><br/>
+        <strong>My recommendation:</strong> The model is ready to use for most of your project area. If floodplain accuracy matters for your mission, one more review round focused on those regions would help.
+      </div>
+    </div>
+    <div class="msg asta">
+      <div class="msg-bub">
+        What would you like to do?
+        <div class="c-act" style="flex-direction:column;gap:5px;">
+          <button class="btn btn-p btn-sm" style="width:100%;">✓ Accept model &amp; use in predictions</button>
+          <button class="btn btn-s btn-sm" style="width:100%;" onclick="go(7)">↻ Do another review round</button>
+          <button class="btn btn-s btn-sm" style="width:100%;">📄 Download plain-language report</button>
+        </div>
+      </div>
+    </div>
+  `
+}
+
+]; // end S[]
+
+// ─── NAV LOGIC ────────────────────────────────────────────────────────────
+let cur = 0;
+
+function go(n) {
+  cur = n;
+  render();
+}
+function prev() { if (cur > 0) go(cur - 1); }
+function next() { if (cur < S.length - 1) go(cur + 1); }
+
+function render() {
+  const s = S[cur];
+
+  // Header
+  document.getElementById('main-header').innerHTML = `
+    <div class="breadcrumb">
+      ${s.crumbs.map((c,i) => i < s.crumbs.length-1
+        ? `<span>${c}</span><span class="bc-sep">/</span>`
+        : `<span class="bc-cur">${c}</span>`).join('')}
+    </div>
+    <div class="header-actions">
+      <span style="font-size:10px;color:#9ca3af;background:#f3f4f6;padding:2px 7px;border-radius:10px;">Screen ${cur+1} / ${S.length}</span>
+    </div>`;
+
+  // Screen body
+  document.getElementById('screen-wrap').innerHTML = s.html();
+
+  // Asta panel
+  const panel = document.getElementById('asta-panel');
+  const arrow = document.getElementById('ap-arrow');
+  if (s.astaClosed) {
+    panel.classList.add('collapsed');
+    arrow.textContent = '⇤';
+  } else {
+    panel.classList.remove('collapsed');
+    arrow.textContent = '⇥';
+  }
+  document.getElementById('asta-status').textContent = s.astaStatus;
+  const body = document.getElementById('ap-body');
+  body.innerHTML = s.astaHtml || '';
+  setTimeout(() => { body.scrollTop = body.scrollHeight; }, 60);
+
+  // Sidebar badge
+  document.getElementById('sb-badge').style.display = s.badge ? 'inline' : 'none';
+
+  // Sidebar active
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const ni = document.getElementById(s.navActive);
+  if (ni) ni.classList.add('active');
+
+  // Storyboard nav
+  document.querySelectorAll('.snav-btn').forEach(b => b.classList.remove('active'));
+  const sb = document.getElementById('sb'+cur);
+  if (sb) sb.classList.add('active');
+
+  // Arrows
+  document.getElementById('sarr-p').disabled = cur === 0;
+  document.getElementById('sarr-n').disabled = cur === S.length - 1;
+}
+
+// ─── INTERACTION HELPERS ──────────────────────────────────────────────────
+function toggleAsta() {
+  const p = document.getElementById('asta-panel');
+  p.classList.toggle('collapsed');
+  document.getElementById('ap-arrow').textContent = p.classList.contains('collapsed') ? '⇤' : '⇥';
+}
+
+function sel(el) {
+  const parent = el.closest('.msg-bub') || el.closest('.ap-body');
+  if (parent) parent.querySelectorAll('.copt').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+let revCount = 0;
+function markRev(i, type) {
+  const card = document.getElementById('rc'+i);
+  if (!card) return;
+  const wasMarked = card.classList.contains('good') || card.classList.contains('bad');
+  card.classList.remove('good','bad');
+  card.classList.add(type);
+  const counter = document.getElementById('rev-count');
+  if (counter) {
+    if (!wasMarked) revCount++;
+    counter.textContent = revCount;
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
