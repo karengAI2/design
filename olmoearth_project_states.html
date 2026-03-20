@@ -1,0 +1,345 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.root{font-family:var(--font-sans);font-size:13px;color:var(--color-text-primary)}
+
+/* State tabs */
+.state-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.stab{padding:5px 12px;font-size:12px;border:0.5px solid var(--color-border-secondary);border-radius:20px;cursor:pointer;background:transparent;color:var(--color-text-secondary)}
+.stab.active{background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary)}
+
+/* Shell */
+.shell{display:flex;height:660px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:208px;min-width:208px;background:var(--color-background-secondary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;flex-shrink:0}
+.sb-head{padding:12px 12px 10px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.sb-brand{font-size:13px;font-weight:500;margin-bottom:8px}
+.org-row{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:11px;margin-bottom:5px}
+.org-label{font-size:10px;color:var(--color-text-tertiary)}
+.org-name{font-weight:500;flex:1}
+.proj-row{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:12px;cursor:pointer}
+.proj-row-name{font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chev{color:var(--color-text-tertiary);font-size:10px}
+.sb-nav{padding:8px 6px;flex:1;overflow-y:auto}
+.sb-section{font-size:10px;letter-spacing:.04em;color:var(--color-text-tertiary);padding:8px 10px 3px;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 10px;font-size:13px;color:var(--color-text-secondary);border-radius:var(--border-radius-md);margin-bottom:1px;cursor:pointer}
+.sb-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.sb-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500}
+.sb-item.dim{opacity:.38;pointer-events:none}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.d-done{background:#1D9E75}.d-act{background:#185FA5}.d-warn{background:#BA7517}.d-idle{background:var(--color-border-secondary)}
+.sb-foot{border-top:0.5px solid var(--color-border-tertiary);padding:8px 12px}
+.sb-foot-item{font-size:12px;color:var(--color-text-secondary);padding:3px 0;cursor:pointer}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;background:var(--color-background-tertiary);min-width:0}
+.topbar{padding:11px 20px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tb-left p{font-size:15px;font-weight:500}
+.tb-left span{font-size:11px;color:var(--color-text-secondary)}
+.tb-right{display:flex;gap:8px;align-items:center}
+.btn{font-size:12px;padding:5px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-primary);cursor:pointer;white-space:nowrap}
+.btn-p{background:#0F6E56;border-color:#0F6E56;color:#E1F5EE}
+.pill{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);white-space:nowrap}
+.content{padding:20px;overflow-y:auto;flex:1}
+
+/* Cards */
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px}
+.card-title{font-size:12px;font-weight:500;margin-bottom:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.mcard{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:11px 13px}
+.mlabel{font-size:10px;color:var(--color-text-secondary);margin-bottom:3px}
+.mval{font-size:19px;font-weight:500}
+.msub{font-size:11px;margin-top:2px}
+
+/* Project cards (overview) */
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pc{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:13px 15px;cursor:pointer}
+.pc:hover{border-color:var(--color-border-secondary)}
+.pc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.pc-name{font-size:13px;font-weight:500}
+.pc-org{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+.badge{font-size:10px;padding:2px 7px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.b-review{background:var(--color-background-warning);color:var(--color-text-warning)}
+.b-done{background:var(--color-background-success);color:var(--color-text-success)}
+.b-training{background:var(--color-background-info);color:var(--color-text-info)}
+.b-annotate{background:#FAEEDA;color:#633806}
+.b-new{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.prog-track{height:4px;background:var(--color-background-secondary);border-radius:3px;margin-bottom:6px;overflow:hidden}
+.prog-fill{height:4px;border-radius:3px;background:#1D9E75}
+.prog-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--color-text-tertiary);margin-bottom:8px}
+.pc-meta{display:flex;gap:12px;font-size:11px;padding-top:8px;border-top:0.5px solid var(--color-border-tertiary)}
+.pm-item{display:flex;flex-direction:column;gap:1px}
+.pm-label{font-size:10px;color:var(--color-text-tertiary)}
+.pm-val{font-size:11px;font-weight:500;color:var(--color-text-primary)}
+.pm-val.warn{color:var(--color-text-danger)}
+
+/* Task list */
+.task-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.task-row:last-child{border-bottom:none}
+.task-name{flex:1;color:var(--color-text-primary);font-weight:500;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task-status{font-size:10px;padding:2px 7px;border-radius:8px}
+.ts-q{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.ts-ip{background:var(--color-background-info);color:var(--color-text-info)}
+.ts-done{background:var(--color-background-success);color:var(--color-text-success)}
+
+/* Map placeholder */
+.map-ph{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px}
+.map-ph span{font-size:11px;color:var(--color-text-secondary)}
+
+/* Banner */
+.banner{display:flex;align-items:center;gap:8px;border-radius:var(--border-radius-md);padding:9px 12px;margin-bottom:14px;font-size:12px}
+.ban-info{background:var(--color-background-info);border:0.5px solid var(--color-border-info);color:var(--color-text-info)}
+.ban-warn{background:#FAEEDA;border:0.5px solid #854F0B;color:#633806}
+.ban-ok{background:var(--color-background-success);border:0.5px solid var(--color-border-success);color:var(--color-text-success)}
+
+/* Empty cta */
+.empty-cta{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 20px;gap:10px}
+.empty-cta p{font-size:13px;color:var(--color-text-secondary);max-width:280px;line-height:1.6}
+
+/* Class bars */
+.cls-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.cls-row:last-child{border-bottom:none}
+.cdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cname{flex:1}
+.bwrap{width:60px;background:var(--color-background-secondary);border-radius:3px;height:4px;overflow:hidden}
+.bfill{height:4px;border-radius:3px}
+.cf1{width:34px;text-align:right;font-size:12px;font-weight:500}
+</style>
+
+<div class="root">
+<div class="state-tabs">
+  <button class="stab active" onclick="show(0)">1 — All projects</button>
+  <button class="stab" onclick="show(1)">2 — Data uploaded</button>
+  <button class="stab" onclick="show(2)">3 — Data annotated</button>
+  <button class="stab" onclick="show(3)">4 — Needs annotation</button>
+</div>
+
+<!-- STATE 0: All projects -->
+<div class="shell" id="v0">
+  <div class="sidebar">
+    <div class="sb-head">
+      <div class="sb-brand">OlmoEarth Studio</div>
+      <div class="org-row"><span class="org-label">Org</span><span class="org-name">Ai2 - Demo</span><span class="chev">&#9660;</span></div>
+      <div class="proj-row"><span class="proj-row-name">All projects</span><span class="chev">&#9660;</span></div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-item active">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8.5" y="1" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="8.5" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8.5" y="8.5" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+        All projects
+      </div>
+    </div>
+    <div class="sb-foot">
+      <div class="sb-foot-item">Account</div>
+      <div class="sb-foot-item">Organizations</div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-left"><p>Ai2 - Demo</p><span>6 projects</span></div>
+      <div class="tb-right">
+        <div class="pill">Cards</div>
+        <button class="btn btn-p">+ New project</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="proj-grid">
+        <div class="pc"><div class="pc-head"><div><div class="pc-name">Uganda crops</div><div class="pc-org">Ai2 - Demo</div></div><span class="badge b-review">Needs review</span></div><div class="prog-track"><div class="prog-fill" style="width:72%"></div></div><div class="prog-labels"><span>Data</span><span>Model</span><span>Deploy</span></div><div class="pc-meta"><div class="pm-item"><span class="pm-label">Latest model</span><span class="pm-val">V1.5 — 92.4% F1</span></div><div class="pm-item"><span class="pm-label">Lowest class</span><span class="pm-val warn">Vegetables 71%</span></div></div></div>
+        <div class="pc"><div class="pc-head"><div><div class="pc-name">LFMC CONUS Woody Demo</div><div class="pc-org">Ai2 - Demo</div></div><span class="badge b-done">Deployed</span></div><div class="prog-track"><div class="prog-fill" style="width:100%"></div></div><div class="prog-labels"><span>Data</span><span>Model</span><span>Deploy</span></div><div class="pc-meta"><div class="pm-item"><span class="pm-label">Published map</span><span class="pm-val">CONUS 2024</span></div><div class="pm-item"><span class="pm-label">Run status</span><span class="pm-val">Completed</span></div></div></div>
+        <div class="pc"><div class="pc-head"><div><div class="pc-name">Global Mangrove Demo</div><div class="pc-org">Ai2 - Demo</div></div><span class="badge b-training">Training</span></div><div class="prog-track"><div class="prog-fill" style="width:55%"></div></div><div class="prog-labels"><span>Data</span><span>Model</span><span>Deploy</span></div><div class="pc-meta"><div class="pm-item"><span class="pm-label">Model run</span><span class="pm-val">V2 — in progress</span></div><div class="pm-item"><span class="pm-label">Annotations</span><span class="pm-val">4,210 labeled</span></div></div></div>
+        <div class="pc"><div class="pc-head"><div><div class="pc-name">Kenya/Nandi Crop Type</div><div class="pc-org">Ai2 - Demo</div></div><span class="badge b-annotate">Annotating</span></div><div class="prog-track"><div class="prog-fill" style="width:28%"></div></div><div class="prog-labels"><span>Data</span><span>Model</span><span>Deploy</span></div><div class="pc-meta"><div class="pm-item"><span class="pm-label">Tasks complete</span><span class="pm-val">312 / 1,100</span></div><div class="pm-item"><span class="pm-label">Assigned to me</span><span class="pm-val">14 tasks</span></div></div></div>
+        <div class="pc"><div class="pc-head"><div><div class="pc-name">Forest Loss Colombia 12</div><div class="pc-org">Ai2 - Demo</div></div><span class="badge b-new">Not started</span></div><div class="prog-track"><div class="prog-fill" style="width:0%"></div></div><div class="prog-labels"><span>Data</span><span>Model</span><span>Deploy</span></div><div class="pc-meta"><div class="pm-item"><span class="pm-label">Data</span><span class="pm-val">Not uploaded</span></div><div class="pm-item"><span class="pm-label">Created</span><span class="pm-val">Mar 14, 2026</span></div></div></div>
+        <div class="pc"><div class="pc-head"><div><div class="pc-name">Nepal landslides</div><div class="pc-org">Ai2 - Demo</div></div><span class="badge b-review">Evaluate</span></div><div class="prog-track"><div class="prog-fill" style="width:60%"></div></div><div class="prog-labels"><span>Data</span><span>Model</span><span>Deploy</span></div><div class="pc-meta"><div class="pm-item"><span class="pm-label">Latest model</span><span class="pm-val">V1 — completed</span></div><div class="pm-item"><span class="pm-label">Reviewed</span><span class="pm-val warn">Not yet</span></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATE 1: Data uploaded (pre-labeled, no annotation needed) -->
+<div class="shell" id="v1" style="display:none">
+  <div class="sidebar">
+    <div class="sb-head">
+      <div class="sb-brand">OlmoEarth Studio</div>
+      <div class="org-row"><span class="org-label">Org</span><span class="org-name">Ai2 - Demo</span><span class="chev">&#9660;</span></div>
+      <div class="proj-row"><span class="proj-row-name">Uganda crops</span><span class="chev">&#9660;</span></div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-section">Data</div>
+      <div class="sb-item active"><span class="dot d-act"></span>Label data</div>
+      <div class="sb-section">Model</div>
+      <div class="sb-item dim"><span class="dot d-idle"></span>Configure model</div>
+      <div class="sb-item dim"><span class="dot d-idle"></span>Train &amp; evaluate</div>
+      <div class="sb-item dim"><span class="dot d-idle"></span>Improve</div>
+      <div class="sb-section">Deploy</div>
+      <div class="sb-item dim"><span class="dot d-idle"></span>Run model</div>
+      <div class="sb-item dim"><span class="dot d-idle"></span>Publish map</div>
+    </div>
+    <div class="sb-foot"><div class="sb-foot-item">Account</div><div class="sb-foot-item">Organizations</div></div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-left"><p>Uganda crops — label data</p><span>Ai2 - Demo</span></div>
+      <div class="tb-right"><button class="btn btn-p">Configure model &rarr;</button></div>
+    </div>
+    <div class="content">
+      <div class="banner ban-ok">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#1D9E75" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        23,150 rows imported from uganda_crops_labels.csv. Labels detected in crop_type.
+      </div>
+      <div class="grid4">
+        <div class="mcard"><div class="mlabel">Rows imported</div><div class="mval">23,150</div><div class="msub" style="color:var(--color-text-tertiary)">34 excluded</div></div>
+        <div class="mcard"><div class="mlabel">Label field</div><div class="mval" style="font-size:14px;padding-top:4px">crop_type</div><div class="msub" style="color:var(--color-text-tertiary)">Categorical</div></div>
+        <div class="mcard"><div class="mlabel">Date range</div><div class="mval" style="font-size:13px;padding-top:4px">Apr–May 2020</div><div class="msub" style="color:var(--color-text-tertiary)">start_date → end_date</div></div>
+        <div class="mcard"><div class="mlabel">Geometry</div><div class="mval" style="font-size:14px;padding-top:4px">Point</div><div class="msub" style="color:var(--color-text-tertiary)">Auto-detected</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">Label distribution</div>
+          <div class="cls-row"><span class="cdot" style="background:#639922"></span><span class="cname">Trees</span><div class="bwrap"><div class="bfill" style="width:95%;background:#639922"></div></div><span class="cf1">4,586</span></div>
+          <div class="cls-row"><span class="cdot" style="background:#EF9F27"></span><span class="cname">Maize</span><div class="bwrap"><div class="bfill" style="width:68%;background:#EF9F27"></div></div><span class="cf1">3,126</span></div>
+          <div class="cls-row"><span class="cdot" style="background:#F4C0D1"></span><span class="cname">Sugarcane</span><div class="bwrap"><div class="bfill" style="width:84%;background:#F4C0D1"></div></div><span class="cf1">3,870</span></div>
+          <div class="cls-row"><span class="cdot" style="background:#5DCAA5"></span><span class="cname">Tea</span><div class="bwrap"><div class="bfill" style="width:63%;background:#5DCAA5"></div></div><span class="cf1">2,906</span></div>
+          <div class="cls-row"><span class="cdot" style="background:#7F77DD"></span><span class="cname">Coffee</span><div class="bwrap"><div class="bfill" style="width:55%;background:#7F77DD"></div></div><span class="cf1">2,533</span></div>
+          <div class="cls-row"><span class="cdot" style="background:#E24B4A"></span><span class="cname">Vegetables</span><div class="bwrap"><div class="bfill" style="width:7%;background:#E24B4A"></div></div><span class="cf1" style="color:var(--color-text-danger)">325</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Data preview</div>
+          <div class="map-ph" style="height:160px;margin-bottom:10px"><svg width="24" height="24" viewBox="0 0 28 28" fill="none"><rect x="4" y="4" width="20" height="20" rx="3" stroke="var(--color-border-secondary)" stroke-width="1.5"/><circle cx="10" cy="11" r="2.5" stroke="var(--color-text-tertiary)" stroke-width="1.2"/><path d="M4 19l6-4 4 3 4-2.5 6 4" stroke="var(--color-text-tertiary)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>23,150 points on map</span></div>
+          <div class="banner ban-warn" style="margin-bottom:0">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 13H2L8 2Z" stroke="#854F0B" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 7v3M8 11.5v.5" stroke="#854F0B" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Vegetables has only 325 samples — may affect model performance.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATE 2: Data annotated (annotation complete, ready to train) -->
+<div class="shell" id="v2" style="display:none">
+  <div class="sidebar">
+    <div class="sb-head">
+      <div class="sb-brand">OlmoEarth Studio</div>
+      <div class="org-row"><span class="org-label">Org</span><span class="org-name">Ai2 - Demo</span><span class="chev">&#9660;</span></div>
+      <div class="proj-row"><span class="proj-row-name">Kenya/Nandi Crop Type</span><span class="chev">&#9660;</span></div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-section">Data</div>
+      <div class="sb-item"><span class="dot d-done"></span>Label data</div>
+      <div class="sb-item"><span class="dot d-done"></span>Annotate</div>
+      <div class="sb-section">Model</div>
+      <div class="sb-item active"><span class="dot d-act"></span>Configure model</div>
+      <div class="sb-item"><span class="dot d-idle"></span>Train &amp; evaluate</div>
+      <div class="sb-item"><span class="dot d-idle"></span>Improve</div>
+      <div class="sb-section">Deploy</div>
+      <div class="sb-item dim"><span class="dot d-idle"></span>Run model</div>
+      <div class="sb-item dim"><span class="dot d-idle"></span>Publish map</div>
+    </div>
+    <div class="sb-foot"><div class="sb-foot-item">Account</div><div class="sb-foot-item">Organizations</div></div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-left"><p>Kenya/Nandi Crop Type — configure model</p><span>Ai2 - Demo</span></div>
+      <div class="tb-right"><button class="btn">Save draft</button><button class="btn btn-p">Start training &rarr;</button></div>
+    </div>
+    <div class="content">
+      <div class="banner ban-ok">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#1D9E75" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        1,100 annotation tasks complete. Data is ready — configure your model to begin training.
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">Model recipe</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="border:0.5px solid #1D9E75;border-radius:var(--border-radius-md);padding:10px 12px;background:#E1F5EE;cursor:pointer">
+              <div style="font-size:13px;font-weight:500;color:#085041">Crop type mapping</div>
+              <div style="font-size:11px;color:#0F6E56;margin-top:2px">Recommended — matches your label setup</div>
+            </div>
+            <div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;cursor:pointer">
+              <div style="font-size:13px;font-weight:500">Custom configuration</div>
+              <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Choose foundation model, patch size, and more</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Training data summary</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><span style="color:var(--color-text-secondary)">Annotations</span><span style="font-weight:500">1,100</span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><span style="color:var(--color-text-secondary)">Label field</span><span style="font-weight:500">crop_class</span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><span style="color:var(--color-text-secondary)">Classes</span><span style="font-weight:500">11</span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><span style="color:var(--color-text-secondary)">Date range</span><span style="font-weight:500">Feb–Jul 2023</span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0"><span style="color:var(--color-text-secondary)">Foundation model</span><span style="font-weight:500">OlmoEarth v2</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATE 3: Needs annotation -->
+<div class="shell" id="v3" style="display:none">
+  <div class="sidebar">
+    <div class="sb-head">
+      <div class="sb-brand">OlmoEarth Studio</div>
+      <div class="org-row"><span class="org-label">Org</span><span class="org-name">Ai2 - Demo</span><span class="chev">&#9660;</span></div>
+      <div class="proj-row"><span class="proj-row-name">Forest Loss Colombia 12</span><span class="chev">&#9660;</span></div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-section">Data</div>
+      <div class="sb-item"><span class="dot d-done"></span>Label data</div>
+      <div class="sb-item active"><span class="dot d-warn"></span>Annotate</div>
+      <div class="sb-section">Model</div>
+      <div class="sb-item dim"><span class="dot d-idle"></span>Configure model</div>
+      <div class="sb-item dim"><span class="dot d-idle"></span>Train &amp; evaluate</div>
+      <div class="sb-item dim"><span class="dot d-idle"></span>Improve</div>
+      <div class="sb-section">Deploy</div>
+      <div class="sb-item dim"><span class="dot d-idle"></span>Run model</div>
+      <div class="sb-item dim"><span class="dot d-idle"></span>Publish map</div>
+    </div>
+    <div class="sb-foot"><div class="sb-foot-item">Account</div><div class="sb-foot-item">Organizations</div></div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-left"><p>Forest Loss Colombia 12 — annotate</p><span>Ai2 - Demo · 850 tasks remaining</span></div>
+      <div class="tb-right"><button class="btn">Manage tasks</button><button class="btn btn-p">Start annotating &rarr;</button></div>
+    </div>
+    <div class="content">
+      <div class="banner ban-warn">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 13H2L8 2Z" stroke="#854F0B" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 7v3M8 11.5v.5" stroke="#854F0B" stroke-width="1.5" stroke-linecap="round"/></svg>
+        250 of 1,100 tasks complete. At least 600 labeled examples are recommended before training.
+      </div>
+      <div class="grid4">
+        <div class="mcard"><div class="mlabel">Tasks complete</div><div class="mval">250</div><div class="msub" style="color:var(--color-text-tertiary)">of 1,100 total</div></div>
+        <div class="mcard"><div class="mlabel">Assigned to me</div><div class="mval">14</div><div class="msub" style="color:#0F6E56">Start labeling</div></div>
+        <div class="mcard"><div class="mlabel">In progress</div><div class="mval">12</div><div class="msub" style="color:var(--color-text-tertiary)">by others</div></div>
+        <div class="mcard"><div class="mlabel">Queued</div><div class="mval">838</div><div class="msub" style="color:var(--color-text-tertiary)">unassigned</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">My queue</div>
+          <div class="task-row"><span class="task-name">col12_tile_0047</span><span class="task-status ts-ip">In progress</span></div>
+          <div class="task-row"><span class="task-name">col12_tile_0051</span><span class="task-status ts-q">Queued</span></div>
+          <div class="task-row"><span class="task-name">col12_tile_0055</span><span class="task-status ts-q">Queued</span></div>
+          <div class="task-row"><span class="task-name">col12_tile_0058</span><span class="task-status ts-q">Queued</span></div>
+          <div style="margin-top:10px"><button class="btn btn-p" style="width:100%;text-align:center;padding:7px">Open annotation view</button></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Coverage so far</div>
+          <div class="map-ph" style="height:168px">
+            <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><rect x="4" y="4" width="20" height="20" rx="3" stroke="var(--color-border-secondary)" stroke-width="1.5"/><circle cx="10" cy="11" r="2.5" stroke="var(--color-text-tertiary)" stroke-width="1.2"/><path d="M4 19l6-4 4 3 4-2.5 6 4" stroke="var(--color-text-tertiary)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>250 labeled · 850 remaining</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function show(n){
+  for(var i=0;i<4;i++) document.getElementById('v'+i).style.display=i===n?'flex':'none';
+  document.querySelectorAll('.stab').forEach(function(t,i){t.classList.toggle('active',i===n);});
+}
+</script>

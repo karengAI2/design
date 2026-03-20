@@ -1,0 +1,318 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.shell{display:flex;min-height:720px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.sidebar{width:208px;min-width:208px;background:var(--color-background-secondary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column}
+.sb-header{padding:12px 12px 10px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.sb-brand{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:8px}
+
+.org-selector{margin-bottom:6px}
+.org-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:11px;color:var(--color-text-secondary);cursor:pointer;gap:4px}
+.org-btn-name{flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;color:var(--color-text-primary)}
+.org-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);z-index:20;overflow:hidden}
+.org-dropdown.open{display:block}
+.od-item{padding:7px 10px;font-size:12px;cursor:pointer;color:var(--color-text-primary)}
+.od-item:hover{background:var(--color-background-secondary)}
+.od-item.selected{font-weight:500;color:var(--color-text-info);background:var(--color-background-info)}
+
+.project-switcher{position:relative}
+.project-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:12px;cursor:pointer;gap:6px}
+.project-btn-name{flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;color:var(--color-text-primary)}
+.chevron{color:var(--color-text-tertiary);font-size:10px;flex-shrink:0}
+.project-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);z-index:10;overflow:hidden}
+.project-dropdown.open{display:block}
+.pd-search{width:100%;border:none;border-bottom:0.5px solid var(--color-border-tertiary);padding:7px 10px;font-size:12px;background:transparent;color:var(--color-text-primary);outline:none}
+.pd-item{padding:7px 10px;font-size:12px;cursor:pointer}
+.pd-item:hover{background:var(--color-background-secondary)}
+.pd-item.selected{background:var(--color-background-info)}
+.pd-item-name{font-weight:500;color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pd-item.selected .pd-item-name{color:var(--color-text-info)}
+.pd-overview{padding:7px 10px;font-size:12px;cursor:pointer;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);font-style:italic}
+.pd-overview:hover{background:var(--color-background-secondary)}
+
+.sb-nav{padding:8px 6px;flex:1;overflow-y:auto}
+.sb-section-label{font-size:10px;letter-spacing:.04em;color:var(--color-text-tertiary);padding:8px 10px 3px;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 10px;font-size:13px;color:var(--color-text-secondary);border-radius:var(--border-radius-md);margin-bottom:1px;cursor:pointer}
+.sb-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.sb-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500}
+.sb-item.overview-item{color:var(--color-text-primary);font-weight:500}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-done{background:#1D9E75}.dot-active{background:#185FA5}.dot-idle{background:var(--color-border-secondary)}
+.sb-footer{border-top:0.5px solid var(--color-border-tertiary);padding:8px 12px}
+.sb-footer-item{font-size:12px;color:var(--color-text-secondary);padding:4px 0;cursor:pointer}
+.sb-footer-item:hover{color:var(--color-text-primary)}
+
+.main{flex:1;background:var(--color-background-tertiary);display:flex;flex-direction:column;min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:500}
+.topbar-sub{font-size:12px;color:var(--color-text-secondary);margin-top:1px}
+.topbar-right{display:flex;gap:8px;align-items:center}
+.btn{font-size:12px;padding:5px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-primary);cursor:pointer}
+.btn-primary{background:#0F6E56;border-color:#0F6E56;color:#E1F5EE}
+.view-toggle{display:flex;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);overflow:hidden}
+.vt-btn{padding:5px 10px;font-size:12px;background:transparent;border:none;color:var(--color-text-secondary);cursor:pointer}
+.vt-btn.active{background:var(--color-background-secondary);color:var(--color-text-primary)}
+
+.content{padding:20px;overflow-y:auto}
+.projects-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.proj-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px;cursor:pointer;transition:border-color .15s}
+.proj-card:hover{border-color:var(--color-border-secondary)}
+.proj-card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.proj-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.proj-org{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+.status-badge{font-size:10px;padding:2px 7px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.badge-active{background:var(--color-background-info);color:var(--color-text-info)}
+.badge-review{background:var(--color-background-warning);color:var(--color-text-warning)}
+.badge-done{background:var(--color-background-success);color:var(--color-text-success)}
+.badge-new{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.proj-progress{margin-bottom:10px}
+.progress-track{height:4px;background:var(--color-background-secondary);border-radius:3px;margin-bottom:6px;overflow:hidden}
+.progress-fill{height:4px;border-radius:3px;background:#1D9E75}
+.progress-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--color-text-tertiary)}
+.proj-meta{display:flex;gap:12px;font-size:11px;color:var(--color-text-secondary);border-top:0.5px solid var(--color-border-tertiary);padding-top:8px;margin-top:2px}
+.meta-item{display:flex;flex-direction:column;gap:1px}
+.meta-label{font-size:10px;color:var(--color-text-tertiary)}
+.meta-val{font-size:12px;color:var(--color-text-primary);font-weight:500}
+.meta-val.warn{color:var(--color-text-danger)}
+.proj-last{font-size:11px;color:var(--color-text-tertiary);margin-top:6px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;color:var(--color-text-secondary)}
+.empty-state p{font-size:13px;margin-top:8px}
+</style>
+
+<div class="shell">
+  <div class="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">OlmoEarth Studio</div>
+
+      <div class="org-selector" style="position:relative" id="os">
+        <div class="org-btn" onclick="toggleOrg()">
+          <span style="font-size:10px;color:var(--color-text-tertiary);margin-right:2px">Org</span>
+          <span class="org-btn-name" id="active-org-name">Ai2 - Demo</span>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="org-dropdown" id="od">
+          <div class="od-item selected" onclick="selectOrg('Ai2 - Demo',this)">Ai2 - Demo</div>
+          <div class="od-item" onclick="selectOrg('A4OE',this)">A4OE</div>
+          <div class="od-item" onclick="selectOrg('IFPRI',this)">IFPRI</div>
+          <div class="od-item" onclick="selectOrg('Wildfire',this)">Wildfire</div>
+        </div>
+      </div>
+
+      <div class="project-switcher" id="ps">
+        <div class="project-btn" onclick="toggleDropdown()">
+          <span class="project-btn-name" id="active-proj-name">All projects</span>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="project-dropdown" id="pd">
+          <div class="pd-overview" onclick="selectOverview()">All projects overview</div>
+          <input class="pd-search" placeholder="Search projects..." oninput="filterProjects(this.value)" />
+          <div id="pd-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-nav" id="sb-nav">
+      <div class="sb-item overview-item active" id="overview-nav-item">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="opacity:.7"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+        Projects overview
+      </div>
+      <div id="project-nav" style="display:none">
+        <div class="sb-section-label">Data</div>
+        <div class="sb-item"><span class="dot dot-done"></span>Label data</div>
+        <div class="sb-item"><span class="dot dot-done"></span>Annotate</div>
+        <div class="sb-section-label">Model</div>
+        <div class="sb-item"><span class="dot dot-done"></span>Configure model</div>
+        <div class="sb-item active"><span class="dot dot-active"></span>Train &amp; evaluate</div>
+        <div class="sb-item"><span class="dot dot-idle"></span>Improve</div>
+        <div class="sb-section-label">Deploy</div>
+        <div class="sb-item"><span class="dot dot-idle"></span>Run model</div>
+        <div class="sb-item"><span class="dot dot-idle"></span>Publish map</div>
+      </div>
+    </div>
+
+    <div class="sb-footer">
+      <div class="sb-footer-item">Account</div>
+      <div class="sb-footer-item">Organizations</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="main-title">Ai2 - Demo — projects</div>
+        <div class="topbar-sub">6 projects</div>
+      </div>
+      <div class="topbar-right">
+        <div class="view-toggle">
+          <button class="vt-btn active">Cards</button>
+          <button class="vt-btn">Table</button>
+        </div>
+        <button class="btn btn-primary">+ New project</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="projects-grid">
+
+        <div class="proj-card" onclick="selectProject('Uganda crops')">
+          <div class="proj-card-head">
+            <div><div class="proj-name">Uganda crops</div><div class="proj-org">Ai2 - Demo</div></div>
+            <span class="status-badge badge-review">Needs review</span>
+          </div>
+          <div class="proj-progress">
+            <div class="progress-track"><div class="progress-fill" style="width:72%"></div></div>
+            <div class="progress-labels"><span>Data</span><span>Model</span><span>Deploy</span></div>
+          </div>
+          <div class="proj-meta">
+            <div class="meta-item"><span class="meta-label">Latest model</span><span class="meta-val">V1.5 — 92.4% F1</span></div>
+            <div class="meta-item"><span class="meta-label">Lowest class</span><span class="meta-val warn">Vegetables 71%</span></div>
+          </div>
+          <div class="proj-last">Updated 5 days ago</div>
+        </div>
+
+        <div class="proj-card" onclick="selectProject('LFMC CONUS Woody Demo')">
+          <div class="proj-card-head">
+            <div><div class="proj-name">LFMC CONUS Woody Demo</div><div class="proj-org">Ai2 - Demo</div></div>
+            <span class="status-badge badge-done">Deployed</span>
+          </div>
+          <div class="proj-progress">
+            <div class="progress-track"><div class="progress-fill" style="width:100%"></div></div>
+            <div class="progress-labels"><span>Data</span><span>Model</span><span>Deploy</span></div>
+          </div>
+          <div class="proj-meta">
+            <div class="meta-item"><span class="meta-label">Published map</span><span class="meta-val">CONUS 2024</span></div>
+            <div class="meta-item"><span class="meta-label">Run status</span><span class="meta-val">Completed</span></div>
+          </div>
+          <div class="proj-last">Updated 3 weeks ago</div>
+        </div>
+
+        <div class="proj-card" onclick="selectProject('Global Mangrove Demo')">
+          <div class="proj-card-head">
+            <div><div class="proj-name">Global Mangrove Demo</div><div class="proj-org">Ai2 - Demo</div></div>
+            <span class="status-badge badge-active">Training</span>
+          </div>
+          <div class="proj-progress">
+            <div class="progress-track"><div class="progress-fill" style="width:55%"></div></div>
+            <div class="progress-labels"><span>Data</span><span>Model</span><span>Deploy</span></div>
+          </div>
+          <div class="proj-meta">
+            <div class="meta-item"><span class="meta-label">Model run</span><span class="meta-val">V2 — in progress</span></div>
+            <div class="meta-item"><span class="meta-label">Annotations</span><span class="meta-val">4,210 labeled</span></div>
+          </div>
+          <div class="proj-last">Updated today</div>
+        </div>
+
+        <div class="proj-card" onclick="selectProject('Kenya/Nandi Crop Type')">
+          <div class="proj-card-head">
+            <div><div class="proj-name">Kenya/Nandi Crop Type</div><div class="proj-org">Ai2 - Demo</div></div>
+            <span class="status-badge badge-active">Annotating</span>
+          </div>
+          <div class="proj-progress">
+            <div class="progress-track"><div class="progress-fill" style="width:28%"></div></div>
+            <div class="progress-labels"><span>Data</span><span>Model</span><span>Deploy</span></div>
+          </div>
+          <div class="proj-meta">
+            <div class="meta-item"><span class="meta-label">Tasks complete</span><span class="meta-val">312 / 1,100</span></div>
+            <div class="meta-item"><span class="meta-label">Assigned to me</span><span class="meta-val">14 tasks</span></div>
+          </div>
+          <div class="proj-last">Updated 2 days ago</div>
+        </div>
+
+        <div class="proj-card" onclick="selectProject('Forest Loss Colombia')">
+          <div class="proj-card-head">
+            <div><div class="proj-name">Forest Loss Colombia 12</div><div class="proj-org">Ai2 - Demo</div></div>
+            <span class="status-badge badge-new">Not started</span>
+          </div>
+          <div class="proj-progress">
+            <div class="progress-track"><div class="progress-fill" style="width:0%"></div></div>
+            <div class="progress-labels"><span>Data</span><span>Model</span><span>Deploy</span></div>
+          </div>
+          <div class="proj-meta">
+            <div class="meta-item"><span class="meta-label">Data</span><span class="meta-val">Not uploaded</span></div>
+            <div class="meta-item"><span class="meta-label">Created</span><span class="meta-val">Mar 14, 2026</span></div>
+          </div>
+          <div class="proj-last">Created 4 days ago</div>
+        </div>
+
+        <div class="proj-card" onclick="selectProject('Nepal Landslides')">
+          <div class="proj-card-head">
+            <div><div class="proj-name">Nepal landslides</div><div class="proj-org">Ai2 - Demo</div></div>
+            <span class="status-badge badge-review">Evaluate</span>
+          </div>
+          <div class="proj-progress">
+            <div class="progress-track"><div class="progress-fill" style="width:60%"></div></div>
+            <div class="progress-labels"><span>Data</span><span>Model</span><span>Deploy</span></div>
+          </div>
+          <div class="proj-meta">
+            <div class="meta-item"><span class="meta-label">Latest model</span><span class="meta-val">V1 — completed</span></div>
+            <div class="meta-item"><span class="meta-label">Reviewed</span><span class="meta-val warn">Not yet</span></div>
+          </div>
+          <div class="proj-last">Updated 1 week ago</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var orgs = ['Ai2 - Demo','A4OE','IFPRI','Wildfire'];
+var activeOrg = 'Ai2 - Demo';
+var activeProj = null;
+
+function toggleOrg(){
+  document.getElementById('od').classList.toggle('open');
+  document.getElementById('pd').classList.remove('open');
+}
+function selectOrg(name, el){
+  activeOrg = name;
+  document.getElementById('active-org-name').textContent = name;
+  document.getElementById('od').classList.remove('open');
+  document.querySelectorAll('.od-item').forEach(function(i){i.classList.remove('selected');});
+  el.classList.add('selected');
+  selectOverview();
+}
+function toggleDropdown(){
+  document.getElementById('pd').classList.toggle('open');
+  document.getElementById('od').classList.remove('open');
+  if(document.getElementById('pd').classList.contains('open')){
+    renderProjList('');
+    document.querySelector('.pd-search').value='';
+  }
+}
+function renderProjList(filter){
+  var list = document.getElementById('pd-list');
+  list.innerHTML='';
+  var projects = ['Uganda crops','LFMC CONUS Woody Demo','Global Mangrove Demo','Kenya/Nandi Crop Type','Forest Loss Colombia','Nepal Landslides'];
+  projects.forEach(function(p){
+    if(filter && p.toLowerCase().indexOf(filter.toLowerCase())<0) return;
+    var d = document.createElement('div');
+    d.className = 'pd-item' + (activeProj===p?' selected':'');
+    d.innerHTML='<div class="pd-item-name">'+p+'</div>';
+    d.onclick=function(){selectProject(p);};
+    list.appendChild(d);
+  });
+}
+function filterProjects(v){renderProjList(v);}
+function selectOverview(){
+  activeProj = null;
+  document.getElementById('active-proj-name').textContent = 'All projects';
+  document.getElementById('pd').classList.remove('open');
+  document.getElementById('main-title').textContent = activeOrg + ' — projects';
+  document.getElementById('overview-nav-item').style.display='flex';
+  document.getElementById('project-nav').style.display='none';
+  document.getElementById('overview-nav-item').classList.add('active');
+}
+function selectProject(name){
+  activeProj = name;
+  document.getElementById('active-proj-name').textContent = name;
+  document.getElementById('pd').classList.remove('open');
+  document.getElementById('overview-nav-item').style.display='none';
+  document.getElementById('project-nav').style.display='block';
+}
+document.addEventListener('click',function(e){
+  if(!document.getElementById('ps').contains(e.target)) document.getElementById('pd').classList.remove('open');
+  if(!document.getElementById('os').contains(e.target)) document.getElementById('od').classList.remove('open');
+});
+renderProjList('');
+</script>

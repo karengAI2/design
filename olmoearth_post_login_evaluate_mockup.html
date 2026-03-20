@@ -1,0 +1,260 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);font-size:14px;color:var(--color-text-primary)}
+.shell{display:flex;height:100%;min-height:680px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.sidebar{width:200px;min-width:200px;background:var(--color-background-secondary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;padding:0}
+.sb-header{padding:14px 16px 10px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.sb-brand{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.sb-project{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.sb-section{padding:10px 12px 4px;font-size:10px;letter-spacing:.04em;color:var(--color-text-tertiary);text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;font-size:13px;color:var(--color-text-secondary);border-radius:var(--border-radius-md);margin:1px 6px;cursor:pointer}
+.sb-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.sb-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500}
+.sb-item svg{opacity:.6;flex-shrink:0}
+.sb-item.active svg{opacity:1}
+.sb-phase{font-size:10px;color:var(--color-text-tertiary);padding:8px 12px 2px 12px;letter-spacing:.03em}
+.phase-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-done{background:#1D9E75}
+.dot-active{background:#185FA5}
+.dot-idle{background:var(--color-border-secondary)}
+.sb-spacer{flex:1}
+.sb-footer{border-top:0.5px solid var(--color-border-tertiary);padding:10px 12px}
+.main{flex:1;background:var(--color-background-tertiary);overflow-y:auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px 12px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.breadcrumb{font-size:13px;color:var(--color-text-secondary)}
+.breadcrumb span{color:var(--color-text-primary);font-weight:500}
+.topbar-actions{display:flex;gap:8px;align-items:center}
+.btn{font-size:13px;padding:6px 14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-primary);cursor:pointer}
+.btn-primary{background:#0F6E56;border-color:#0F6E56;color:#E1F5EE}
+.content{padding:24px}
+.status-banner{background:var(--color-background-success);border:0.5px solid var(--color-border-success);border-radius:var(--border-radius-lg);padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.status-banner p{font-size:13px;color:var(--color-text-success)}
+.status-banner strong{font-weight:500}
+.metrics-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.metric-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px}
+.metric-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px}
+.metric-value{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.metric-delta{font-size:11px;color:var(--color-text-success);margin-top:2px}
+.metric-delta.warn{color:var(--color-text-warning)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px}
+.card-title{font-size:13px;font-weight:500;margin-bottom:12px;color:var(--color-text-primary)}
+.class-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.class-row:last-child{border-bottom:none}
+.class-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.class-name{flex:1;color:var(--color-text-primary)}
+.class-f1{width:36px;text-align:right;font-weight:500;font-variant-numeric:tabular-nums}
+.class-f1.low{color:var(--color-text-danger)}
+.f1-bar-wrap{width:70px;background:var(--color-background-secondary);border-radius:3px;height:4px;overflow:hidden}
+.f1-bar{height:4px;border-radius:3px;background:#1D9E75}
+.f1-bar.low{background:#E24B4A}
+.map-placeholder{background:var(--color-background-secondary);border-radius:var(--border-radius-md);height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:0.5px solid var(--color-border-tertiary)}
+.map-label{font-size:12px;color:var(--color-text-secondary)}
+.error-list{display:flex;flex-direction:column;gap:6px}
+.error-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:12px;cursor:pointer}
+.error-item:hover{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary)}
+.error-tag{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--color-background-danger);color:var(--color-text-danger);white-space:nowrap}
+.error-loc{color:var(--color-text-secondary);flex:1}
+.error-count{font-size:11px;color:var(--color-text-secondary);white-space:nowrap}
+.cta-row{display:flex;gap:10px;margin-top:20px}
+.cta-card{flex:1;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.cta-text p{font-size:13px;font-weight:500;margin-bottom:2px}
+.cta-text span{font-size:12px;color:var(--color-text-secondary)}
+.arrow-icon{font-size:16px;color:var(--color-text-tertiary)}
+.version-pill{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+</style>
+
+<div class="shell">
+  <div class="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">OlmoEarth Studio</div>
+      <div class="sb-project">Uganda crops &rarr; V1.5 lulc</div>
+    </div>
+
+    <div style="padding:8px 6px 0">
+      <div class="sb-phase">Phase 1 — prepare data</div>
+      <div class="sb-item" style="gap:8px">
+        <span class="phase-dot dot-done"></span>
+        <span>Label data</span>
+      </div>
+      <div class="sb-item">
+        <span class="phase-dot dot-done"></span>
+        <span>Annotate</span>
+      </div>
+
+      <div class="sb-phase" style="margin-top:6px">Phase 2 — build model</div>
+      <div class="sb-item">
+        <span class="phase-dot dot-done"></span>
+        <span>Configure model</span>
+      </div>
+      <div class="sb-item active">
+        <span class="phase-dot dot-active"></span>
+        <span>Train &amp; evaluate</span>
+      </div>
+      <div class="sb-item">
+        <span class="phase-dot dot-idle"></span>
+        <span>Improve</span>
+      </div>
+
+      <div class="sb-phase" style="margin-top:6px">Phase 3 — deploy</div>
+      <div class="sb-item">
+        <span class="phase-dot dot-idle"></span>
+        <span>Run model</span>
+      </div>
+      <div class="sb-item">
+        <span class="phase-dot dot-idle"></span>
+        <span>Publish map</span>
+      </div>
+    </div>
+
+    <div class="sb-spacer"></div>
+    <div class="sb-footer">
+      <div class="sb-item" style="margin:0;padding:6px 4px;font-size:12px">Projects</div>
+      <div class="sb-item" style="margin:0;padding:6px 4px;font-size:12px">Account</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="breadcrumb">Uganda crops &rsaquo; <span>Train &amp; evaluate</span></div>
+      </div>
+      <div class="topbar-actions">
+        <span class="version-pill">V1.5 Uganda crops and lulc</span>
+        <button class="btn">View predictions</button>
+        <button class="btn btn-primary">Improve model &rarr;</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="status-banner">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#1D9E75" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <p>Training completed Feb 11, 2026. <strong>Model passed evaluation threshold</strong> — mean F1 92.4% across all classes.</p>
+      </div>
+
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="metric-label">Overall accuracy</div>
+          <div class="metric-value">91.8%</div>
+          <div class="metric-delta">+4.2% vs V1.4</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Mean F1 score</div>
+          <div class="metric-value">92.4%</div>
+          <div class="metric-delta">+3.1% vs V1.4</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Samples evaluated</div>
+          <div class="metric-value">23,184</div>
+          <div class="metric-delta" style="color:var(--color-text-tertiary)">validation set</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Lowest class F1</div>
+          <div class="metric-value">71.3%</div>
+          <div class="metric-delta warn">Vegetables — needs attention</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Per-class performance</div>
+          <div class="class-row">
+            <span class="class-dot" style="background:#639922"></span>
+            <span class="class-name">Trees</span>
+            <div class="f1-bar-wrap"><div class="f1-bar" style="width:98%"></div></div>
+            <span class="class-f1">98.1%</span>
+          </div>
+          <div class="class-row">
+            <span class="class-dot" style="background:#EF9F27"></span>
+            <span class="class-name">Maize</span>
+            <div class="f1-bar-wrap"><div class="f1-bar" style="width:95%"></div></div>
+            <span class="class-f1">95.4%</span>
+          </div>
+          <div class="class-row">
+            <span class="class-dot" style="background:#F4C0D1"></span>
+            <span class="class-name">Sugarcane</span>
+            <div class="f1-bar-wrap"><div class="f1-bar" style="width:94%"></div></div>
+            <span class="class-f1">94.2%</span>
+          </div>
+          <div class="class-row">
+            <span class="class-dot" style="background:#5DCAA5"></span>
+            <span class="class-name">Tea</span>
+            <div class="f1-bar-wrap"><div class="f1-bar" style="width:93%"></div></div>
+            <span class="class-f1">93.0%</span>
+          </div>
+          <div class="class-row">
+            <span class="class-dot" style="background:#7F77DD"></span>
+            <span class="class-name">Coffee</span>
+            <div class="f1-bar-wrap"><div class="f1-bar" style="width:91%"></div></div>
+            <span class="class-f1">91.3%</span>
+          </div>
+          <div class="class-row">
+            <span class="class-dot" style="background:#378ADD"></span>
+            <span class="class-name">Water</span>
+            <div class="f1-bar-wrap"><div class="f1-bar" style="width:90%"></div></div>
+            <span class="class-f1">90.7%</span>
+          </div>
+          <div class="class-row">
+            <span class="class-dot" style="background:#D4537E"></span>
+            <span class="class-name">Built-up</span>
+            <div class="f1-bar-wrap"><div class="f1-bar" style="width:86%"></div></div>
+            <span class="class-f1">86.1%</span>
+          </div>
+          <div class="class-row">
+            <span class="class-dot" style="background:#E24B4A"></span>
+            <span class="class-name">Vegetables</span>
+            <div class="f1-bar-wrap"><div class="f1-bar low" style="width:71%"></div></div>
+            <span class="class-f1 low">71.3%</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Where errors cluster</div>
+          <div class="map-placeholder">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="4" y="4" width="24" height="24" rx="4" stroke="var(--color-border-secondary)" stroke-width="1.5"/><circle cx="12" cy="13" r="3" stroke="var(--color-text-tertiary)" stroke-width="1.5"/><path d="M4 22l7-5 5 4 4-3 8 5" stroke="var(--color-text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="map-label">Spatial error heatmap</span>
+            <button class="btn" style="font-size:11px;padding:4px 10px;margin-top:4px">Open in viewer</button>
+          </div>
+          <div style="margin-top:12px">
+            <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:8px">Top misclassifications</div>
+            <div class="error-list">
+              <div class="error-item">
+                <span class="error-tag">Vegetables &rarr; Maize</span>
+                <span class="error-loc">NW region, Nandi</span>
+                <span class="error-count">142 samples</span>
+              </div>
+              <div class="error-item">
+                <span class="error-tag">Built-up &rarr; Bare soil</span>
+                <span class="error-loc">Kampala fringe</span>
+                <span class="error-count">87 samples</span>
+              </div>
+              <div class="error-item">
+                <span class="error-tag">Coffee &rarr; Trees</span>
+                <span class="error-loc">Western highlands</span>
+                <span class="error-count">54 samples</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <div class="cta-card" style="cursor:pointer">
+          <div class="cta-text">
+            <p>Fix Vegetables class</p>
+            <span>Generate annotation tasks for the 142 misclassified samples</span>
+          </div>
+          <span class="arrow-icon">&rarr;</span>
+        </div>
+        <div class="cta-card" style="cursor:pointer">
+          <div class="cta-text">
+            <p>Deploy this model</p>
+            <span>Run inference on NE Uganda Feb–July area</span>
+          </div>
+          <span class="arrow-icon">&rarr;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
