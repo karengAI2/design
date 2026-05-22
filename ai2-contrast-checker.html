@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ai2 Color Contrast Checker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Epilogue:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --pink: #F0529C;
+    --dark-teal: #0A3235;
+    --cream: #FAF2E9;
+    --teal: #105257;
+    --bg: #FAF2E9;
+    --surface: #fff;
+    --border: rgba(10,50,53,0.12);
+    --text: #0A3235;
+    --text-muted: rgba(10,50,53,0.5);
+    --mono: 'DM Mono', monospace;
+    --sans: 'Epilogue', sans-serif;
+    --radius: 12px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  header {
+    max-width: 720px;
+    margin: 0 auto 3rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--pink);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .logo-mark svg { width: 20px; height: 20px; fill: var(--cream); }
+
+  .header-text h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .header-text p {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin-top: 3px;
+    font-weight: 400;
+  }
+
+  main { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+
+  .section-label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
+  /* ── Brand presets ── */
+  .presets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+  }
+
+  .preset-btn {
+    border: 1.5px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 0;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+    background: none;
+    text-align: left;
+  }
+
+  .preset-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+  .preset-btn.active { border-color: var(--pink); }
+
+  .preset-swatch {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .preset-meta {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 6px 8px;
+  }
+
+  .preset-meta .name { font-size: 0.6875rem; font-weight: 500; color: var(--text); }
+  .preset-meta .ratio { font-size: 0.625rem; font-family: var(--mono); color: var(--text-muted); }
+
+  /* ── Custom hex input section ── */
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .color-input-group label {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .color-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0 10px;
+    background: var(--bg);
+    transition: border-color 0.15s;
+  }
+
+  .color-input-wrap:focus-within { border-color: var(--pink); }
+
+  .color-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .color-dot input[type="color"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    border: none;
+    padding: 0;
+  }
+
+  .hex-input {
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    width: 100%;
+    padding: 9px 0;
+    outline: none;
+  }
+
+  .error-msg { font-size: 0.6875rem; color: #A32D2D; margin-top: 4px; min-height: 16px; }
+
+  /* ── Live preview ── */
+  .preview-box {
+    height: 88px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    transition: background 0.2s, color 0.2s;
+    margin-bottom: 1rem;
+  }
+
+  .preview-label { font-size: 1.125rem; font-weight: 700; }
+  .preview-small { font-size: 0.75rem; font-weight: 400; opacity: 0.85; }
+
+  /* ── Ratio display ── */
+  .ratio-display {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .ratio-number {
+    font-family: var(--mono);
+    font-size: 2.5rem;
+    font-weight: 500;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .ratio-label { font-size: 0.875rem; color: var(--text-muted); }
+
+  /* ── WCAG badges ── */
+  .wcag-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .wcag-badge {
+    border-radius: var(--radius-sm);
+    padding: 8px 6px;
+    text-align: center;
+    border: 1px solid transparent;
+  }
+
+  .wcag-badge .wcag-level { font-size: 0.75rem; font-weight: 700; margin-bottom: 2px; }
+  .wcag-badge .wcag-desc { font-size: 0.5625rem; line-height: 1.3; color: inherit; opacity: 0.75; }
+
+  .wcag-badge.pass { background: #EAF3DE; border-color: #9FC86A; color: #27500A; }
+  .wcag-badge.fail { background: #FFF0F0; border-color: #F5C1C1; color: #A32D2D; }
+
+  /* ── HSL sliders ── */
+  .slider-section { display: flex; flex-direction: column; gap: 10px; }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .slider-row label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    width: 90px;
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+
+  .slider-row input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .slider-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--pink);
+    border: 2px solid white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    cursor: pointer;
+  }
+
+  .slider-row .val {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    min-width: 36px;
+    text-align: right;
+    color: var(--text);
+  }
+
+  .slider-note {
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* ── Suggestions ── */
+  .suggestions { display: flex; flex-direction: column; gap: 8px; }
+
+  .suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+  }
+
+  .suggestion-item:hover { border-color: var(--pink); background: rgba(240,82,156,0.04); }
+
+  .sug-dot { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; }
+  .sug-text { flex: 1; }
+  .sug-name { font-size: 0.8125rem; font-weight: 500; }
+  .sug-hex { font-family: var(--mono); font-size: 0.6875rem; color: var(--text-muted); }
+  .sug-badge { font-size: 0.6875rem; font-weight: 500; padding: 2px 8px; border-radius: 4px; }
+  .sug-badge.pass { background: #EAF3DE; color: #27500A; }
+  .sug-badge.partial { background: #FFF5DB; color: #854F0B; }
+
+  /* ── Footer ── */
+  footer {
+    max-width: 720px;
+    margin: 2.5rem auto 0;
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 500px) {
+    .input-row { grid-template-columns: 1fr; }
+    .wcag-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:flex-start;gap:12px;">
+    <div class="logo-mark">
+      <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="7" height="7" rx="1.5"/>
+        <rect x="11" y="2" width="7" height="7" rx="1.5"/>
+        <rect x="2" y="11" width="7" height="7" rx="1.5"/>
+        <rect x="11" y="11" width="7" height="7" rx="1.5"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Color Contrast Checker</h1>
+      <p>Ai2 Brand · WCAG Accessibility Tool</p>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Brand presets -->
+  <div class="card">
+    <div class="section-label">Brand presets — click to load</div>
+    <div class="presets-grid" id="presets-grid"></div>
+  </div>
+
+  <!-- Custom input -->
+  <div class="card">
+    <div class="section-label">Custom hex values</div>
+    <div class="input-row">
+      <div class="color-input-group">
+        <label>Background color</label>
+        <div class="color-input-wrap">
+          <div class="color-dot" id="bg-dot">
+            <input type="color" id="bg-picker" value="#F0529C">
+          </div>
+          <input class="hex-input" id="bg-hex" type="text" value="#F0529C" maxlength="7" spellcheck="false" placeholder="#000000">
+        </div>
+        <div class="error-msg" id="bg-err"></div>
+      </div>
+      <div class="color-input-group">
+        <label>Foreground (text) color</label>
+        <div class="color-input-wrap">
+          <div class="color-dot" id="fg-dot">
+            <input type="color" id="fg-picker" value="#FAF2E9">
+          </div>
+          <input class="hex-input" id="fg-hex" type="text" value="#FAF2E9" maxlength="7" spellcheck="false" placeholder="#ffffff">
+        </div>
+        <div class="error-msg" id="fg-err"></div>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview-box" id="preview-box">
+      <div class="preview-label" id="preview-label">Aa — Label Button</div>
+      <div class="preview-small" id="preview-small">Body text sample · 14px regular</div>
+    </div>
+
+    <!-- Ratio -->
+    <div class="ratio-display">
+      <span class="ratio-number" id="ratio-num">—</span>
+      <span class="ratio-label">contrast ratio</span>
+    </div>
+
+    <!-- WCAG badges -->
+    <div class="wcag-grid" id="wcag-grid">
+      <div class="wcag-badge" id="badge-aa-large">
+        <div class="wcag-level">AA Large</div>
+        <div class="wcag-desc">3:1 · ≥18px or bold ≥14px</div>
+      </div>
+      <div class="wcag-badge" id="badge-aa">
+        <div class="wcag-level">AA Normal</div>
+        <div class="wcag-desc">4.5:1 · body &amp; UI text</div>
+      </div>
+      <div class="wcag-badge" id="badge-aaa-large">
+        <div class="wcag-level">AAA Large</div>
+        <div class="wcag-desc">4.5:1 · enhanced large</div>
+      </div>
+      <div class="wcag-badge" id="badge-aaa">
+        <div class="wcag-level">AAA Normal</div>
+        <div class="wcag-desc">7:1 · highest standard</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HSL Adjuster -->
+  <div class="card">
+    <div class="section-label">Fine-tune background color</div>
+    <p style="font-size:0.8125rem;color:var(--text-muted);margin-bottom:1rem;">Adjust lightness and saturation to find a passing variant. Updates the checker above in real time.</p>
+    <div class="slider-section">
+      <div class="slider-row">
+        <label>Lightness</label>
+        <input type="range" id="sl-l" min="10" max="70" value="49" step="1">
+        <span class="val" id="out-l">49%</span>
+      </div>
+      <div class="slider-row">
+        <label>Saturation</label>
+        <input type="range" id="sl-s" min="20" max="100" value="85" step="1">
+        <span class="val" id="out-s">85%</span>
+      </div>
+    </div>
+    <p class="slider-note">Hue is locked to the current background. Drag lightness down to darken.</p>
+  </div>
+
+  <!-- Passing suggestions -->
+  <div class="card">
+    <div class="section-label">Suggested passing alternatives for cream text</div>
+    <div class="suggestions" id="suggestions"></div>
+  </div>
+
+</main>
+
+<footer>
+  Built for Ai2 Design · WCAG 2.1 · Contrast ratios calculated per <a href="https://www.w3.org/TR/WCAG21/#contrast-minimum" style="color:var(--pink);">W3C relative luminance spec</a>
+</footer>
+
+<script>
+// ── Color math ──────────────────────────────────────────────
+function hexToRgb(hex) {
+  hex = hex.replace(/^#/, '');
+  if (hex.length === 3) hex = hex.split('').map(c => c+c).join('');
+  return [parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16)];
+}
+
+function isValidHex(hex) {
+  return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(hex);
+}
+
+function linearize(c) {
+  c /= 255;
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+function getLum(r, g, b) {
+  return 0.2126 * linearize(r) + 0.7152 * linearize(g) + 0.0722 * linearize(b);
+}
+
+function contrastRatio(hex1, hex2) {
+  const [r1,g1,b1] = hexToRgb(hex1), [r2,g2,b2] = hexToRgb(hex2);
+  const l1 = getLum(r1,g1,b1), l2 = getLum(r2,g2,b2);
+  const bright = Math.max(l1,l2), dark = Math.min(l1,l2);
+  return (bright + 0.05) / (dark + 0.05);
+}
+
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  let h, s, l = (max + min) / 2;
+  if (max === min) { h = s = 0; }
+  else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch(max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+  return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+}
+
+function hslToHex(h, s, l) {
+  s /= 100; l /= 100;
+  const k = n => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  const toHex = x => Math.round(x * 255).toString(16).padStart(2, '0');
+  return '#' + toHex(f(0)) + toHex(f(8)) + toHex(f(4));
+}
+
+function toFullHex(hex) {
+  hex = hex.trim();
+  if (!hex.startsWith('#')) hex = '#' + hex;
+  if (/^#[0-9A-Fa-f]{3}$/.test(hex)) {
+    hex = '#' + hex[1]+hex[1]+hex[2]+hex[2]+hex[3]+hex[3];
+  }
+  return hex.toUpperCase();
+}
+
+// ── State ────────────────────────────────────────────────────
+let bgHex = '#F0529C', fgHex = '#FAF2E9';
+let bgHsl = [330, 85, 49];
+
+// ── Brand presets ─────────────────────────────────────────────
+const presets = [
+  { name: 'Cream on Pink',   bg: '#F0529C', fg: '#FAF2E9' },
+  { name: 'Teal on Pink',    bg: '#F0529C', fg: '#0A3235' },
+  { name: 'Pink on Cream',   bg: '#FAF2E9', fg: '#F0529C' },
+  { name: 'Pink on Teal',    bg: '#0A3235', fg: '#F0529C' },
+  { name: 'Cream on Teal',   bg: '#105257', fg: '#FAF2E9' },
+  { name: 'Pink on Purple',  bg: '#B11BE8', fg: '#FAF2E9' },
+  { name: 'Cream on Purple', bg: '#B11BE8', fg: '#FAF2E9' },
+  { name: 'Cream on Green',  bg: '#0FCB8C', fg: '#0A3235' },
+];
+
+function buildPresets() {
+  const grid = document.getElementById('presets-grid');
+  presets.forEach((p, i) => {
+    const ratio = contrastRatio(p.bg, p.fg);
+    const level = ratio >= 4.5 ? 'AA ✓' : ratio >= 3 ? 'AA large' : 'Fails';
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn';
+    btn.dataset.index = i;
+    btn.innerHTML = `
+      <div class="preset-swatch" style="background:${p.bg};color:${p.fg};">Aa</div>
+      <div class="preset-meta">
+        <div class="name">${p.name}</div>
+        <div class="ratio">${ratio.toFixed(2)}:1 · ${level}</div>
+      </div>`;
+    btn.addEventListener('click', () => loadPreset(p, btn));
+    grid.appendChild(btn);
+  });
+}
+
+function loadPreset(p, btn) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  setColors(p.bg, p.fg);
+}
+
+// ── Suggestions ───────────────────────────────────────────────
+const suggestionData = [
+  { name: 'Deep Magenta',     hex: '#8C1A52', note: 'AA · 7.1:1' },
+  { name: 'Raspberry',        hex: '#A8245E', note: 'AA · 5.8:1' },
+  { name: 'Dark Rose',        hex: '#B82E6B', note: 'AA · 4.9:1' },
+  { name: 'Rich Cranberry',   hex: '#7A1247', note: 'AAA · 9.2:1' },
+];
+
+function buildSuggestions() {
+  const cream = '#FAF2E9';
+  const list = document.getElementById('suggestions');
+  list.innerHTML = '';
+  suggestionData.forEach(s => {
+    const ratio = contrastRatio(s.hex, cream);
+    const level = ratio >= 7 ? 'AAA' : ratio >= 4.5 ? 'AA' : ratio >= 3 ? 'AA large' : 'Fails';
+    const cls = ratio >= 4.5 ? 'pass' : ratio >= 3 ? 'partial' : 'fail';
+    const item = document.createElement('button');
+    item.className = 'suggestion-item';
+    item.innerHTML = `
+      <div class="sug-dot" style="background:${s.hex};"></div>
+      <div class="sug-text">
+        <div class="sug-name">${s.name}</div>
+        <div class="sug-hex">${s.hex} · cream text</div>
+      </div>
+      <span class="sug-badge ${cls}">${ratio.toFixed(2)}:1 ${level}</span>`;
+    item.addEventListener('click', () => setColors(s.hex, cream));
+    list.appendChild(item);
+  });
+}
+
+// ── Core update ───────────────────────────────────────────────
+function setColors(bg, fg) {
+  bgHex = toFullHex(bg);
+  fgHex = toFullHex(fg);
+
+  document.getElementById('bg-hex').value = bgHex;
+  document.getElementById('fg-hex').value = fgHex;
+  document.getElementById('bg-picker').value = bgHex;
+  document.getElementById('fg-picker').value = fgHex;
+  document.getElementById('bg-dot').style.background = bgHex;
+  document.getElementById('fg-dot').style.background = fgHex;
+  document.getElementById('bg-err').textContent = '';
+  document.getElementById('fg-err').textContent = '';
+
+  const [h, s, l] = rgbToHsl(...hexToRgb(bgHex));
+  bgHsl = [h, s, l];
+  document.getElementById('sl-l').value = l;
+  document.getElementById('sl-s').value = s;
+  document.getElementById('out-l').textContent = l + '%';
+  document.getElementById('out-s').textContent = s + '%';
+
+  updateSliderTrack();
+  renderContrast();
+}
+
+function renderContrast() {
+  const ratio = contrastRatio(bgHex, fgHex);
+  const rounded = (Math.round(ratio * 100) / 100).toFixed(2);
+
+  document.getElementById('preview-box').style.background = bgHex;
+  document.getElementById('preview-label').style.color = fgHex;
+  document.getElementById('preview-small').style.color = fgHex;
+
+  const numEl = document.getElementById('ratio-num');
+  numEl.textContent = rounded + ':1';
+  numEl.style.color = ratio >= 4.5 ? '#3B6D11' : ratio >= 3 ? '#854F0B' : '#A32D2D';
+
+  const checks = [
+    { id: 'badge-aa-large',  pass: ratio >= 3   },
+    { id: 'badge-aa',        pass: ratio >= 4.5  },
+    { id: 'badge-aaa-large', pass: ratio >= 4.5  },
+    { id: 'badge-aaa',       pass: ratio >= 7    },
+  ];
+  checks.forEach(c => {
+    const el = document.getElementById(c.id);
+    el.className = 'wcag-badge ' + (c.pass ? 'pass' : 'fail');
+  });
+}
+
+function updateSliderTrack() {
+  const [h, s, l] = bgHsl;
+  const slL = document.getElementById('sl-l');
+  const dark = hslToHex(h, s, 15);
+  const light = hslToHex(h, s, 85);
+  slL.style.background = `linear-gradient(to right, ${dark}, ${light})`;
+  const slS = document.getElementById('sl-s');
+  const gray = hslToHex(h, 0, l);
+  const vivid = hslToHex(h, 100, l);
+  slS.style.background = `linear-gradient(to right, ${gray}, ${vivid})`;
+}
+
+// ── Hex input handling ────────────────────────────────────────
+function attachHexInput(inputId, pickerId, dotId, errId, isBg) {
+  const input = document.getElementById(inputId);
+  const picker = document.getElementById(pickerId);
+  const dot = document.getElementById(dotId);
+  const err = document.getElementById(errId);
+
+  input.addEventListener('input', () => {
+    let val = input.value.trim();
+    if (!val.startsWith('#')) val = '#' + val;
+    err.textContent = '';
+    if (isValidHex(val)) {
+      const full = toFullHex(val);
+      dot.style.background = full;
+      picker.value = full;
+      if (isBg) { bgHex = full; updateSliderFromBg(); }
+      else fgHex = full;
+      renderContrast();
+    } else if (val.length >= 4) {
+      err.textContent = 'Enter a valid hex (e.g. #F0529C)';
+    }
+  });
+
+  picker.addEventListener('input', () => {
+    const val = picker.value;
+    input.value = val.toUpperCase();
+    dot.style.background = val;
+    err.textContent = '';
+    if (isBg) { bgHex = val; updateSliderFromBg(); }
+    else fgHex = val;
+    renderContrast();
+  });
+}
+
+function updateSliderFromBg() {
+  const [h, s, l] = rgbToHsl(...hexToRgb(bgHex));
+  bgHsl = [h, s, l];
+  document.getElementById('sl-l').value = l;
+  document.getElementById('sl-s').value = s;
+  document.getElementById('out-l').textContent = l + '%';
+  document.getElementById('out-s').textContent = s + '%';
+  updateSliderTrack();
+}
+
+// ── Slider handling ───────────────────────────────────────────
+function attachSliders() {
+  const slL = document.getElementById('sl-l');
+  const slS = document.getElementById('sl-s');
+  const outL = document.getElementById('out-l');
+  const outS = document.getElementById('out-s');
+
+  function onSlide() {
+    const l = parseInt(slL.value), s = parseInt(slS.value);
+    outL.textContent = l + '%';
+    outS.textContent = s + '%';
+    bgHsl[1] = s; bgHsl[2] = l;
+    const hex = hslToHex(bgHsl[0], s, l);
+    bgHex = hex.toUpperCase();
+    document.getElementById('bg-hex').value = bgHex;
+    document.getElementById('bg-picker').value = bgHex;
+    document.getElementById('bg-dot').style.background = bgHex;
+    updateSliderTrack();
+    renderContrast();
+  }
+
+  slL.addEventListener('input', onSlide);
+  slS.addEventListener('input', onSlide);
+}
+
+// ── Init ──────────────────────────────────────────────────────
+buildPresets();
+buildSuggestions();
+attachHexInput('bg-hex', 'bg-picker', 'bg-dot', 'bg-err', true);
+attachHexInput('fg-hex', 'fg-picker', 'fg-dot', 'fg-err', false);
+attachSliders();
+setColors('#F0529C', '#FAF2E9');
+
+document.querySelector('.preset-btn').classList.add('active');
+</script>
+</body>
+</html>
