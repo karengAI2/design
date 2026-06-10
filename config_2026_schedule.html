@@ -1,0 +1,644 @@
+
+<style>
+  h2.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+  .day-header { font-size: 18px; font-weight: 500; color: var(--color-text-primary); padding: 1.5rem 0 0.75rem; border-top: 1.5px solid var(--color-border-primary); margin-top: 1.5rem; }
+  .day-header:first-of-type { border-top: none; margin-top: 0; }
+  .session { display: flex; gap: 16px; padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); align-items: flex-start; }
+  .time { font-size: 12px; color: var(--color-text-secondary); min-width: 120px; padding-top: 3px; flex-shrink: 0; }
+  .info { flex: 1; }
+  .title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 3px; }
+  .meta { font-size: 12px; color: var(--color-text-secondary); margin: 0; }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; margin-right: 4px; font-weight: 400; }
+  .badge-keynote { background: var(--color-background-info); color: var(--color-text-info); }
+  .badge-deepdive { background: var(--color-background-warning); color: var(--color-text-warning); }
+  .badge-lab { background: var(--color-background-success); color: var(--color-text-success); }
+  .badge-event { background: var(--color-background-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-secondary); }
+  .stage { color: var(--color-text-tertiary); font-size: 12px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+  .tab { padding: 6px 16px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); font-size: 13px; cursor: pointer; background: transparent; color: var(--color-text-secondary); }
+  .tab.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+</style>
+
+<h2 class="sr-only">Config 2026 full schedule for June 24 and 25, listed chronologically by session.</h2>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('jun24')">June 24</button>
+  <button class="tab" onclick="show('jun25')">June 25</button>
+</div>
+
+<div id="jun24">
+  <div class="day-header">June 24 — Day 1</div>
+
+  <div class="session">
+    <div class="time">9:00 – 10:20 AM<br><span class="stage">Main stage</span></div>
+    <div class="info">
+      <p class="title">Figma product launch <span class="badge badge-keynote">Opening keynote</span></p>
+      <p class="meta">Dylan Field (CEO & Co-founder, Figma) · Doors 8:15 AM</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">10:35 – 10:55 AM<br><span class="stage">Main stage</span></div>
+    <div class="info">
+      <p class="title">The rules are the art: creating with AI <span class="badge badge-keynote">Keynote</span></p>
+      <p class="meta">Holly Herndon (Artist, Herndon Dryhurst Studio)</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:00 – 11:45 AM<br><span class="stage">Learning Labs</span></div>
+    <div class="info">
+      <p class="title">Figma learning lab: design to development workflows <span class="badge badge-lab">Lab</span></p>
+      <p class="meta">Amy Lima (Designer Advocate, Figma) · Beginner</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:10 AM – 12:10 PM<br><span class="stage">Main stage</span></div>
+    <div class="info">
+      <p class="title">Figma deep dive <span class="badge badge-deepdive">Deep dive</span></p>
+      <p class="meta">Speaker details coming soon</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:10 – 11:30 AM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">Scooter, screen and duct-tape: from hack to habit</p>
+      <p class="meta">Unni Krishnan Manikoth + Harish Kumar (Ather Energy) · Hardware / Prototyping</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:10 – 11:30 AM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">Ready for the world</p>
+      <p class="meta">Vicki Tan (Designer and Author) · Illustration / Storytelling</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:10 – 11:30 AM<br><span class="stage">Maker Stage</span></div>
+    <div class="info">
+      <p class="title">From kickoff to canvas: connecting Google Workspace and Figma</p>
+      <p class="meta">Addison Rodomista + Chloe Fagan-Tucker (Google) · Workflows / AI</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:30 – 11:50 AM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">Beyond design systems: designing for robots and seniors</p>
+      <p class="meta">Anna Oh (Head of Product and Design, Norbert Health) · AI / Prototyping / Accessibility</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:30 – 11:50 AM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">Dimensional shift: sculpting in Figma Draw</p>
+      <p class="meta">Josh McKenna (Independent Illustrator) · Illustration / Visual design</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:50 AM – 12:10 PM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">Figma meets hardware: prototyping for the physical world</p>
+      <p class="meta">Frederik Ueberschär + Sam Thorne (Electrolux) · Hardware / Prototyping</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:50 AM – 12:10 PM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">Out of sync, on purpose: desktop design after mobile won</p>
+      <p class="meta">Giulio Fagiolini (Staff Designer, Spotify) · UX / Workflows</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:50 AM – 12:10 PM<br><span class="stage">Maker Stage</span></div>
+    <div class="info">
+      <p class="title">How to build content systems for AI product workflows</p>
+      <p class="meta">Jessica Ouyang + Jolena Ma (Co-founders, Ditto) · AI / Content design</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">12:00 – 12:45 PM<br><span class="stage">Learning Labs</span></div>
+    <div class="info">
+      <p class="title">Figma learning lab: the many ways to make with Figma Make <span class="badge badge-lab">Lab</span></p>
+      <p class="meta">Alexia Danton + Brett McMillin (Designer Advocates, Figma) · All skill levels</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">12:10 – 12:30 PM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">Writing for humans in an AI world</p>
+      <p class="meta">Chelsea Larsson (Content Design, Anthropic) · Content design / AI</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">12:30 – 12:50 PM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">Be the director: how stage craft informs product craft</p>
+      <p class="meta">Kim Beverett (Product Manager, OpenAI) · Storytelling / Product</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">12:30 – 12:50 PM<br><span class="stage">Maker Stage</span></div>
+    <div class="info">
+      <p class="title">From concept to confidence with Dscout AI</p>
+      <p class="meta">Lauren Madura + Michael Winnick (Dscout) · AI / Research</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">12:55 – 1:15 PM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">Designing the product that can do anything</p>
+      <p class="meta">Brian Ringley (Distinguished PM & HRI Designer, Boston Dynamics) · Hardware / Research</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">1:00 – 1:45 PM<br><span class="stage">Learning Labs</span></div>
+    <div class="info">
+      <p class="title">Figma learning lab: bringing designs to life with [REDACTED] <span class="badge badge-lab">Lab</span></p>
+      <p class="meta">Miggi (Designer Advocate, Figma) · All skill levels</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">1:10 – 1:40 PM<br><span class="stage">Main stage</span></div>
+    <div class="info">
+      <p class="title">Figma deep dive <span class="badge badge-deepdive">Deep dive</span></p>
+      <p class="meta">Speaker details coming soon</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">1:15 – 1:35 PM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">Prompts to fashion: AI-powered 3D-printed garments</p>
+      <p class="meta">Danit Peleg (Founder, 3D-Printed Fashion Lab) · AI / Scale</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">1:50 – 2:10 PM<br><span class="stage">Maker Stage</span></div>
+    <div class="info">
+      <p class="title">Hacking AI for creative operations at scale</p>
+      <p class="meta">Rory Flynn (Founder, Systematiq Ai) · AI / Scale / Workflows</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:00 – 2:30 PM<br><span class="stage">Main stage</span></div>
+    <div class="info">
+      <p class="title">Figma deep dive <span class="badge badge-deepdive">Deep dive</span></p>
+      <p class="meta">Speaker details coming soon</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:00 – 2:45 PM<br><span class="stage">Learning Labs</span></div>
+    <div class="info">
+      <p class="title">Figma learning lab: unlocking speed and visual expression with [REDACTED] <span class="badge badge-lab">Lab</span></p>
+      <p class="meta">Hugo Raymond + Mallory Dean (Designer Advocates, Figma) · Visual design · Beginner</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:10 – 2:30 PM<br><span class="stage">Community Stage</span></div>
+    <div class="info">
+      <p class="title">The most important component: community</p>
+      <p class="meta">Alicia Kranjc (Figma Community PM, Figma) · AI / Storytelling</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:15 – 2:35 PM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">From handoffs to upstream</p>
+      <p class="meta">Frederick Andersen (Founder, EDL) · Dev and code / UX</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:30 – 2:50 PM<br><span class="stage">Maker Stage</span></div>
+    <div class="info">
+      <p class="title">How structured thinking gives your AI superpowers</p>
+      <p class="meta">Carola Pescio Canale (Head of Design, AI — Atlassian) · AI / Workflows</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:35 – 2:55 PM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">The metacognitive design loop</p>
+      <p class="meta">Jenny Au + Mike Green (Epsilon/Publicis Groupe) · Dev and code / AI</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:40 – 3:00 PM<br><span class="stage">Community Stage</span></div>
+    <div class="info">
+      <p class="title">Human methods, new material: designing with AI for the classroom</p>
+      <p class="meta">Mubarak "Moby" Marafa + Wendy Liao (Goodnotes) · AI / UX</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:45 – 3:05 PM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">The edge case is everyone</p>
+      <p class="meta">Willie King (T-Mobile) + Lex Liley (Kettle) · UX / Accessibility</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:50 – 3:10 PM<br><span class="stage">Main stage</span></div>
+    <div class="info">
+      <p class="title">Figma deep dive <span class="badge badge-deepdive">Deep dive</span></p>
+      <p class="meta">Speaker details coming soon</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:55 – 3:15 PM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">Your best practices are trapped in your head—and your AI has no idea</p>
+      <p class="meta">Harald Kirschner (Principal PM, Microsoft) · AI / Workflows</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">3:05 – 3:25 PM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">ESPN's migration playbook: the move to Figma with One North</p>
+      <p class="meta">Elliott Muñoz (ESPN) + Matt Rogers (One North) · Scale / Brand</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">3:10 – 3:30 PM<br><span class="stage">Maker Stage</span></div>
+    <div class="info">
+      <p class="title">Build like it's 2030. Listen like you mean it.</p>
+      <p class="meta">Ned Dwyer (CEO & Co-founder, Great Question) · AI / Research</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">3:10 – 3:30 PM<br><span class="stage">Community Stage</span></div>
+    <div class="info">
+      <p class="title">When to prototype; when to perfect</p>
+      <p class="meta">Noah Finer (Software Engineer, Figma) · Prototyping / Dev and code</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">3:25 – 3:45 PM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">Reimagining NASA.gov to tell Earth's most important stories</p>
+      <p class="meta">Ben Shown (Blink UX) + Megan Greco (Greenlight) · Workflows / UX</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">4:00 – 5:00 PM<br><span class="stage">Main stage</span></div>
+    <div class="info">
+      <p class="title">What it feels like to build in 2026 <span class="badge badge-keynote">Closing keynote</span></p>
+      <p class="meta">Tommy Geoco (UX Tools) · Catt Small (Dropbox) · Matt D. Smith (Shift Nudge) · Doors 3:40 PM</p>
+    </div>
+  </div>
+</div>
+
+<div id="jun25" style="display:none">
+  <div class="day-header">June 25 — Day 2</div>
+
+  <div class="session">
+    <div class="time">9:00 – 10:00 AM<br><span class="stage">Main stage</span></div>
+    <div class="info">
+      <p class="title">Opening keynotes <span class="badge badge-keynote">Keynote</span></p>
+      <p class="meta">Designing math — Grant Sanderson (3Blue1Brown) · Patterns for restarting the world — Switch Angel + LO.FI.SCI.FI · Doors 8:15 AM</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">10:15 – 11:15 AM<br><span class="stage">Main stage</span></div>
+    <div class="info">
+      <p class="title">Figma deep dive <span class="badge badge-deepdive">Deep dive</span></p>
+      <p class="meta">Speaker details coming soon</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">10:15 – 11:00 AM<br><span class="stage">Learning Labs</span></div>
+    <div class="info">
+      <p class="title">Figma learning lab: upskill on skills and agentic workflows <span class="badge badge-lab">Lab</span></p>
+      <p class="meta">Laura Fehre + Manish Kumar (Figma) · Intermediate / Advanced</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">10:15 – 10:35 AM<br><span class="stage">Maker Stage</span></div>
+    <div class="info">
+      <p class="title">Designing in the age of the 10x engineer</p>
+      <p class="meta">Andy Zhang (Design Engineer Lead, Google) · AI / UX / Product</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">10:20 – 10:40 AM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">10 years of daily sketching</p>
+      <p class="meta">Zach Lieberman (Artist, MIT Media Lab) · Storytelling / Visual design</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">10:30 – 10:50 AM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">The invisible mechanisms in your interfaces</p>
+      <p class="meta">Johannes Mutter (Design Engineer, mutter.co) · UX / Research</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">10:40 – 11:00 AM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">The world of street art and care-filled design</p>
+      <p class="meta">Ella Rochelle-Lawton (First Amendment) · Illustration / Visual design</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">10:50 – 11:10 AM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">Dense by design</p>
+      <p class="meta">Matthew Ström-Awn (Founder, mu.design) · Visual design / UX</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">10:50 – 11:10 AM<br><span class="stage">Maker Stage</span></div>
+    <div class="info">
+      <p class="title">Building real-time user insights into your design workflow</p>
+      <p class="meta">Prayag Narula (CEO & Co-Founder, HeyMarvin) · Research / Workflows</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:00 – 11:20 AM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">Managing multiple creative passions in a world that tells you to specialize</p>
+      <p class="meta">Lauren Hom (Lettering Artist & Designer, Hom Sweet Hom) · Brand / Storytelling</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:10 – 11:30 AM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">Usernames on Instagram: how a craft fix became an identity crisis</p>
+      <p class="meta">Rose McManus (Content Designer, Instagram/Meta) · Content design / UX</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:25 – 11:45 AM<br><span class="stage">Maker Stage</span></div>
+    <div class="info">
+      <p class="title">AI will upend your process—for the better</p>
+      <p class="meta">Justin Meyer (CEO, Bitovi) · AI / UX</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:30 – 11:50 AM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">The future is low-tech: lessons from the early 2000s</p>
+      <p class="meta">Jésabel DC (Tech Anthropologist, The Lifestyle Lab) · UX</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">11:30 AM – 12:15 PM<br><span class="stage">Learning Labs</span></div>
+    <div class="info">
+      <p class="title">Figma learning lab: express yourself with Figma Draw <span class="badge badge-lab">Lab</span></p>
+      <p class="meta">Laura Butvinik + Rachel Platt + Kristen Bates (Figma) · Illustration · All skill levels</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">12:15 – 1:00 PM<br><span class="stage">Main stage</span></div>
+    <div class="info">
+      <p class="title">Figma deep dive: inside the Weave workflow <span class="badge badge-deepdive">Deep dive</span></p>
+      <p class="meta">Gal Sharir + Ron Baranov (Figma) · AI / Workflows / Visual design</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">12:25 – 12:45 PM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">The learning curve: turning real-world motion into design</p>
+      <p class="meta">Patrick Flaherty (Senior Motion Designer, Microsoft) · Motion design / Dev and code</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">12:45 – 1:05 PM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">The canvas is not dead</p>
+      <p class="meta">Catt Small (Staff Product Designer, Dropbox) · AI / UX / Workflows</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">12:45 – 1:05 PM<br><span class="stage">Maker Stage</span></div>
+    <div class="info">
+      <p class="title">Quirk up your workplace</p>
+      <p class="meta">Darby Thomas (Senior Product Designer, GitHub) · Storytelling</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">12:45 – 1:30 PM<br><span class="stage">Learning Labs</span></div>
+    <div class="info">
+      <p class="title">Figma learning lab: workflow tips—from slow to flow <span class="badge badge-lab">Lab</span></p>
+      <p class="meta">Chad Bergman + Michel Ferreira (Designer Advocates, Figma) · Beginner</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">12:50 – 1:10 PM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">Everyone's still eating: building Notion's design system</p>
+      <p class="meta">Tamara Chu + Shauna Sapper (Notion) · Dev and code / Scale</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">1:10 – 1:30 PM<br><span class="stage">Community Stage</span></div>
+    <div class="info">
+      <p class="title">In praise of dark mode</p>
+      <p class="meta">Mehmet Aydın Baytaş (Senior Design Engineer, Attio) · Visual design / UX</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">1:10 – 1:30 PM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">Preparing Rocket for the AI era</p>
+      <p class="meta">Emily Strobl + Will Hobick (Rocket) · AI / Dev and code / Scale</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">1:20 – 1:40 PM<br><span class="stage">Maker Stage</span></div>
+    <div class="info">
+      <p class="title">Designing with confidence in an AI-powered world</p>
+      <p class="meta">Bobby Meixner (VP, Solution Marketing — UserTesting) · AI / Research</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">1:30 – 1:50 PM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">Designed to be read: making a system AI can actually use</p>
+      <p class="meta">Harvey Whiting (Product Designer, Meta) · AI / Workflows / Prototyping</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">1:40 – 2:00 PM<br><span class="stage">Community Stage</span></div>
+    <div class="info">
+      <p class="title">Designing brand intelligence: from rules to expression</p>
+      <p class="meta">Nicole Martinez (Co-founder, Let's Jetty) · Brand / AI / Workflows</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">1:45 – 2:15 PM<br><span class="stage">Main stage</span></div>
+    <div class="info">
+      <p class="title">Figma deep dive <span class="badge badge-deepdive">Deep dive</span></p>
+      <p class="meta">Speaker details coming soon</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:00 – 3:00 PM<br><span class="stage">Learning Labs</span></div>
+    <div class="info">
+      <p class="title">Figma learning lab: build your first Weave workflow <span class="badge badge-lab">Lab</span></p>
+      <p class="meta">Moran Dankner + Ken Vreman (Figma) · AI / Workflows · Beginner / Intermediate</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:05 – 2:25 PM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">Own the loop: how designers and researchers win with AI evals</p>
+      <p class="meta">Setor Zilevu (Researcher, Figma) · AI / Research</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:10 – 2:30 PM<br><span class="stage">Community Stage</span></div>
+    <div class="info">
+      <p class="title">Gnarly by design: building systems with grit</p>
+      <p class="meta">Beau Wingfield (Visual Product Designer, ex-EA) · Visual design / Scale</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:15 – 2:35 PM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">300GB story: how to inspire action when data isn't enough</p>
+      <p class="meta">Luke Fiorante + Sirinda Limsong (Harvard University) · Research / Storytelling</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:15 – 2:45 PM<br><span class="stage">Main stage</span></div>
+    <div class="info">
+      <p class="title">Figma deep dive <span class="badge badge-deepdive">Deep dive</span></p>
+      <p class="meta">Speaker details coming soon</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:25 – 2:45 PM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">Design for the future of apps</p>
+      <p class="meta">Craig Labenz (Developer Relations Engineer, Google) · AI / UX / Dev and code</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:35 – 2:55 PM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">The marathon designer: creative endurance beyond prompts and pixels</p>
+      <p class="meta">Socrates Charisis (Founder & Designer, Quintessential) · UX / Storytelling</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:40 – 3:00 PM<br><span class="stage">Community Stage</span></div>
+    <div class="info">
+      <p class="title">Don't forget the feeling: a critique of software in 2026</p>
+      <p class="meta">Luis Ouriach (Designer Advocate, Figma) · Brand / AI</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:45 – 3:05 PM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">Designing money: how to build a trustworthy brand in the age of AI</p>
+      <p class="meta">Chris Warner (Creative Lead, Brand Studio — Plaid) · Brand / AI / Visual design</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">2:55 – 3:15 PM<br><span class="stage">Level 2 Stage</span></div>
+    <div class="info">
+      <p class="title">Design systems anarchy</p>
+      <p class="meta">Lauren LoPrete (Head of Design Foundations, Mercury) · Storytelling / AI / Scale</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">3:05 – 3:25 PM<br><span class="stage">Mezzanine stage</span></div>
+    <div class="info">
+      <p class="title">Legibility by design</p>
+      <p class="meta">Ryan Powell (Head of Design, Waymo) · AI / UX / Product</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">4:00 – 5:00 PM<br><span class="stage">Main stage</span></div>
+    <div class="info">
+      <p class="title">Death of the finished state + It used to be hard to be average <span class="badge badge-keynote">Closing keynote</span></p>
+      <p class="meta">Brent David Freaney (Special Offer, Inc.) + André Anjos (RAC) · Doors 3:40 PM</p>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="time">5:00 – 6:30 PM<br><span class="stage">Config Commons</span></div>
+    <div class="info">
+      <p class="title">Closing happy hour <span class="badge badge-event">Event</span></p>
+      <p class="meta">Toast to new connections and inspirational sessions</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(day) {
+  document.getElementById('jun24').style.display = day === 'jun24' ? 'block' : 'none';
+  document.getElementById('jun25').style.display = day === 'jun25' ? 'block' : 'none';
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+}
+</script>
