@@ -1,0 +1,373 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.cw{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:4px 0 16px}
+.cl{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px;padding:0 2px}
+.panel{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);overflow:hidden;font-size:13px}
+.ptb{background:#06303A;padding:7px 10px;display:flex;align-items:center;gap:5px}
+.tc{height:22px;padding:0 8px;border-radius:100px;border:0.5px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.85);font-size:11px;display:flex;align-items:center;gap:4px}
+.tc.a{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.4)}
+.tc i{font-size:12px}
+.tbadge{background:#5DCAA5;color:#04342C;border-radius:100px;padding:1px 4px;font-size:9px;font-weight:500}
+.tsp{flex:1}
+.psearch{padding:7px 10px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:6px;background:var(--color-background-secondary)}
+.psearch i{font-size:13px;color:var(--color-text-tertiary)}
+.psearch span{font-size:11px;color:var(--color-text-tertiary);flex:1}
+.fph{padding:7px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--color-border-tertiary)}
+.fpa{font-size:12px;font-weight:500;color:#0F6E56;display:flex;align-items:center;gap:3px}
+.fpa i{font-size:13px}
+.sl{font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);padding:7px 10px 3px;display:flex;align-items:center;justify-content:space-between}
+.fr{display:flex;align-items:center;padding:5px 10px;gap:5px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.fr:last-child{border-bottom:none}
+.frl{font-size:12px;color:var(--color-text-primary);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.frr{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.ie{display:flex;border:0.5px solid var(--color-border-secondary);border-radius:6px;overflow:hidden;height:22px}
+.ie span{font-size:10px;padding:0 6px;display:flex;align-items:center;cursor:pointer;color:var(--color-text-secondary);border-right:0.5px solid var(--color-border-secondary);transition:background .1s}
+.ie span:last-child{border-right:none}
+.ie span.s{background:#E1F5EE;color:#085041;font-weight:500}
+.fsel{font-size:11px;color:var(--color-text-secondary);background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:6px;padding:2px 5px;height:22px;max-width:84px}
+.ftxt{font-size:11px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:6px;padding:2px 5px;height:22px;width:84px;color:var(--color-text-secondary)}
+.ftr{color:var(--color-text-tertiary);font-size:13px;cursor:pointer}
+.rw{padding:2px 10px 8px}
+.rw input[type=range]{width:100%}
+.rl{display:flex;justify-content:space-between;font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.rv{font-size:11px;font-weight:500;color:#0F6E56;text-align:right;margin-top:2px}
+.mbtn{display:flex;align-items:center;gap:5px;font-size:12px;color:#0F6E56;padding:7px 10px;cursor:pointer;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.mbtn i{font-size:13px}
+.mrows{border-top:0.5px solid var(--color-border-tertiary)}
+.pfoot{padding:8px 10px;display:flex;align-items:center;justify-content:space-between;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.pclr{font-size:11px;color:var(--color-text-secondary);cursor:pointer;text-decoration:underline}
+.papply{background:#06303A;color:#fff;font-size:11px;font-weight:500;border:none;border-radius:6px;padding:5px 12px;cursor:pointer}
+.stag{font-size:10px;padding:1px 5px;border-radius:3px;background:#E1F5EE;color:#085041;flex-shrink:0}
+.stag.b{background:#E6F1FB;color:#0C447C}
+.fnote{font-size:10px;color:var(--color-text-tertiary);padding:2px 10px 6px;display:flex;align-items:flex-start;gap:3px;line-height:1.4}
+.fnote i{font-size:11px;flex-shrink:0;margin-top:1px}
+.seg{display:flex;border:0.5px solid var(--color-border-secondary);border-radius:6px;overflow:hidden;height:22px;width:100%}
+.seg span{font-size:10px;flex:1;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-secondary);border-right:0.5px solid var(--color-border-secondary);white-space:nowrap;padding:0 3px;transition:background .1s}
+.seg span:last-child{border-right:none}
+.seg span.s{background:#E1F5EE;color:#085041;font-weight:500}
+.segw{padding:2px 10px 8px}
+.cb{display:flex;align-items:center;gap:5px}
+.cbx{width:13px;height:13px;border:0.5px solid var(--color-border-primary);border-radius:3px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cbx.on{background:#0F6E56;border-color:#0F6E56}
+.cbx.on::after{content:'';width:7px;height:4px;border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;transform:rotate(-45deg) translateY(-1px)}
+.cbl{font-size:11px;color:var(--color-text-primary);cursor:pointer}
+.ann{font-size:11px;color:var(--color-text-secondary);background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;margin-top:8px;line-height:1.6;border:0.5px solid var(--color-border-tertiary)}
+.ann strong{font-weight:500;color:var(--color-text-primary);display:block;margin-bottom:4px}
+.pro{color:#0F6E56}
+.con{color:var(--color-text-secondary)}
+.secdiv{height:0.5px;background:var(--color-border-tertiary)}
+</style>
+
+<h2 class="sr-only">Full filter panel comparison including vessel detections: Direction 1 uses tiered prominence with expander; Direction 2 moves identifiers to search and shows satellite estimates inline with source tags.</h2>
+
+<div class="cw">
+
+  <div>
+    <div class="cl">Direction 1 — tiered prominence</div>
+    <div class="panel">
+      <div class="ptb">
+        <div class="tc a"><i class="ti ti-adjustments-horizontal" aria-hidden="true"></i> Filters <span class="tbadge">4</span></div>
+        <div class="tsp"></div>
+        <div class="tc"><i class="ti ti-clock" aria-hidden="true"></i> Past week ✕</div>
+      </div>
+      <div class="fph">
+        <span class="fpa"><i class="ti ti-check" aria-hidden="true"></i> Apply</span>
+        <i class="ti ti-chevron-up" style="font-size:13px;color:var(--color-text-tertiary)" aria-hidden="true"></i>
+      </div>
+
+      <div class="sl">Vessel information (AIS/GFW)</div>
+      <div class="fr">
+        <span class="frl">Vessel type</span>
+        <div class="frr">
+          <div class="ie"><span class="s">Inc</span><span>Exc</span></div>
+          <select class="fsel"><option>Fishing</option></select>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">Vessel flag</span>
+        <div class="frr">
+          <div class="ie"><span class="s">Inc</span><span>Exc</span></div>
+          <input class="ftxt" value="PHL">
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">AIS vessel length</span>
+        <div class="frr"><span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span></div>
+      </div>
+      <div class="rw">
+        <input type="range" min="0" max="400" step="1" value="180" id="r1a" oninput="document.getElementById('rv1a').textContent=Math.round(this.value)+'m'">
+        <div class="rl"><span>0 m</span><span>400 m</span></div>
+        <div class="rv" id="rv1a">180m</div>
+      </div>
+
+      <div class="mbtn" id="mb1" onclick="tog('mr1','mb1','mi1','ml1')">
+        <i class="ti ti-chevron-down" id="mi1" aria-hidden="true"></i>
+        <span id="ml1">8 more filters</span>
+      </div>
+      <div id="mr1" style="display:none" class="mrows">
+        <div class="sl" style="padding-top:8px">More vessel information filters</div>
+        <div class="fr"><span class="frl">Vessel name</span><div class="frr"><div class="ie"><span class="s">Inc</span><span>Exc</span></div><input class="ftxt" placeholder="Name…"><span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span></div></div>
+        <div class="fr"><span class="frl">MMSI</span><div class="frr"><div class="ie"><span class="s">Inc</span><span>Exc</span></div><input class="ftxt" placeholder="MMSI…"><span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span></div></div>
+        <div class="fr"><span class="frl">IMO</span><div class="frr"><div class="ie"><span class="s">Inc</span><span>Exc</span></div><input class="ftxt" placeholder="IMO…"><span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span></div></div>
+        <div class="fr"><span class="frl">Gear type &amp; sub-type</span><div class="frr"><div class="ie"><span class="s">Inc</span><span>Exc</span></div><select class="fsel"><option>Trawl</option></select><span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span></div></div>
+        <div class="fr"><span class="frl">Partner vessel type</span><div class="frr"><div class="ie"><span class="s">Inc</span><span>Exc</span></div><select class="fsel"><option>Carrier</option></select><span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span></div></div>
+        <div class="fr"><span class="frl">Authorization list</span><div class="frr"><div class="ie"><span class="s">Inc</span><span>Exc</span></div><select class="fsel"><option>CCAMLR</option></select><span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span></div></div>
+        <div class="fr"><span class="frl">Owner name</span><div class="frr"><div class="ie"><span class="s">Inc</span><span>Exc</span></div><input class="ftxt" placeholder="Name…"><span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span></div></div>
+        <div class="fr"><span class="frl">Owner flag</span><div class="frr"><div class="ie"><span class="s">Inc</span><span>Exc</span></div><input class="ftxt" placeholder="Flag…"><span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span></div></div>
+      </div>
+
+      <div class="secdiv"></div>
+      <div class="sl">Vessel detections (satellite)</div>
+      <div class="fr">
+        <span class="frl">Detection type</span>
+        <div class="frr">
+          <select class="fsel"><option>SAR (S1)</option><option>Optical</option></select>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">AIS correlation</span>
+        <div class="frr" style="gap:8px">
+          <div class="cb"><div class="cbx on" onclick="this.classList.toggle('on')"></div><span class="cbl">Correlated</span></div>
+          <div class="cb"><div class="cbx on" onclick="this.classList.toggle('on')"></div><span class="cbl">Dark</span></div>
+          <span class="ftr" style="margin-left:2px"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">Est. vessel type</span>
+        <div class="frr">
+          <div class="ie"><span class="s">Inc</span><span>Exc</span></div>
+          <select class="fsel"><option>Fishing</option></select>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">Est. vessel length</span>
+        <div class="frr">
+          <span class="stag b">S1·S2·LS</span>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="rw">
+        <input type="range" min="0" max="400" step="1" value="120" id="r1b" oninput="document.getElementById('rv1b').textContent=Math.round(this.value)+'m'">
+        <div class="rl"><span>0 m</span><span>400 m</span></div>
+        <div class="rv" id="rv1b">120m</div>
+      </div>
+      <div class="fnote"><i class="ti ti-info-circle" aria-hidden="true"></i>Values under 50 m shown as "small" for Landsat</div>
+      <div class="fr">
+        <span class="frl">Est. speed</span>
+        <div class="frr">
+          <span class="stag b">S1·LS</span>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="segw">
+        <div class="seg">
+          <span class="s">Stationary <span style="opacity:.65">0–2kn</span></span>
+          <span>Medium <span style="opacity:.65">2–8kn</span></span>
+          <span class="s">Fast <span style="opacity:.65">8+kn</span></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">Est. heading</span>
+        <div class="frr">
+          <span class="stag b">S1·LS &gt;50m</span>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="segw">
+        <div class="seg">
+          <span class="s">N</span><span class="s">NE</span><span>E</span><span>SE</span><span>S</span><span class="s">SW</span><span>W</span><span>NW</span>
+        </div>
+      </div>
+      <div class="fnote"><i class="ti ti-info-circle" aria-hidden="true"></i>Not available for detections under 50 m</div>
+
+      <div class="pfoot">
+        <span class="pclr">Clear all</span>
+        <button class="papply">Apply filters</button>
+      </div>
+    </div>
+
+    <div class="ann">
+      <strong>Direction 1 — what changed from the last mockup</strong>
+      <div class="pro">✓ Vessel detections now fully visible — no Add/Remove step</div>
+      <div class="pro">✓ Source tags (S1·S2·LS) keep attribution compact</div>
+      <div class="pro">✓ Speed and heading use segmented pickers — honest about data resolution</div>
+      <div class="con" style="margin-top:4px">✗ Total scroll depth is significant when "8 more" is expanded</div>
+      <div class="con">✗ AIS filters and satellite estimates share the same visual weight — no distinction between certainty levels</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="cl">Direction 2 — search for identifiers</div>
+    <div class="panel">
+      <div class="ptb">
+        <div class="tc a"><i class="ti ti-adjustments-horizontal" aria-hidden="true"></i> Filters <span class="tbadge">4</span></div>
+        <div class="tsp"></div>
+        <div class="tc"><i class="ti ti-clock" aria-hidden="true"></i> Past week ✕</div>
+      </div>
+      <div class="psearch">
+        <i class="ti ti-search" aria-hidden="true"></i>
+        <span>Search by name, MMSI, IMO, owner…</span>
+        <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i>
+      </div>
+      <div class="fph">
+        <span class="fpa"><i class="ti ti-check" aria-hidden="true"></i> Apply</span>
+        <i class="ti ti-chevron-up" style="font-size:13px;color:var(--color-text-tertiary)" aria-hidden="true"></i>
+      </div>
+
+      <div class="sl">Vessel information (AIS/GFW)</div>
+      <div class="fr">
+        <span class="frl">Vessel type</span>
+        <div class="frr">
+          <div class="ie"><span class="s">Inc</span><span>Exc</span></div>
+          <select class="fsel"><option>Fishing</option></select>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">Vessel flag</span>
+        <div class="frr">
+          <div class="ie"><span class="s">Inc</span><span>Exc</span></div>
+          <input class="ftxt" value="PHL">
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">Gear type &amp; sub-type</span>
+        <div class="frr">
+          <div class="ie"><span class="s">Inc</span><span>Exc</span></div>
+          <select class="fsel"><option>— any —</option></select>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">Partner vessel type</span>
+        <div class="frr">
+          <div class="ie"><span class="s">Inc</span><span>Exc</span></div>
+          <select class="fsel"><option>— any —</option></select>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">Authorization list</span>
+        <div class="frr">
+          <div class="ie"><span class="s">Inc</span><span>Exc</span></div>
+          <select class="fsel"><option>CCAMLR</option></select>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">Owner flag</span>
+        <div class="frr">
+          <div class="ie"><span class="s">Inc</span><span>Exc</span></div>
+          <input class="ftxt" placeholder="Flag…">
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">AIS vessel length</span>
+        <div class="frr"><span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span></div>
+      </div>
+      <div class="rw">
+        <input type="range" min="0" max="400" step="1" value="180" id="r2a" oninput="document.getElementById('rv2a').textContent=Math.round(this.value)+'m'">
+        <div class="rl"><span>0 m</span><span>400 m</span></div>
+        <div class="rv" id="rv2a">180m</div>
+      </div>
+
+      <div class="secdiv"></div>
+      <div class="sl">Vessel detections (satellite)</div>
+      <div class="fr">
+        <span class="frl">Detection type</span>
+        <div class="frr">
+          <select class="fsel"><option>SAR (S1)</option><option>Optical</option></select>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">AIS correlation</span>
+        <div class="frr" style="gap:8px">
+          <div class="cb"><div class="cbx on" onclick="this.classList.toggle('on')"></div><span class="cbl">Correlated</span></div>
+          <div class="cb"><div class="cbx on" onclick="this.classList.toggle('on')"></div><span class="cbl">Dark</span></div>
+          <span class="ftr" style="margin-left:2px"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">Est. vessel type</span>
+        <div class="frr">
+          <div class="ie"><span class="s">Inc</span><span>Exc</span></div>
+          <select class="fsel"><option>Fishing</option></select>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">Est. vessel length</span>
+        <div class="frr">
+          <span class="stag b">S1·S2·LS</span>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="rw">
+        <input type="range" min="0" max="400" step="1" value="120" id="r2b" oninput="document.getElementById('rv2b').textContent=Math.round(this.value)+'m'">
+        <div class="rl"><span>0 m</span><span>400 m</span></div>
+        <div class="rv" id="rv2b">120m</div>
+      </div>
+      <div class="fnote"><i class="ti ti-info-circle" aria-hidden="true"></i>Values under 50 m shown as "small" for Landsat</div>
+      <div class="fr">
+        <span class="frl">Est. speed</span>
+        <div class="frr">
+          <span class="stag b">S1·LS</span>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="segw">
+        <div class="seg">
+          <span class="s">Stationary <span style="opacity:.65">0–2kn</span></span>
+          <span>Medium <span style="opacity:.65">2–8kn</span></span>
+          <span class="s">Fast <span style="opacity:.65">8+kn</span></span>
+        </div>
+      </div>
+      <div class="fr">
+        <span class="frl">Est. heading</span>
+        <div class="frr">
+          <span class="stag b">S1·LS &gt;50m</span>
+          <span class="ftr"><i class="ti ti-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+      <div class="segw">
+        <div class="seg">
+          <span class="s">N</span><span class="s">NE</span><span>E</span><span>SE</span><span>S</span><span class="s">SW</span><span>W</span><span>NW</span>
+        </div>
+      </div>
+      <div class="fnote"><i class="ti ti-info-circle" aria-hidden="true"></i>Not available for detections under 50 m</div>
+
+      <div class="pfoot">
+        <span class="pclr">Clear all</span>
+        <button class="papply">Apply filters</button>
+      </div>
+    </div>
+
+    <div class="ann">
+      <strong>Direction 2 — what changed from the last mockup</strong>
+      <div class="pro">✓ Same complete satellite estimates section as D1</div>
+      <div class="pro">✓ Search bar replaces 4 identifier rows — panel stays one screenful</div>
+      <div class="pro">✓ Cleaner conceptual split: characteristics vs. identities</div>
+      <div class="con" style="margin-top:4px">✗ Owner flag stays in the panel (it's a characteristic, not an identifier) — worth flagging to team</div>
+      <div class="con">✗ Still need to define what the search bar experience looks like — this is a placeholder</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function tog(rowsId,btnId,iconId,labelId){
+  var r=document.getElementById(rowsId);
+  var open=r.style.display==='none';
+  r.style.display=open?'block':'none';
+  document.getElementById(iconId).className=open?'ti ti-chevron-up':'ti ti-chevron-down';
+  document.getElementById(labelId).textContent=open?'Collapse':'8 more filters';
+}
+</script>
