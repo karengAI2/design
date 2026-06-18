@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Config 2026 — Schedule</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-page: #f6f8fa;
+    --text-primary: #1f2329;
+    --text-secondary: #5f6368;
+    --text-tertiary: #9aa0a6;
+    --border: #e0e0e0;
+    --border-light: #efefef;
+    --hour-h: 56px;
+    --time-col: 52px;
+    --radius: 4px;
+    --stage-count: 6;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-size: 12px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .toolbar h1 {
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--text-secondary);
+  }
+  .toolbar h1 strong { color: var(--text-primary); font-weight: 500; }
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .tab {
+    padding: 6px 18px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: inherit;
+    transition: background 0.12s, color 0.12s;
+  }
+  .tab:hover { background: var(--bg-page); }
+  .tab.active {
+    background: #1a73e8;
+    color: #fff;
+    border-color: #1a73e8;
+  }
+
+  /* ── CAL WRAPPER ── */
+  .cal-outer {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+  }
+
+  /* ── STAGE HEADER ── */
+  .stage-header {
+    display: grid;
+    grid-template-columns: var(--time-col) repeat(var(--stage-count), 1fr);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 20;
+  }
+  .stage-header .gutter { border-right: 1px solid var(--border-light); }
+  .stage-cell {
+    padding: 10px 4px 8px;
+    text-align: center;
+    border-left: 1px solid var(--border-light);
+  }
+  .stage-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+  }
+  .stage-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-bottom: 4px;
+  }
+
+  /* ── SCROLLABLE GRID ── */
+  .grid-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .time-grid {
+    display: grid;
+    grid-template-columns: var(--time-col) repeat(var(--stage-count), 1fr);
+    position: relative;
+  }
+
+  .time-labels {
+    position: relative;
+    border-right: 1px solid var(--border-light);
+  }
+  .time-label {
+    position: absolute;
+    right: 8px;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    transform: translateY(-50%);
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .stage-col {
+    border-left: 1px solid var(--border-light);
+    position: relative;
+  }
+  .h-line {
+    position: absolute;
+    left: 0; right: 0;
+    border-top: 1px solid var(--border);
+    pointer-events: none;
+  }
+  .h-half {
+    position: absolute;
+    left: 0; right: 0;
+    border-top: 1px dashed var(--border-light);
+    pointer-events: none;
+  }
+
+  /* ── EVENT BLOCKS ── */
+  .ev {
+    position: absolute;
+    left: 2px; right: 2px;
+    border-radius: var(--radius);
+    padding: 4px 6px;
+    font-size: 11px;
+    overflow: hidden;
+    cursor: default;
+    line-height: 1.35;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .ev-title {
+    font-weight: 600;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ev-time  { font-size: 10px; opacity: 0.8; display: block; white-space: nowrap; }
+  .ev-who   { font-size: 10px; opacity: 0.75; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Stage color palette */
+  .col-main     { background: #e8f0fe; color: #1a3a7a; border-left: 3px solid #1a73e8; }
+  .col-labs     { background: #e6f4ea; color: #1b5e20; border-left: 3px solid #34a853; }
+  .col-l2       { background: #fce8e6; color: #7f1b17; border-left: 3px solid #ea4335; }
+  .col-mezz     { background: #fef3e2; color: #6d3a00; border-left: 3px solid #fa7b17; }
+  .col-maker    { background: #f3e8fd; color: #4a1474; border-left: 3px solid #9334e6; }
+  .col-community{ background: #e2f3f5; color: #004d54; border-left: 3px solid #12b5cb; }
+  .col-keynote  { background: #1a73e8; color: #fff; border-left: 3px solid #0d47a1; }
+  .col-closing  { background: #0d47a1; color: #fff; border-left: 3px solid #01004a; }
+  .col-deepdive { background: #fff8e1; color: #6d4c00; border-left: 3px solid #f9ab00; }
+  .col-event    { background: #f1f3f4; color: #3c4043; border-left: 3px solid #9aa0a6; }
+
+  .day { display: none; }
+  .day.visible { display: contents; }
+
+  /* legend */
+  .legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    background: var(--bg);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1><strong>Config 2026</strong> &nbsp;·&nbsp; San Francisco</h1>
+  <div class="tabs">
+    <button class="tab active" onclick="showDay('d24',this)">Jun 24</button>
+    <button class="tab" onclick="showDay('d25',this)">Jun 25</button>
+  </div>
+</div>
+
+<div class="cal-outer">
+
+  <!-- Stage header -->
+  <div class="stage-header">
+    <div class="gutter"></div>
+    <div class="stage-cell"><div class="stage-dot" style="background:#1a73e8"></div><div class="stage-name">Main Stage</div></div>
+    <div class="stage-cell"><div class="stage-dot" style="background:#34a853"></div><div class="stage-name">Learning Labs</div></div>
+    <div class="stage-cell"><div class="stage-dot" style="background:#ea4335"></div><div class="stage-name">Level 2 Stage</div></div>
+    <div class="stage-cell"><div class="stage-dot" style="background:#fa7b17"></div><div class="stage-name">Mezzanine Stage</div></div>
+    <div class="stage-cell"><div class="stage-dot" style="background:#9334e6"></div><div class="stage-name">Maker Stage</div></div>
+    <div class="stage-cell"><div class="stage-dot" style="background:#12b5cb"></div><div class="stage-name">Community Stage</div></div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#1a73e8"></div>Keynote</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f9ab00"></div>Deep dive</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#34a853"></div>Lab</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ea4335"></div>Talk — Level 2</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#fa7b17"></div>Talk — Mezzanine</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9334e6"></div>Talk — Maker</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#12b5cb"></div>Talk — Community</div>
+  </div>
+
+  <div class="grid-scroll">
+    <div class="time-grid" id="timeGrid">
+      <div class="time-labels" id="timeLabels"></div>
+      <div class="stage-col" id="col-main"></div>
+      <div class="stage-col" id="col-labs"></div>
+      <div class="stage-col" id="col-l2"></div>
+      <div class="stage-col" id="col-mezz"></div>
+      <div class="stage-col" id="col-maker"></div>
+      <div class="stage-col" id="col-community"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const START_H = 8;
+const END_H   = 19;
+const HOUR_PX = 60;
+const COLS = ['col-main','col-labs','col-l2','col-mezz','col-maker','col-community'];
+
+const totalH = END_H - START_H;
+document.getElementById('timeGrid').style.height = (totalH * HOUR_PX) + 'px';
+document.getElementById('timeLabels').style.height = (totalH * HOUR_PX) + 'px';
+
+// Time labels + grid lines
+const labelsEl = document.getElementById('timeLabels');
+for (let h = START_H; h <= END_H; h++) {
+  const top = (h - START_H) * HOUR_PX;
+  if (h > START_H) {
+    const lbl = document.createElement('div');
+    lbl.className = 'time-label';
+    lbl.style.top = top + 'px';
+    const ampm = h < 12 ? 'AM' : 'PM';
+    const d = h === 12 ? 12 : h > 12 ? h - 12 : h;
+    lbl.textContent = d + ' ' + ampm;
+    labelsEl.appendChild(lbl);
+  }
+  COLS.forEach(id => {
+    const col = document.getElementById(id);
+    const line = document.createElement('div');
+    line.className = 'h-line';
+    line.style.top = top + 'px';
+    col.appendChild(line);
+    if (h < END_H) {
+      const half = document.createElement('div');
+      half.className = 'h-half';
+      half.style.top = (top + HOUR_PX/2) + 'px';
+      col.appendChild(half);
+    }
+  });
+}
+
+function pxTop(h, m) { return ((h + m/60) - START_H) * HOUR_PX; }
+function pxH(h1,m1,h2,m2) { return Math.max(22, ((h2+m2/60)-(h1+m1/60)) * HOUR_PX - 2); }
+
+function ev(colId, h1,m1,h2,m2, cls, title, timeStr, who) {
+  const col = document.getElementById(colId);
+  const el = document.createElement('div');
+  el.className = 'ev ' + cls;
+  el.style.top    = pxTop(h1,m1) + 'px';
+  el.style.height = pxH(h1,m1,h2,m2) + 'px';
+  el.innerHTML = `<span class="ev-title">${title}</span><span class="ev-time">${timeStr}</span>${who ? `<span class="ev-who">${who}</span>` : ''}`;
+  col.appendChild(el);
+}
+
+// ═══════════════════════════════════════
+// JUNE 24 DATA
+// ═══════════════════════════════════════
+const d24 = [
+  // Main stage
+  () => ev('col-main',  9,0, 10,20, 'col-keynote',  'Opening keynote: Figma product launch', '9:00–10:20 AM', 'Dylan Field · Doors 8:15 AM'),
+  () => ev('col-main', 10,35,10,55, 'col-keynote',  'The rules are the art: creating with AI', '10:35–10:55 AM', 'Holly Herndon'),
+  () => ev('col-main', 11,10,12,10, 'col-deepdive', 'Figma deep dive', '11:10 AM–12:10 PM', 'Details TBA'),
+  () => ev('col-main', 13,10,13,40, 'col-deepdive', 'Figma deep dive', '1:10–1:40 PM', 'Details TBA'),
+  () => ev('col-main', 14,0, 14,30, 'col-deepdive', 'Figma deep dive', '2:00–2:30 PM', 'Details TBA'),
+  () => ev('col-main', 14,50,15,10, 'col-deepdive', 'Figma deep dive', '2:50–3:10 PM', 'Details TBA'),
+  () => ev('col-main', 16,0, 17,0,  'col-closing',  'Closing keynote: What it feels like to build in 2026', '4:00–5:00 PM', 'Tommy Geoco · Catt Small · Matt D. Smith · Doors 3:40 PM'),
+
+  // Learning Labs
+  () => ev('col-labs', 11,0, 11,45, 'col-labs', 'Lab: Design to development workflows', '11:00–11:45 AM', 'Amy Lima · Beginner'),
+  () => ev('col-labs', 12,0, 12,45, 'col-labs', 'Lab: The many ways to make with Figma Make', '12:00–12:45 PM', 'Alexia Danton · Brett McMillin · All levels'),
+  () => ev('col-labs', 13,0, 13,45, 'col-labs', 'Lab: Bringing designs to life with [Redacted]', '1:00–1:45 PM', 'Miggi · All levels'),
+  () => ev('col-labs', 14,0, 14,45, 'col-labs', 'Lab: Unlocking speed and visual expression with [Redacted]', '2:00–2:45 PM', 'Hugo Raymond · Mallory Dean · Beginner'),
+
+  // Level 2 Stage
+  () => ev('col-l2', 11,10,11,30, 'col-l2', 'Scooter, screen and duct-tape: from hack to habit', '11:10–11:30 AM', 'Unni Krishnan Manikoth · Harish Kumar'),
+  () => ev('col-l2', 11,30,11,50, 'col-l2', 'Beyond design systems: designing for robots and seniors', '11:30–11:50 AM', 'Anna Oh'),
+  () => ev('col-l2', 11,50,12,10, 'col-l2', 'Figma meets hardware: prototyping for the physical world', '11:50 AM–12:10 PM', 'Frederik Ueberschär · Sam Thorne'),
+  () => ev('col-l2', 12,30,12,50, 'col-l2', 'Be the director: how stage craft informs product craft', '12:30–12:50 PM', 'Kim Beverett'),
+  () => ev('col-l2', 14,15,14,35, 'col-l2', 'From handoffs to upstream', '2:15–2:35 PM', 'Frederick Andersen'),
+  () => ev('col-l2', 14,35,14,55, 'col-l2', 'The metacognitive design loop', '2:35–2:55 PM', 'Jenny Au · Mike Green'),
+  () => ev('col-l2', 14,55,15,15, 'col-l2', 'Your best practices are trapped in your head', '2:55–3:15 PM', 'Harald Kirschner'),
+  () => ev('col-l2', 15,25,15,45, 'col-l2', 'Reimagining NASA.gov', '3:25–3:45 PM', 'Ben Shown · Megan Greco'),
+
+  // Mezzanine Stage
+  () => ev('col-mezz', 11,10,11,30, 'col-mezz', 'Ready for the world', '11:10–11:30 AM', 'Vicki Tan'),
+  () => ev('col-mezz', 11,30,11,50, 'col-mezz', 'Dimensional shift: sculpting in Figma Draw', '11:30–11:50 AM', 'Josh McKenna'),
+  () => ev('col-mezz', 11,50,12,10, 'col-mezz', 'Out of sync, on purpose: desktop design after mobile won', '11:50 AM–12:10 PM', 'Giulio Fagiolini'),
+  () => ev('col-mezz', 12,10,12,30, 'col-mezz', 'Writing for humans in an AI world', '12:10–12:30 PM', 'Chelsea Larsson · Anthropic'),
+  () => ev('col-mezz', 12,55,13,15, 'col-mezz', 'Designing the product that can do anything', '12:55–1:15 PM', 'Brian Ringley · Boston Dynamics'),
+  () => ev('col-mezz', 13,15,13,35, 'col-mezz', 'Prompts to fashion: AI-powered 3D-printed garments', '1:15–1:35 PM', 'Danit Peleg'),
+  () => ev('col-mezz', 14,45,15,5,  'col-mezz', 'The edge case is everyone', '2:45–3:05 PM', 'Willie King · Lex Liley'),
+  () => ev('col-mezz', 15,5, 15,25, 'col-mezz', 'ESPN\'s migration playbook: the move to Figma', '3:05–3:25 PM', 'Elliott Muñoz · Matt Rogers'),
+
+  // Maker Stage
+  () => ev('col-maker', 11,10,11,30, 'col-maker', 'From kickoff to canvas: Google Workspace + Figma', '11:10–11:30 AM', 'Addison Rodomista · Chloe Fagan-Tucker · Google'),
+  () => ev('col-maker', 11,50,12,10, 'col-maker', 'How to build content systems for AI product workflows', '11:50 AM–12:10 PM', 'Jessica Ouyang · Jolena Ma · Ditto'),
+  () => ev('col-maker', 12,30,12,50, 'col-maker', 'From concept to confidence with Dscout AI', '12:30–12:50 PM', 'Lauren Madura · Michael Winnick'),
+  () => ev('col-maker', 13,50,14,10, 'col-maker', 'Hacking AI for creative operations at scale', '1:50–2:10 PM', 'Rory Flynn · Systematiq Ai'),
+  () => ev('col-maker', 14,30,14,50, 'col-maker', 'How structured thinking gives your AI superpowers', '2:30–2:50 PM', 'Carola Pescio Canale · Atlassian'),
+  () => ev('col-maker', 15,10,15,30, 'col-maker', 'Build like it\'s 2030. Listen like you mean it.', '3:10–3:30 PM', 'Ned Dwyer · Great Question'),
+
+  // Community Stage
+  () => ev('col-community', 14,10,14,30, 'col-community', 'The most important component: community', '2:10–2:30 PM', 'Alicia Kranjc · Figma'),
+  () => ev('col-community', 14,40,15,0,  'col-community', 'Human methods, new material: AI for the classroom', '2:40–3:00 PM', 'Mubarak "Moby" Marafa · Wendy Liao · Goodnotes'),
+  () => ev('col-community', 15,10,15,30, 'col-community', 'When to prototype; when to perfect', '3:10–3:30 PM', 'Noah Finer · Figma'),
+];
+
+// ═══════════════════════════════════════
+// JUNE 25 DATA
+// ═══════════════════════════════════════
+const d25 = [
+  // Main Stage
+  () => ev('col-main',  9,0, 10,0,  'col-keynote',  'Opening keynotes: Designing math + Patterns for restarting the world', '9:00–10:00 AM', 'Grant Sanderson (3Blue1Brown) · Switch Angel + LO.FI.SCI.FI · Doors 8:15 AM'),
+  () => ev('col-main', 10,15,11,15, 'col-deepdive', 'Figma deep dive', '10:15–11:15 AM', 'Details TBA'),
+  () => ev('col-main', 12,15,13,0,  'col-deepdive', 'Figma deep dive: inside the Weave workflow', '12:15–1:00 PM', 'Gal Sharir · Ron Baranov · Figma'),
+  () => ev('col-main', 13,45,14,15, 'col-deepdive', 'Figma deep dive', '1:45–2:15 PM', 'Details TBA'),
+  () => ev('col-main', 14,15,14,45, 'col-deepdive', 'Figma deep dive', '2:15–2:45 PM', 'Details TBA'),
+  () => ev('col-main', 16,0, 17,0,  'col-closing',  'Closing keynote: Death of the finished state + It used to be hard to be average', '4:00–5:00 PM', 'Brent David Freaney · André Anjos (RAC) · Doors 3:40 PM'),
+
+  // Learning Labs
+  () => ev('col-labs', 10,15,11,0,  'col-labs', 'Lab: Upskill on skills and agentic workflows', '10:15–11:00 AM', 'Laura Fehre · Manish Kumar · Intermediate/Advanced'),
+  () => ev('col-labs', 11,30,12,15, 'col-labs', 'Lab: Express yourself with Figma Draw', '11:30 AM–12:15 PM', 'Laura Butvinik · Rachel Platt · Kristen Bates · All levels'),
+  () => ev('col-labs', 12,45,13,30, 'col-labs', 'Lab: Workflow tips—from slow to flow', '12:45–1:30 PM', 'Chad Bergman · Michel Ferreira · Beginner'),
+  () => ev('col-labs', 14,0, 15,0,  'col-labs', 'Lab: Build your first Weave workflow', '2:00–3:00 PM', 'Moran Dankner · Ken Vreman · Beginner/Intermediate'),
+
+  // Level 2 Stage
+  () => ev('col-l2', 10,30,10,50, 'col-l2', 'The invisible mechanisms in your interfaces', '10:30–10:50 AM', 'Johannes Mutter'),
+  () => ev('col-l2', 10,50,11,10, 'col-l2', 'Dense by design', '10:50–11:10 AM', 'Matthew Ström-Awn'),
+  () => ev('col-l2', 11,10,11,30, 'col-l2', 'Usernames on Instagram: how a craft fix became an identity crisis', '11:10–11:30 AM', 'Rose McManus · Instagram/Meta'),
+  () => ev('col-l2', 11,30,11,50, 'col-l2', 'The future is low-tech: lessons from the early 2000s', '11:30–11:50 AM', 'Jésabel DC'),
+  () => ev('col-l2', 12,50,13,10, 'col-l2', 'Everyone\'s still eating: building Notion\'s design system', '12:50–1:10 PM', 'Tamara Chu · Shauna Sapper · Notion'),
+  () => ev('col-l2', 13,10,13,30, 'col-l2', 'Preparing Rocket for the AI era', '1:10–1:30 PM', 'Emily Strobl · Will Hobick · Rocket'),
+  () => ev('col-l2', 13,30,13,50, 'col-l2', 'Designed to be read: making a system AI can actually use', '1:30–1:50 PM', 'Harvey Whiting · Meta'),
+  () => ev('col-l2', 14,15,14,35, 'col-l2', '300GB story: how to inspire action when data isn\'t enough', '2:15–2:35 PM', 'Luke Fiorante · Sirinda Limsong · Harvard'),
+  () => ev('col-l2', 14,35,14,55, 'col-l2', 'The marathon designer: creative endurance', '2:35–2:55 PM', 'Socrates Charisis'),
+  () => ev('col-l2', 14,55,15,15, 'col-l2', 'Design systems anarchy', '2:55–3:15 PM', 'Lauren LoPrete · Mercury'),
+
+  // Mezzanine Stage
+  () => ev('col-mezz', 10,20,10,40, 'col-mezz', '10 years of daily sketching', '10:20–10:40 AM', 'Zach Lieberman · MIT Media Lab'),
+  () => ev('col-mezz', 10,40,11,0,  'col-mezz', 'The world of street art and care-filled design', '10:40–11:00 AM', 'Ella Rochelle-Lawton'),
+  () => ev('col-mezz', 11,0, 11,20, 'col-mezz', 'Managing multiple creative passions in a world that tells you to specialize', '11:00–11:20 AM', 'Lauren Hom'),
+  () => ev('col-mezz', 12,25,12,45, 'col-mezz', 'The learning curve: turning real-world motion into design', '12:25–12:45 PM', 'Patrick Flaherty · Microsoft'),
+  () => ev('col-mezz', 12,45,13,5,  'col-mezz', 'The canvas is not dead', '12:45–1:05 PM', 'Catt Small · Dropbox'),
+  () => ev('col-mezz', 14,5, 14,25, 'col-mezz', 'Own the loop: how designers and researchers win with AI evals', '2:05–2:25 PM', 'Setor Zilevu · Figma'),
+  () => ev('col-mezz', 14,25,14,45, 'col-mezz', 'Design for the future of apps', '2:25–2:45 PM', 'Craig Labenz · Google'),
+  () => ev('col-mezz', 14,45,15,5,  'col-mezz', 'Designing money: trustworthy brand in the age of AI', '2:45–3:05 PM', 'Chris Warner · Plaid'),
+  () => ev('col-mezz', 15,5, 15,25, 'col-mezz', 'Legibility by design', '3:05–3:25 PM', 'Ryan Powell · Waymo'),
+
+  // Maker Stage
+  () => ev('col-maker', 10,15,10,35, 'col-maker', 'Designing in the age of the 10x engineer', '10:15–10:35 AM', 'Andy Zhang · Google'),
+  () => ev('col-maker', 10,50,11,10, 'col-maker', 'Building real-time user insights into your design workflow', '10:50–11:10 AM', 'Prayag Narula · HeyMarvin'),
+  () => ev('col-maker', 11,25,11,45, 'col-maker', 'AI will upend your process—for the better', '11:25–11:45 AM', 'Justin Meyer · Bitovi'),
+  () => ev('col-maker', 12,45,13,5,  'col-maker', 'Quirk up your workplace', '12:45–1:05 PM', 'Darby Thomas · GitHub'),
+  () => ev('col-maker', 13,20,13,40, 'col-maker', 'Designing with confidence in an AI-powered world', '1:20–1:40 PM', 'Bobby Meixner · UserTesting'),
+
+  // Community Stage
+  () => ev('col-community', 13,10,13,30, 'col-community', 'In praise of dark mode', '1:10–1:30 PM', 'Mehmet Aydın Baytaş · Attio'),
+  () => ev('col-community', 13,40,14,0,  'col-community', 'Designing brand intelligence: from rules to expression', '1:40–2:00 PM', 'Nicole Martinez · Let\'s Jetty'),
+  () => ev('col-community', 14,10,14,30, 'col-community', 'Gnarly by design: building systems with grit', '2:10–2:30 PM', 'Beau Wingfield'),
+  () => ev('col-community', 14,40,15,0,  'col-community', 'Don\'t forget the feeling: a critique of software in 2026', '2:40–3:00 PM', 'Luis Ouriach · Figma'),
+
+  // Happy hour
+  () => ev('col-main', 17,0, 18,30, 'col-event', 'Closing happy hour — Config Commons', '5:00–6:30 PM', 'Toast to new connections'),
+];
+
+let currentDay = 'd24';
+let rendered = { d24: false, d25: false };
+
+function renderDay(dayKey) {
+  const events = dayKey === 'd24' ? d24 : d25;
+  // Clear columns
+  COLS.forEach(id => {
+    const col = document.getElementById(id);
+    Array.from(col.querySelectorAll('.ev')).forEach(e => e.remove());
+  });
+  events.forEach(fn => fn());
+}
+
+function showDay(dayKey, btn) {
+  currentDay = dayKey;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderDay(dayKey);
+}
+
+// Initial render
+renderDay('d24');
+</script>
+</body>
+</html>
