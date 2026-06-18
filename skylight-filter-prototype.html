@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skylight filter panel — direction comparison</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal-dark: #2a4a52;
+    --teal-mid: #3d6b75;
+    --teal-light: #e8f2f4;
+    --teal-accent: #1a6b5a;
+    --teal-accent-light: #e0f0eb;
+    --teal-accent-text: #0d4a3d;
+    --blue-light: #e8f0f8;
+    --blue-text: #0c3a6e;
+    --border: #c8d4d8;
+    --border-light: #dde6e9;
+    --text-primary: #1a2a2e;
+    --text-secondary: #4a6068;
+    --text-tertiary: #7a9099;
+    --bg-page: #f0f4f5;
+    --bg-panel: #ffffff;
+    --bg-secondary: #f5f8f9;
+    --bg-hover: #eef3f5;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    font-size: 13px;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    line-height: 1.4;
+    min-height: 100vh;
+  }
+
+  /* ── Page header ── */
+  .page-header {
+    background: var(--teal-dark);
+    color: rgba(255,255,255,0.9);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .page-header h1 { font-size: 13px; font-weight: 500; letter-spacing: .02em; }
+  .page-header .sep { opacity: .3; }
+  .page-header .sub { font-size: 12px; opacity: .6; }
+  .page-header .badge {
+    margin-left: auto;
+    font-size: 10px;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 4px;
+    padding: 2px 8px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  /* ── Layout ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 24px;
+    align-items: start;
+  }
+
+  .col-wrap {}
+  .col-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 10px;
+    padding: 0 2px;
+  }
+
+  /* ── Panel shell ── */
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  /* ── Panel header ── */
+  .panel-header {
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+    user-select: none;
+  }
+  .panel-header:hover { background: var(--bg-hover); }
+  .ph-apply {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600; color: var(--teal-accent);
+  }
+  .ph-apply svg { width: 13px; height: 13px; }
+  .ph-chev { color: var(--text-tertiary); transition: transform .2s; }
+  .ph-chev.open { transform: rotate(180deg); }
+
+  /* ── Search row (D2 only) ── */
+  .search-row {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-light);
+    background: var(--bg-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    position: relative;
+  }
+  .search-row:hover { background: var(--bg-hover); }
+  .search-row svg { width: 13px; height: 13px; color: var(--text-tertiary); flex-shrink: 0; }
+  .search-row .sr-text { font-size: 12px; color: var(--text-tertiary); flex: 1; }
+  .search-row .sr-arrow { color: var(--text-tertiary); font-size: 11px; }
+  .search-row .sr-tag {
+    font-size: 10px; background: var(--teal-accent-light); color: var(--teal-accent-text);
+    border-radius: 3px; padding: 1px 5px; font-weight: 500;
+  }
+
+  /* ── Search overlay ── */
+  .search-overlay {
+    display: none;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-panel);
+  }
+  .search-overlay.open { display: block; }
+  .so-input-row {
+    padding: 10px 12px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .so-input-row svg { width: 14px; height: 14px; color: var(--text-tertiary); flex-shrink: 0; }
+  .so-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    font-family: var(--sans);
+    color: var(--text-primary);
+    background: transparent;
+  }
+  .so-input::placeholder { color: var(--text-tertiary); }
+  .so-close {
+    width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text-tertiary); border-radius: 3px;
+    font-size: 14px; line-height: 1;
+  }
+  .so-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .so-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .so-tab {
+    font-size: 11px; padding: 7px 12px; cursor: pointer;
+    color: var(--text-secondary); border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .so-tab.active { color: var(--teal-accent); border-bottom-color: var(--teal-accent); font-weight: 500; }
+  .so-results { padding: 4px 0; }
+  .so-result {
+    padding: 7px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .so-result:hover { background: var(--bg-hover); }
+  .so-result-icon {
+    width: 28px; height: 28px; border-radius: 4px;
+    background: var(--teal-light);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .so-result-icon svg { width: 14px; height: 14px; color: var(--teal-mid); }
+  .so-result-main { flex: 1; min-width: 0; }
+  .so-result-name { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+  .so-result-meta { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+  .so-result-badge {
+    font-size: 10px; padding: 2px 6px; border-radius: 3px;
+    background: var(--bg-secondary); color: var(--text-secondary);
+    border: 1px solid var(--border-light);
+  }
+  .so-action {
+    padding: 8px 12px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .so-apply-btn {
+    font-size: 11px; font-weight: 500; background: var(--teal-dark); color: #fff;
+    border: none; border-radius: 5px; padding: 5px 12px; cursor: pointer;
+  }
+  .so-apply-btn:hover { background: var(--teal-mid); }
+  .so-hint { font-size: 11px; color: var(--text-tertiary); }
+  .so-selected-pills { display: flex; flex-wrap: wrap; gap: 5px; padding: 6px 12px 8px; }
+  .so-pill {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 11px; background: var(--teal-accent-light); color: var(--teal-accent-text);
+    border-radius: 100px; padding: 3px 8px; cursor: default;
+  }
+  .so-pill-x {
+    cursor: pointer; font-size: 12px; line-height: 1;
+    opacity: .6; margin-left: 1px;
+  }
+  .so-pill-x:hover { opacity: 1; }
+
+  /* ── Section label ── */
+  .sec-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    padding: 9px 12px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sec-label .sec-note {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--text-tertiary);
+  }
+  .sec-divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+  /* ── Filter row ── */
+  .f-row {
+    display: flex;
+    align-items: center;
+    padding: 5px 12px;
+    gap: 6px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .f-row:last-of-type { border-bottom: none; }
+  .f-label {
+    font-size: 12px;
+    color: var(--text-primary);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .f-right { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+
+  /* Include/Exclude toggle */
+  .ie {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+    height: 22px;
+  }
+  .ie span {
+    font-size: 10px;
+    padding: 0 7px;
+    display: flex; align-items: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    border-right: 1px solid var(--border);
+    transition: background .1s;
+    user-select: none;
+  }
+  .ie span:last-child { border-right: none; }
+  .ie span.on { background: var(--teal-accent-light); color: var(--teal-accent-text); font-weight: 500; }
+  .ie span:hover:not(.on) { background: var(--bg-hover); }
+
+  /* Select */
+  .f-sel {
+    font-size: 11px;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 2px 5px;
+    height: 22px;
+    max-width: 90px;
+    font-family: var(--sans);
+  }
+
+  /* Text input */
+  .f-txt {
+    font-size: 11px;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 2px 6px;
+    height: 22px;
+    width: 82px;
+    font-family: var(--sans);
+  }
+  .f-txt:focus { outline: none; border-color: var(--teal-mid); }
+
+  /* Trash */
+  .f-trash {
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .f-trash:hover { color: #b83232; background: #fef2f2; }
+  .f-trash svg { width: 13px; height: 13px; }
+
+  /* Source tag */
+  .src-tag {
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: var(--blue-light);
+    color: var(--blue-text);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  /* Range */
+  .range-wrap { padding: 3px 12px 8px; }
+  .range-wrap input[type=range] {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    accent-color: var(--teal-accent);
+  }
+  .range-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
+  .range-val { font-size: 11px; font-weight: 600; color: var(--teal-accent); text-align: right; margin-top: 2px; }
+
+  /* Checkboxes */
+  .cb-group { display: flex; align-items: center; gap: 10px; }
+  .cb-item { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+  .cb-box {
+    width: 13px; height: 13px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .1s, border-color .1s;
+  }
+  .cb-box.on { background: var(--teal-accent); border-color: var(--teal-accent); }
+  .cb-box.on::after {
+    content: '';
+    width: 7px; height: 4px;
+    border-left: 1.5px solid #fff;
+    border-bottom: 1.5px solid #fff;
+    transform: rotate(-45deg) translateY(-1px);
+  }
+  .cb-label { font-size: 11px; color: var(--text-primary); }
+
+  /* Segmented picker */
+  .seg-wrap { padding: 3px 12px 9px; }
+  .seg {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .seg span {
+    flex: 1;
+    font-size: 10px;
+    padding: 4px 3px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    border-right: 1px solid var(--border);
+    transition: background .1s;
+    user-select: none;
+    line-height: 1.3;
+  }
+  .seg span:last-child { border-right: none; }
+  .seg span.on { background: var(--teal-accent-light); color: var(--teal-accent-text); font-weight: 500; }
+  .seg span:hover:not(.on) { background: var(--bg-hover); }
+  .seg-subtext { font-size: 9px; display: block; opacity: .7; }
+
+  /* Footnote */
+  .f-note {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    padding: 1px 12px 7px;
+    display: flex; align-items: flex-start; gap: 4px;
+    line-height: 1.4;
+  }
+  .f-note svg { width: 11px; height: 11px; flex-shrink: 0; margin-top: 1px; }
+
+  /* More expander */
+  .more-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--teal-accent);
+    padding: 8px 12px;
+    cursor: pointer;
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-secondary);
+    user-select: none;
+  }
+  .more-btn:hover { background: var(--bg-hover); }
+  .more-btn svg { width: 13px; height: 13px; transition: transform .2s; }
+  .more-btn.open svg { transform: rotate(180deg); }
+  .more-rows { border-top: 1px solid var(--border-light); }
+
+  /* Footer */
+  .panel-footer {
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    background: var(--bg-secondary);
+  }
+  .btn-clear {
+    font-size: 11px; color: var(--text-secondary); cursor: pointer;
+    text-decoration: underline; background: none; border: none; font-family: var(--sans);
+  }
+  .btn-clear:hover { color: var(--text-primary); }
+  .btn-apply {
+    font-size: 11px; font-weight: 600; background: var(--teal-dark); color: #fff;
+    border: none; border-radius: 5px; padding: 6px 14px; cursor: pointer; font-family: var(--sans);
+  }
+  .btn-apply:hover { background: var(--teal-mid); }
+
+  /* Annotation */
+  .annotation {
+    font-size: 11px;
+    color: var(--text-secondary);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-top: 10px;
+    line-height: 1.6;
+  }
+  .annotation .ann-title { font-weight: 600; color: var(--text-primary); margin-bottom: 6px; font-size: 11px; }
+  .annotation .pro { color: #1a6b3a; }
+  .annotation .con { color: var(--text-secondary); }
+  .annotation .q { color: var(--blue-text); margin-top: 6px; border-top: 1px solid var(--border-light); padding-top: 6px; }
+
+  /* Wireframe note bar */
+  .wf-bar {
+    background: #fffbe6;
+    border-bottom: 1px solid #f0e060;
+    padding: 8px 24px;
+    font-size: 11px;
+    color: #6b5a00;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .wf-bar strong { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <strong>Skylight</strong>
+  <span class="sep">|</span>
+  <span>Filter panel — direction comparison</span>
+  <span class="badge">Wireframe · For review</span>
+</div>
+
+<div class="wf-bar">
+  <strong>Prototype instructions:</strong>
+  Interact with both panels — toggle Include/Exclude, click segmented pickers, expand "8 more filters", and try the
+  <strong>Search by name, MMSI, IMO…</strong> row in Direction 2 to see the proposed search workflow.
+</div>
+
+<div class="layout">
+
+  <!-- ═══════════════════════════════════════════
+       DIRECTION 1 — Tiered prominence
+  ════════════════════════════════════════════ -->
+  <div class="col-wrap">
+    <div class="col-label">Direction 1 — tiered prominence</div>
+    <div class="panel" id="p1">
+
+      <div class="panel-header">
+        <span class="ph-apply">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,8 6,12 14,4"/></svg>
+          Apply
+        </span>
+        <svg class="ph-chev open" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg>
+      </div>
+
+      <!-- AIS section -->
+      <div class="sec-label">Vessel information (AIS/GFW)</div>
+
+      <div class="f-row">
+        <span class="f-label">Vessel type</span>
+        <div class="f-right">
+          <div class="ie">
+            <span class="on" onclick="toggleIE(this)">Include</span>
+            <span onclick="toggleIE(this)">Exclude</span>
+          </div>
+          <select class="f-sel"><option>Fishing</option><option>Cargo</option><option>Tanker</option><option>Passenger</option></select>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">Vessel flag</span>
+        <div class="f-right">
+          <div class="ie">
+            <span class="on" onclick="toggleIE(this)">Include</span>
+            <span onclick="toggleIE(this)">Exclude</span>
+          </div>
+          <input class="f-txt" value="PHL">
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">AIS vessel length</span>
+        <div class="f-right">
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="range-wrap">
+        <input type="range" min="0" max="400" step="1" value="200" id="r1" oninput="document.getElementById('rv1').textContent=Math.round(this.value)+'m'">
+        <div class="range-labels"><span>0 m</span><span>400 m</span></div>
+        <div class="range-val" id="rv1">200m</div>
+      </div>
+
+      <!-- More expander -->
+      <div class="more-btn" id="mb1" onclick="toggleMore('mr1','mb1','ml1')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg>
+        <span id="ml1">8 more filters</span>
+      </div>
+      <div id="mr1" style="display:none" class="more-rows">
+        <div class="sec-label" style="padding-top:10px">More vessel information filters</div>
+        <div class="f-row"><span class="f-label">Vessel name</span><div class="f-right"><div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div><input class="f-txt" placeholder="Name…"><span class="f-trash" title="Remove"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span></div></div>
+        <div class="f-row"><span class="f-label">MMSI</span><div class="f-right"><div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div><input class="f-txt" placeholder="MMSI…"><span class="f-trash" title="Remove"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span></div></div>
+        <div class="f-row"><span class="f-label">IMO</span><div class="f-right"><div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div><input class="f-txt" placeholder="IMO…"><span class="f-trash" title="Remove"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span></div></div>
+        <div class="f-row"><span class="f-label">Gear type &amp; sub-type</span><div class="f-right"><div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div><select class="f-sel"><option>— any —</option><option>Trawl</option><option>Longline</option><option>Purse seine</option></select><span class="f-trash" title="Remove"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span></div></div>
+        <div class="f-row"><span class="f-label">Partner vessel type</span><div class="f-right"><div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div><select class="f-sel"><option>— any —</option><option>Carrier</option><option>Bunker</option></select><span class="f-trash" title="Remove"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span></div></div>
+        <div class="f-row"><span class="f-label">Authorization list</span><div class="f-right"><div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div><select class="f-sel"><option>CCAMLR</option><option>WCPFC</option><option>IATTC</option></select><span class="f-trash" title="Remove"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span></div></div>
+        <div class="f-row"><span class="f-label">Owner name</span><div class="f-right"><div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div><input class="f-txt" placeholder="Name…"><span class="f-trash" title="Remove"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span></div></div>
+        <div class="f-row"><span class="f-label">Owner flag</span><div class="f-right"><div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div><input class="f-txt" placeholder="Flag…"><span class="f-trash" title="Remove"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span></div></div>
+      </div>
+
+      <!-- Detections section -->
+      <div class="sec-divider"></div>
+      <div class="sec-label">Vessel detections (satellite)</div>
+
+      <div class="f-row">
+        <span class="f-label">Detection type</span>
+        <div class="f-right">
+          <select class="f-sel"><option>— any —</option><option>SAR (S1)</option><option>Optical (S2)</option><option>Landsat</option></select>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">AIS correlation</span>
+        <div class="f-right">
+          <div class="cb-group">
+            <div class="cb-item" onclick="toggleCb(this)"><div class="cb-box on"></div><span class="cb-label">Correlated</span></div>
+            <div class="cb-item" onclick="toggleCb(this)"><div class="cb-box on"></div><span class="cb-label">Dark</span></div>
+          </div>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">Est. vessel type</span>
+        <div class="f-right">
+          <div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div>
+          <select class="f-sel"><option>Fishing</option><option>Cargo</option><option>Tanker</option><option>Other</option></select>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">Est. vessel length</span>
+        <div class="f-right">
+          <span class="src-tag">S1 · S2 · Landsat</span>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="range-wrap">
+        <input type="range" min="0" max="400" step="1" value="120" id="r1s" oninput="document.getElementById('rv1s').textContent=Math.round(this.value)+'m'">
+        <div class="range-labels"><span>0 m</span><span>400 m</span></div>
+        <div class="range-val" id="rv1s">120m</div>
+      </div>
+      <div class="f-note">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r=".5" fill="currentColor"/></svg>
+        Values under 50 m shown as "small" for Landsat detections
+      </div>
+      <div class="f-row">
+        <span class="f-label">Est. speed</span>
+        <div class="f-right">
+          <span class="src-tag">S1 · Landsat</span>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="seg-wrap">
+        <div class="seg">
+          <span class="on" onclick="this.classList.toggle('on')">Stationary<span class="seg-subtext">0–2 kn</span></span>
+          <span onclick="this.classList.toggle('on')">Medium<span class="seg-subtext">2–8 kn</span></span>
+          <span class="on" onclick="this.classList.toggle('on')">Fast<span class="seg-subtext">8+ kn</span></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">Est. heading</span>
+        <div class="f-right">
+          <span class="src-tag">S1 · Landsat &gt;50 m</span>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="seg-wrap">
+        <div class="seg">
+          <span class="on" onclick="this.classList.toggle('on')">N</span>
+          <span class="on" onclick="this.classList.toggle('on')">NE</span>
+          <span onclick="this.classList.toggle('on')">E</span>
+          <span onclick="this.classList.toggle('on')">SE</span>
+          <span onclick="this.classList.toggle('on')">S</span>
+          <span class="on" onclick="this.classList.toggle('on')">SW</span>
+          <span onclick="this.classList.toggle('on')">W</span>
+          <span onclick="this.classList.toggle('on')">NW</span>
+        </div>
+      </div>
+      <div class="f-note">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r=".5" fill="currentColor"/></svg>
+        Not available for detections under 50 m — those will be excluded from results
+      </div>
+
+      <div class="panel-footer">
+        <button class="btn-clear">Clear all</button>
+        <button class="btn-apply">Apply filters</button>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <div class="ann-title">Direction 1 — tradeoffs</div>
+      <div class="pro">✓ All filters in one place — no context switching</div>
+      <div class="pro">✓ Vessel detections fully visible without any Add/Remove step</div>
+      <div class="pro">✓ Lowest development lift from current state</div>
+      <div class="con">✗ "8 more filters" label gives no hint of what's inside</div>
+      <div class="con">✗ Total panel height is significant when expander is open</div>
+      <div class="con">✗ Doesn't resolve conceptual tension between identifier lookup and map refinement</div>
+      <div class="q">❓ Team question: do users filter by vessel name/MMSI to narrow a map view, or to find a specific vessel? The answer should drive this decision.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       DIRECTION 2 — Search for identifiers
+  ════════════════════════════════════════════ -->
+  <div class="col-wrap">
+    <div class="col-label">Direction 2 — search for identifiers</div>
+    <div class="panel" id="p2">
+
+      <div class="panel-header">
+        <span class="ph-apply">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,8 6,12 14,4"/></svg>
+          Apply
+        </span>
+        <svg class="ph-chev open" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg>
+      </div>
+
+      <!-- Search row -->
+      <div class="search-row" id="sr2" onclick="openSearch()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+        <span class="sr-text" id="sr-text">Search by name, MMSI, IMO, owner…</span>
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" class="sr-arrow"><polyline points="6,4 10,8 6,12"/></svg>
+      </div>
+
+      <!-- Search overlay -->
+      <div class="search-overlay" id="so">
+        <div class="so-input-row">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+          <input class="so-input" id="so-input" placeholder="Search by name, MMSI, IMO, or owner…" oninput="handleSearch(this.value)">
+          <div class="so-close" onclick="closeSearch()" title="Close">✕</div>
+        </div>
+        <div class="so-tabs">
+          <div class="so-tab active" onclick="switchSOTab(this,'all')">All</div>
+          <div class="so-tab" onclick="switchSOTab(this,'mmsi')">MMSI / IMO</div>
+          <div class="so-tab" onclick="switchSOTab(this,'name')">Name</div>
+          <div class="so-tab" onclick="switchSOTab(this,'owner')">Owner</div>
+        </div>
+        <div id="so-pills" class="so-selected-pills" style="display:none"></div>
+        <div class="so-results" id="so-results">
+          <div style="padding:16px 12px;font-size:11px;color:var(--text-tertiary);text-align:center">
+            Type to search, or select a field above
+          </div>
+        </div>
+        <div class="so-action">
+          <button class="so-apply-btn" onclick="applySearch()">Apply as filter</button>
+          <span class="so-hint">Filters the map to matching vessels</span>
+        </div>
+      </div>
+
+      <!-- AIS section -->
+      <div class="sec-label">Vessel information (AIS/GFW)</div>
+
+      <div class="f-row">
+        <span class="f-label">Vessel type</span>
+        <div class="f-right">
+          <div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div>
+          <select class="f-sel"><option>Fishing</option><option>Cargo</option><option>Tanker</option><option>Passenger</option></select>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">Vessel flag</span>
+        <div class="f-right">
+          <div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div>
+          <input class="f-txt" value="PHL">
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">Gear type &amp; sub-type</span>
+        <div class="f-right">
+          <div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div>
+          <select class="f-sel"><option>— any —</option><option>Trawl</option><option>Longline</option><option>Purse seine</option></select>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">Partner vessel type</span>
+        <div class="f-right">
+          <div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div>
+          <select class="f-sel"><option>— any —</option><option>Carrier</option><option>Bunker</option></select>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">Authorization list</span>
+        <div class="f-right">
+          <div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div>
+          <select class="f-sel"><option>CCAMLR</option><option>WCPFC</option><option>IATTC</option></select>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">Owner flag</span>
+        <div class="f-right">
+          <div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div>
+          <input class="f-txt" placeholder="Flag…">
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">AIS vessel length</span>
+        <div class="f-right">
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="range-wrap">
+        <input type="range" min="0" max="400" step="1" value="200" id="r2" oninput="document.getElementById('rv2').textContent=Math.round(this.value)+'m'">
+        <div class="range-labels"><span>0 m</span><span>400 m</span></div>
+        <div class="range-val" id="rv2">200m</div>
+      </div>
+
+      <!-- Detections section -->
+      <div class="sec-divider"></div>
+      <div class="sec-label">Vessel detections (satellite)</div>
+
+      <div class="f-row">
+        <span class="f-label">Detection type</span>
+        <div class="f-right">
+          <select class="f-sel"><option>— any —</option><option>SAR (S1)</option><option>Optical (S2)</option><option>Landsat</option></select>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">AIS correlation</span>
+        <div class="f-right">
+          <div class="cb-group">
+            <div class="cb-item" onclick="toggleCb(this)"><div class="cb-box on"></div><span class="cb-label">Correlated</span></div>
+            <div class="cb-item" onclick="toggleCb(this)"><div class="cb-box on"></div><span class="cb-label">Dark</span></div>
+          </div>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">Est. vessel type</span>
+        <div class="f-right">
+          <div class="ie"><span class="on" onclick="toggleIE(this)">Include</span><span onclick="toggleIE(this)">Exclude</span></div>
+          <select class="f-sel"><option>Fishing</option><option>Cargo</option><option>Tanker</option><option>Other</option></select>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">Est. vessel length</span>
+        <div class="f-right">
+          <span class="src-tag">S1 · S2 · Landsat</span>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="range-wrap">
+        <input type="range" min="0" max="400" step="1" value="120" id="r2s" oninput="document.getElementById('rv2s').textContent=Math.round(this.value)+'m'">
+        <div class="range-labels"><span>0 m</span><span>400 m</span></div>
+        <div class="range-val" id="rv2s">120m</div>
+      </div>
+      <div class="f-note">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r=".5" fill="currentColor"/></svg>
+        Values under 50 m shown as "small" for Landsat detections
+      </div>
+      <div class="f-row">
+        <span class="f-label">Est. speed</span>
+        <div class="f-right">
+          <span class="src-tag">S1 · Landsat</span>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="seg-wrap">
+        <div class="seg">
+          <span class="on" onclick="this.classList.toggle('on')">Stationary<span class="seg-subtext">0–2 kn</span></span>
+          <span onclick="this.classList.toggle('on')">Medium<span class="seg-subtext">2–8 kn</span></span>
+          <span class="on" onclick="this.classList.toggle('on')">Fast<span class="seg-subtext">8+ kn</span></span>
+        </div>
+      </div>
+      <div class="f-row">
+        <span class="f-label">Est. heading</span>
+        <div class="f-right">
+          <span class="src-tag">S1 · Landsat &gt;50 m</span>
+          <span class="f-trash" title="Remove filter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,4 14,4"/><path d="M6 4V2h4v2M5 4v9h6V4"/></svg></span>
+        </div>
+      </div>
+      <div class="seg-wrap">
+        <div class="seg">
+          <span class="on" onclick="this.classList.toggle('on')">N</span>
+          <span class="on" onclick="this.classList.toggle('on')">NE</span>
+          <span onclick="this.classList.toggle('on')">E</span>
+          <span onclick="this.classList.toggle('on')">SE</span>
+          <span onclick="this.classList.toggle('on')">S</span>
+          <span class="on" onclick="this.classList.toggle('on')">SW</span>
+          <span onclick="this.classList.toggle('on')">W</span>
+          <span onclick="this.classList.toggle('on')">NW</span>
+        </div>
+      </div>
+      <div class="f-note">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r=".5" fill="currentColor"/></svg>
+        Not available for detections under 50 m — those will be excluded from results
+      </div>
+
+      <div class="panel-footer">
+        <button class="btn-clear">Clear all</button>
+        <button class="btn-apply">Apply filters</button>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <div class="ann-title">Direction 2 — tradeoffs</div>
+      <div class="pro">✓ Panel fits in one view without expanding — no hidden filters</div>
+      <div class="pro">✓ Cleaner conceptual split: "show me vessels like this" vs "find me this vessel"</div>
+      <div class="pro">✓ Search UI can surface auto-complete / recent vessels — richer than a text input</div>
+      <div class="con">✗ Bigger change — requires rethinking the search bar scope and results</div>
+      <div class="con">✗ Owner flag stays in the panel (it's a population filter, not an identifier lookup) — may feel inconsistent</div>
+      <div class="con">✗ Users who currently filter by MMSI will need to learn a new location</div>
+      <div class="q">❓ Team question: does the search bar apply as an AND filter with the panel filters, or does it open the vessel detail page? These are meaningfully different workflows and the answer changes the design.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  var mockResults = [
+    { name: 'Fu Yuan Yu 831', mmsi: '412549812', flag: 'CHN', type: 'Fishing' },
+    { name: 'Fu Yuan Yu 832', mmsi: '412549813', flag: 'CHN', type: 'Fishing' },
+    { name: 'Atlantic Dawn', mmsi: '250001560', flag: 'IRL', type: 'Fishing' },
+    { name: 'Viking Enterprise', mmsi: '257123450', flag: 'NOR', type: 'Fishing' },
+  ];
+  var selectedItems = [];
+
+  function toggleIE(el) {
+    var parent = el.closest('.ie');
+    parent.querySelectorAll('span').forEach(function(s){ s.classList.remove('on'); });
+    el.classList.add('on');
+  }
+
+  function toggleCb(item) {
+    var box = item.querySelector('.cb-box');
+    box.classList.toggle('on');
+  }
+
+  function toggleMore(rowsId, btnId, labelId) {
+    var rows = document.getElementById(rowsId);
+    var btn = document.getElementById(btnId);
+    var label = document.getElementById(labelId);
+    var open = rows.style.display === 'none';
+    rows.style.display = open ? 'block' : 'none';
+    btn.classList.toggle('open', open);
+    label.textContent = open ? 'Collapse' : '8 more filters';
+  }
+
+  function openSearch() {
+    document.getElementById('so').classList.add('open');
+    document.getElementById('sr2').style.display = 'none';
+    setTimeout(function(){ document.getElementById('so-input').focus(); }, 50);
+  }
+
+  function closeSearch() {
+    document.getElementById('so').classList.remove('open');
+    document.getElementById('sr2').style.display = 'flex';
+    updateSearchRowLabel();
+  }
+
+  function handleSearch(val) {
+    var resultsEl = document.getElementById('so-results');
+    if (!val || val.length < 1) {
+      resultsEl.innerHTML = '<div style="padding:16px 12px;font-size:11px;color:var(--text-tertiary);text-align:center">Type to search, or select a field above</div>';
+      return;
+    }
+    var filtered = mockResults.filter(function(r){
+      return r.name.toLowerCase().includes(val.toLowerCase()) ||
+             r.mmsi.includes(val) || r.flag.toLowerCase().includes(val.toLowerCase());
+    });
+    if (!filtered.length) {
+      resultsEl.innerHTML = '<div style="padding:16px 12px;font-size:11px;color:var(--text-tertiary);text-align:center">No vessels found — try MMSI, name, or flag</div>';
+      return;
+    }
+    resultsEl.innerHTML = filtered.map(function(r){
+      return '<div class="so-result" onclick="selectResult(\''+r.name+'\',\''+r.mmsi+'\')">' +
+        '<div class="so-result-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M2 10l2-6h8l2 6"/><path d="M1 10h14v2H1z"/><line x1="8" y1="4" x2="8" y2="2"/></svg></div>' +
+        '<div class="so-result-main"><div class="so-result-name">'+r.name+'</div><div class="so-result-meta">MMSI '+r.mmsi+' · '+r.flag+'</div></div>' +
+        '<span class="so-result-badge">'+r.type+'</span>' +
+      '</div>';
+    }).join('');
+  }
+
+  function selectResult(name, mmsi) {
+    if (!selectedItems.find(function(i){ return i.mmsi === mmsi; })) {
+      selectedItems.push({ name: name, mmsi: mmsi });
+    }
+    renderPills();
+    document.getElementById('so-input').value = '';
+    document.getElementById('so-results').innerHTML = '<div style="padding:16px 12px;font-size:11px;color:var(--text-tertiary);text-align:center">Type to search, or select a field above</div>';
+  }
+
+  function renderPills() {
+    var pillsEl = document.getElementById('so-pills');
+    if (!selectedItems.length) {
+      pillsEl.style.display = 'none';
+      return;
+    }
+    pillsEl.style.display = 'flex';
+    pillsEl.innerHTML = selectedItems.map(function(item, i){
+      return '<div class="so-pill">'+item.name+'<span class="so-pill-x" onclick="removePill('+i+')">✕</span></div>';
+    }).join('');
+  }
+
+  function removePill(i) {
+    selectedItems.splice(i, 1);
+    renderPills();
+  }
+
+  function applySearch() {
+    closeSearch();
+    updateSearchRowLabel();
+  }
+
+  function updateSearchRowLabel() {
+    var el = document.getElementById('sr-text');
+    if (selectedItems.length) {
+      el.innerHTML = selectedItems.map(function(i){
+        return '<span style="display:inline-block;background:var(--teal-accent-light);color:var(--teal-accent-text);border-radius:3px;padding:1px 5px;font-size:10px;font-weight:500;margin-right:3px">'+i.name+'</span>';
+      }).join('') + '<span style="color:var(--text-tertiary);font-size:11px"> · Edit</span>';
+    } else {
+      el.textContent = 'Search by name, MMSI, IMO, owner…';
+    }
+  }
+
+  function switchSOTab(el, tab) {
+    document.querySelectorAll('.so-tab').forEach(function(t){ t.classList.remove('active'); });
+    el.classList.add('active');
+    var input = document.getElementById('so-input');
+    var placeholders = { all: 'Search by name, MMSI, IMO, or owner…', mmsi: 'Enter MMSI or IMO number…', name: 'Enter vessel name…', owner: 'Enter owner name…' };
+    input.placeholder = placeholders[tab] || placeholders.all;
+    input.focus();
+  }
+</script>
+</body>
+</html>
