@@ -15,7 +15,6 @@
     --text-tertiary: #9aa0a6;
     --border: #e0e0e0;
     --border-light: #efefef;
-    --hour-h: 56px;
     --time-col: 52px;
     --radius: 4px;
     --stage-count: 6;
@@ -32,7 +31,6 @@
     overflow: hidden;
   }
 
-  /* ── TOOLBAR ── */
   .toolbar {
     display: flex;
     align-items: center;
@@ -42,17 +40,9 @@
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
-  .toolbar h1 {
-    font-size: 18px;
-    font-weight: 400;
-    color: var(--text-secondary);
-  }
+  .toolbar h1 { font-size: 18px; font-weight: 400; color: var(--text-secondary); }
   .toolbar h1 strong { color: var(--text-primary); font-weight: 500; }
-  .tabs {
-    display: flex;
-    gap: 6px;
-    margin-left: auto;
-  }
+  .tabs { display: flex; gap: 6px; margin-left: auto; }
   .tab {
     padding: 6px 18px;
     border-radius: 100px;
@@ -66,13 +56,8 @@
     transition: background 0.12s, color 0.12s;
   }
   .tab:hover { background: var(--bg-page); }
-  .tab.active {
-    background: #1a73e8;
-    color: #fff;
-    border-color: #1a73e8;
-  }
+  .tab.active { background: #1a73e8; color: #fff; border-color: #1a73e8; }
 
-  /* ── CAL WRAPPER ── */
   .cal-outer {
     flex: 1;
     overflow: hidden;
@@ -81,44 +66,32 @@
     background: var(--bg);
   }
 
-  /* ── STAGE HEADER ── */
   .stage-header {
     display: grid;
     grid-template-columns: var(--time-col) repeat(var(--stage-count), 1fr);
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
-    position: sticky;
-    top: 0;
     background: var(--bg);
     z-index: 20;
   }
   .stage-header .gutter { border-right: 1px solid var(--border-light); }
-  .stage-cell {
-    padding: 10px 4px 8px;
-    text-align: center;
-    border-left: 1px solid var(--border-light);
-  }
-  .stage-name {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    line-height: 1.3;
-  }
-  .stage-dot {
-    display: inline-block;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    margin-bottom: 4px;
-  }
+  .stage-cell { padding: 10px 4px 8px; text-align: center; border-left: 1px solid var(--border-light); }
+  .stage-name { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.3; }
+  .stage-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-bottom: 4px; }
 
-  /* ── SCROLLABLE GRID ── */
-  .grid-scroll {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
+  .legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 6px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    background: var(--bg);
   }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  .grid-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
 
   .time-grid {
     display: grid;
@@ -126,10 +99,7 @@
     position: relative;
   }
 
-  .time-labels {
-    position: relative;
-    border-right: 1px solid var(--border-light);
-  }
+  .time-labels { position: relative; border-right: 1px solid var(--border-light); }
   .time-label {
     position: absolute;
     right: 8px;
@@ -140,24 +110,11 @@
     user-select: none;
   }
 
-  .stage-col {
-    border-left: 1px solid var(--border-light);
-    position: relative;
-  }
-  .h-line {
-    position: absolute;
-    left: 0; right: 0;
-    border-top: 1px solid var(--border);
-    pointer-events: none;
-  }
-  .h-half {
-    position: absolute;
-    left: 0; right: 0;
-    border-top: 1px dashed var(--border-light);
-    pointer-events: none;
-  }
+  .stage-col { border-left: 1px solid var(--border-light); position: relative; }
+  .h-line { position: absolute; left: 0; right: 0; border-top: 1px solid var(--border); pointer-events: none; }
+  .h-half { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--border-light); pointer-events: none; }
 
-  /* ── EVENT BLOCKS ── */
+  /* Event blocks */
   .ev {
     position: absolute;
     left: 2px; right: 2px;
@@ -165,57 +122,31 @@
     padding: 4px 6px;
     font-size: 11px;
     overflow: hidden;
-    cursor: default;
     line-height: 1.35;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  }
-  .ev-title {
-    font-weight: 600;
+    text-decoration: none;
     display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    transition: filter 0.1s, box-shadow 0.1s;
   }
+  .ev:hover {
+    filter: brightness(0.93);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    z-index: 10;
+  }
+  .ev-title { font-weight: 600; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .ev-time  { font-size: 10px; opacity: 0.8; display: block; white-space: nowrap; }
   .ev-who   { font-size: 10px; opacity: 0.75; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  /* Stage color palette */
-  .col-main     { background: #e8f0fe; color: #1a3a7a; border-left: 3px solid #1a73e8; }
-  .col-labs     { background: #e6f4ea; color: #1b5e20; border-left: 3px solid #34a853; }
-  .col-l2       { background: #fce8e6; color: #7f1b17; border-left: 3px solid #ea4335; }
-  .col-mezz     { background: #fef3e2; color: #6d3a00; border-left: 3px solid #fa7b17; }
-  .col-maker    { background: #f3e8fd; color: #4a1474; border-left: 3px solid #9334e6; }
-  .col-community{ background: #e2f3f5; color: #004d54; border-left: 3px solid #12b5cb; }
-  .col-keynote  { background: #1a73e8; color: #fff; border-left: 3px solid #0d47a1; }
-  .col-closing  { background: #0d47a1; color: #fff; border-left: 3px solid #01004a; }
-  .col-deepdive { background: #fff8e1; color: #6d4c00; border-left: 3px solid #f9ab00; }
-  .col-event    { background: #f1f3f4; color: #3c4043; border-left: 3px solid #9aa0a6; }
-
-  .day { display: none; }
-  .day.visible { display: contents; }
-
-  /* legend */
-  .legend {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    padding: 8px 16px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-    background: var(--bg);
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    color: var(--text-secondary);
-  }
-  .legend-dot {
-    width: 10px; height: 10px;
-    border-radius: 2px;
-    flex-shrink: 0;
-  }
+  .col-main      { background: #e8f0fe; color: #1a3a7a; border-left: 3px solid #1a73e8; }
+  .col-labs      { background: #e6f4ea; color: #1b5e20; border-left: 3px solid #34a853; }
+  .col-l2        { background: #fce8e6; color: #7f1b17; border-left: 3px solid #ea4335; }
+  .col-mezz      { background: #fef3e2; color: #6d3a00; border-left: 3px solid #fa7b17; }
+  .col-maker     { background: #f3e8fd; color: #4a1474; border-left: 3px solid #9334e6; }
+  .col-community { background: #e2f3f5; color: #004d54; border-left: 3px solid #12b5cb; }
+  .col-keynote   { background: #1a73e8; color: #fff;    border-left: 3px solid #0d47a1; }
+  .col-closing   { background: #0d47a1; color: #fff;    border-left: 3px solid #01004a; }
+  .col-deepdive  { background: #fff8e1; color: #6d4c00; border-left: 3px solid #f9ab00; }
+  .col-event     { background: #f1f3f4; color: #3c4043; border-left: 3px solid #9aa0a6; }
 </style>
 </head>
 <body>
@@ -229,8 +160,6 @@
 </div>
 
 <div class="cal-outer">
-
-  <!-- Stage header -->
   <div class="stage-header">
     <div class="gutter"></div>
     <div class="stage-cell"><div class="stage-dot" style="background:#1a73e8"></div><div class="stage-name">Main Stage</div></div>
@@ -241,15 +170,15 @@
     <div class="stage-cell"><div class="stage-dot" style="background:#12b5cb"></div><div class="stage-name">Community Stage</div></div>
   </div>
 
-  <!-- Legend -->
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:#1a73e8"></div>Keynote</div>
     <div class="legend-item"><div class="legend-dot" style="background:#f9ab00"></div>Deep dive</div>
     <div class="legend-item"><div class="legend-dot" style="background:#34a853"></div>Lab</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#ea4335"></div>Talk — Level 2</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#fa7b17"></div>Talk — Mezzanine</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#9334e6"></div>Talk — Maker</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#12b5cb"></div>Talk — Community</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ea4335"></div>Level 2 talk</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#fa7b17"></div>Mezzanine talk</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9334e6"></div>Maker talk</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#12b5cb"></div>Community talk</div>
+    <span style="margin-left:4px;font-size:11px;color:#9aa0a6;">· Click any session to open on config.figma.com</span>
   </div>
 
   <div class="grid-scroll">
@@ -263,7 +192,6 @@
       <div class="stage-col" id="col-community"></div>
     </div>
   </div>
-
 </div>
 
 <script>
@@ -272,11 +200,9 @@ const END_H   = 19;
 const HOUR_PX = 60;
 const COLS = ['col-main','col-labs','col-l2','col-mezz','col-maker','col-community'];
 
-const totalH = END_H - START_H;
-document.getElementById('timeGrid').style.height = (totalH * HOUR_PX) + 'px';
-document.getElementById('timeLabels').style.height = (totalH * HOUR_PX) + 'px';
+document.getElementById('timeGrid').style.height = ((END_H - START_H) * HOUR_PX) + 'px';
+document.getElementById('timeLabels').style.height = ((END_H - START_H) * HOUR_PX) + 'px';
 
-// Time labels + grid lines
 const labelsEl = document.getElementById('timeLabels');
 for (let h = START_H; h <= END_H; h++) {
   const top = (h - START_H) * HOUR_PX;
@@ -307,133 +233,133 @@ for (let h = START_H; h <= END_H; h++) {
 function pxTop(h, m) { return ((h + m/60) - START_H) * HOUR_PX; }
 function pxH(h1,m1,h2,m2) { return Math.max(22, ((h2+m2/60)-(h1+m1/60)) * HOUR_PX - 2); }
 
-function ev(colId, h1,m1,h2,m2, cls, title, timeStr, who) {
+function ev(colId, h1,m1,h2,m2, cls, title, timeStr, who, url) {
   const col = document.getElementById(colId);
-  const el = document.createElement('div');
+  const el = document.createElement('a');
   el.className = 'ev ' + cls;
   el.style.top    = pxTop(h1,m1) + 'px';
   el.style.height = pxH(h1,m1,h2,m2) + 'px';
+  el.href   = url || '#';
+  el.target = '_blank';
+  el.rel    = 'noopener noreferrer';
   el.innerHTML = `<span class="ev-title">${title}</span><span class="ev-time">${timeStr}</span>${who ? `<span class="ev-who">${who}</span>` : ''}`;
   col.appendChild(el);
 }
 
-// ═══════════════════════════════════════
-// JUNE 24 DATA
-// ═══════════════════════════════════════
+// ══════════════════════════════════════════════
+// JUNE 24
+// ══════════════════════════════════════════════
 const d24 = [
   // Main stage
-  () => ev('col-main',  9,0, 10,20, 'col-keynote',  'Opening keynote: Figma product launch', '9:00–10:20 AM', 'Dylan Field · Doors 8:15 AM'),
-  () => ev('col-main', 10,35,10,55, 'col-keynote',  'The rules are the art: creating with AI', '10:35–10:55 AM', 'Holly Herndon'),
-  () => ev('col-main', 11,10,12,10, 'col-deepdive', 'Figma deep dive', '11:10 AM–12:10 PM', 'Details TBA'),
-  () => ev('col-main', 13,10,13,40, 'col-deepdive', 'Figma deep dive', '1:10–1:40 PM', 'Details TBA'),
-  () => ev('col-main', 14,0, 14,30, 'col-deepdive', 'Figma deep dive', '2:00–2:30 PM', 'Details TBA'),
-  () => ev('col-main', 14,50,15,10, 'col-deepdive', 'Figma deep dive', '2:50–3:10 PM', 'Details TBA'),
-  () => ev('col-main', 16,0, 17,0,  'col-closing',  'Closing keynote: What it feels like to build in 2026', '4:00–5:00 PM', 'Tommy Geoco · Catt Small · Matt D. Smith · Doors 3:40 PM'),
+  ()=>ev('col-main',  9,0, 10,20,'col-keynote', 'Opening keynote: Figma product launch','9:00–10:20 AM','Dylan Field · Doors 8:15 AM','https://config.figma.com/san-francisco/session/829e6ced-3257-4f5c-b675-aa72f4d1f98f/'),
+  ()=>ev('col-main', 10,35,10,55,'col-keynote', 'The rules are the art: creating with AI','10:35–10:55 AM','Holly Herndon','https://config.figma.com/san-francisco/session/94c665ce-4b37-4127-b49a-425ac25319a2/'),
+  ()=>ev('col-main', 11,10,12,10,'col-deepdive','Figma deep dive','11:10 AM–12:10 PM','Daniela Muntyan · Luca Damasco · Dave Hornsby','https://config.figma.com/san-francisco/session/dfa297f9-6486-4a4f-b272-97fe3572349c/'),
+  ()=>ev('col-main', 13,10,13,40,'col-deepdive','Figma deep dive','1:10–1:40 PM','Tammy Taabassum · Rodrigo Davies','https://config.figma.com/san-francisco/session/ad4cd109-a176-429f-8a92-da12d1bd2d42/'),
+  ()=>ev('col-main', 14,0, 14,30,'col-deepdive','Figma deep dive','2:00–2:30 PM','Georgia Rust · Avery Frankenberg · Jason Calleiro','https://config.figma.com/san-francisco/session/274b4290-0b17-4464-9959-d6292b57ea71/'),
+  ()=>ev('col-main', 14,45,15,15,'col-deepdive','Figma deep dive','2:45–3:15 PM','Yassir Solomah · Piers Cowburn · Rogie King','https://config.figma.com/san-francisco/session/7da56d0d-c9a4-48e5-b434-b237fbd722be/'),
+  ()=>ev('col-main', 16,0, 17,0, 'col-closing', 'Closing keynote: What it feels like to build in 2026','4:00–5:00 PM','Tommy Geoco · Catt Small · Matt D. Smith · Doors 3:40 PM','https://config.figma.com/san-francisco/session/e8ea736f-5159-46d9-bed5-49855d992a91/'),
 
   // Learning Labs
-  () => ev('col-labs', 11,0, 11,45, 'col-labs', 'Lab: Design to development workflows', '11:00–11:45 AM', 'Amy Lima · Beginner'),
-  () => ev('col-labs', 12,0, 12,45, 'col-labs', 'Lab: The many ways to make with Figma Make', '12:00–12:45 PM', 'Alexia Danton · Brett McMillin · All levels'),
-  () => ev('col-labs', 13,0, 13,45, 'col-labs', 'Lab: Bringing designs to life with [Redacted]', '1:00–1:45 PM', 'Miggi · All levels'),
-  () => ev('col-labs', 14,0, 14,45, 'col-labs', 'Lab: Unlocking speed and visual expression with [Redacted]', '2:00–2:45 PM', 'Hugo Raymond · Mallory Dean · Beginner'),
+  ()=>ev('col-labs', 11,0, 11,45,'col-labs','Lab: Design to development workflows','11:00–11:45 AM','Amy Lima · Beginner','https://config.figma.com/san-francisco/session/caaf2c7f-ce7c-42f5-963f-93e20bcccbf4/'),
+  ()=>ev('col-labs', 12,0, 12,45,'col-labs','Lab: The many ways to make with Figma Make','12:00–12:45 PM','Alexia Danton · Brett McMillin · All levels','https://config.figma.com/san-francisco/session/ec2fc49f-9d34-46c8-9086-8887cab3bef2/'),
+  ()=>ev('col-labs', 13,0, 13,45,'col-labs','Lab: Bringing designs to life with [Redacted]','1:00–1:45 PM','Miggi · All levels','https://config.figma.com/san-francisco/session/a9724310-a83e-4b29-90b4-cce61cfa3ea6/'),
+  ()=>ev('col-labs', 14,0, 14,45,'col-labs','Lab: Unlocking speed and visual expression with [Redacted]','2:00–2:45 PM','Hugo Raymond · Mallory Dean · Beginner','https://config.figma.com/san-francisco/session/6122f91d-d899-4a5a-b542-549b1ffd31ba/'),
 
   // Level 2 Stage
-  () => ev('col-l2', 11,10,11,30, 'col-l2', 'Scooter, screen and duct-tape: from hack to habit', '11:10–11:30 AM', 'Unni Krishnan Manikoth · Harish Kumar'),
-  () => ev('col-l2', 11,30,11,50, 'col-l2', 'Beyond design systems: designing for robots and seniors', '11:30–11:50 AM', 'Anna Oh'),
-  () => ev('col-l2', 11,50,12,10, 'col-l2', 'Figma meets hardware: prototyping for the physical world', '11:50 AM–12:10 PM', 'Frederik Ueberschär · Sam Thorne'),
-  () => ev('col-l2', 12,30,12,50, 'col-l2', 'Be the director: how stage craft informs product craft', '12:30–12:50 PM', 'Kim Beverett'),
-  () => ev('col-l2', 14,15,14,35, 'col-l2', 'From handoffs to upstream', '2:15–2:35 PM', 'Frederick Andersen'),
-  () => ev('col-l2', 14,35,14,55, 'col-l2', 'The metacognitive design loop', '2:35–2:55 PM', 'Jenny Au · Mike Green'),
-  () => ev('col-l2', 14,55,15,15, 'col-l2', 'Your best practices are trapped in your head', '2:55–3:15 PM', 'Harald Kirschner'),
-  () => ev('col-l2', 15,25,15,45, 'col-l2', 'Reimagining NASA.gov', '3:25–3:45 PM', 'Ben Shown · Megan Greco'),
+  ()=>ev('col-l2', 11,10,11,30,'col-l2','Scooter, screen and duct-tape: from hack to habit','11:10–11:30 AM','Unni Krishnan Manikoth · Harish Kumar','https://config.figma.com/san-francisco/session/923b7644-6bbb-4260-97a1-446cb2f05daf/'),
+  ()=>ev('col-l2', 11,30,11,50,'col-l2','Beyond design systems: designing for robots and seniors','11:30–11:50 AM','Anna Oh','https://config.figma.com/san-francisco/session/979a7614-45e1-43a4-82d6-a0e2ef8cbed8/'),
+  ()=>ev('col-l2', 11,50,12,10,'col-l2','Figma meets hardware: prototyping for the physical world','11:50 AM–12:10 PM','Frederik Ueberschär · Sam Thorne','https://config.figma.com/san-francisco/session/93485c8d-f1b1-45b3-bdca-a24e0c0bd94c/'),
+  ()=>ev('col-l2', 12,30,12,50,'col-l2','Be the director: how stage craft informs product craft','12:30–12:50 PM','Kim Beverett','https://config.figma.com/san-francisco/session/8f2835f5-9701-4834-9237-0621882953fa/'),
+  ()=>ev('col-l2', 12,50,13,10,'col-l2','Skill issue: how we built an OS for PMs at Figma','12:50–1:10 PM','Jinen Kamdar · Lawrence Luk','https://config.figma.com/san-francisco/session/5d27f158-dd26-4f34-b7e0-991224db8b7a/'),
+  ()=>ev('col-l2', 14,15,14,35,'col-l2','From handoffs to upstream','2:15–2:35 PM','Frederick Andersen','https://config.figma.com/san-francisco/session/9d0af264-b7d0-4442-be81-26aef7ea89ca/'),
+  ()=>ev('col-l2', 14,35,14,55,'col-l2','The metacognitive design loop','2:35–2:55 PM','Jenny Au · Mike Green','https://config.figma.com/san-francisco/session/6c44950a-077d-47bf-bad1-8cc71f995957/'),
+  ()=>ev('col-l2', 14,55,15,15,'col-l2','Your best practices are trapped in your head','2:55–3:15 PM','Harald Kirschner','https://config.figma.com/san-francisco/session/dbf85ddc-ab1f-41cf-8b33-e488f14b55a7/'),
+  ()=>ev('col-l2', 15,25,15,45,'col-l2','Reimagining NASA.gov','3:25–3:45 PM','Ben Shown · Megan Greco','https://config.figma.com/san-francisco/session/1a2f5f6c-dc7f-431b-acc7-5fd16befe8b4/'),
 
   // Mezzanine Stage
-  () => ev('col-mezz', 11,10,11,30, 'col-mezz', 'Ready for the world', '11:10–11:30 AM', 'Vicki Tan'),
-  () => ev('col-mezz', 11,30,11,50, 'col-mezz', 'Dimensional shift: sculpting in Figma Draw', '11:30–11:50 AM', 'Josh McKenna'),
-  () => ev('col-mezz', 11,50,12,10, 'col-mezz', 'Out of sync, on purpose: desktop design after mobile won', '11:50 AM–12:10 PM', 'Giulio Fagiolini'),
-  () => ev('col-mezz', 12,10,12,30, 'col-mezz', 'Writing for humans in an AI world', '12:10–12:30 PM', 'Chelsea Larsson · Anthropic'),
-  () => ev('col-mezz', 12,55,13,15, 'col-mezz', 'Designing the product that can do anything', '12:55–1:15 PM', 'Brian Ringley · Boston Dynamics'),
-  () => ev('col-mezz', 13,15,13,35, 'col-mezz', 'Prompts to fashion: AI-powered 3D-printed garments', '1:15–1:35 PM', 'Danit Peleg'),
-  () => ev('col-mezz', 14,45,15,5,  'col-mezz', 'The edge case is everyone', '2:45–3:05 PM', 'Willie King · Lex Liley'),
-  () => ev('col-mezz', 15,5, 15,25, 'col-mezz', 'ESPN\'s migration playbook: the move to Figma', '3:05–3:25 PM', 'Elliott Muñoz · Matt Rogers'),
+  ()=>ev('col-mezz', 11,10,11,30,'col-mezz','Ready for the world','11:10–11:30 AM','Vicki Tan','https://config.figma.com/san-francisco/session/e220cef8-e2a0-4384-b9a7-bf6a0b23274a/'),
+  ()=>ev('col-mezz', 11,30,11,50,'col-mezz','Dimensional shift: sculpting in Figma Draw','11:30–11:50 AM','Josh McKenna','https://config.figma.com/san-francisco/session/274b9aeb-8c3a-49b2-b241-325ec5b50487/'),
+  ()=>ev('col-mezz', 11,50,12,10,'col-mezz','Out of sync, on purpose: desktop design after mobile won','11:50 AM–12:10 PM','Giulio Fagiolini','https://config.figma.com/san-francisco/session/eb8fbae1-7cdf-420c-bfbe-cd676fccd1d0/'),
+  ()=>ev('col-mezz', 12,10,12,30,'col-mezz','Writing for humans in an AI world','12:10–12:30 PM','Chelsea Larsson · Anthropic','https://config.figma.com/san-francisco/session/47d280de-e85a-4e10-b6e6-b97734490e9f/'),
+  ()=>ev('col-mezz', 12,55,13,15,'col-mezz','Designing the product that can do anything','12:55–1:15 PM','Brian Ringley · Boston Dynamics','https://config.figma.com/san-francisco/session/ac133b2f-2b12-42b3-8cbc-d9c27e0c1195/'),
+  ()=>ev('col-mezz', 13,15,13,35,'col-mezz','Prompts to fashion: AI-powered 3D-printed garments','1:15–1:35 PM','Danit Peleg','https://config.figma.com/san-francisco/session/349f94c6-628e-40ff-9f90-119750e60bfa/'),
+  ()=>ev('col-mezz', 14,45,15,5, 'col-mezz','The edge case is everyone','2:45–3:05 PM','Willie King · Lex Liley','https://config.figma.com/san-francisco/session/248c6563-329e-4eee-9271-de8fa416a85e/'),
+  ()=>ev('col-mezz', 15,5, 15,25,'col-mezz','ESPN\'s migration playbook: the move to Figma','3:05–3:25 PM','Elliott Muñoz · Matt Rogers','https://config.figma.com/san-francisco/session/5ec10ea1-ecd4-4ccc-ab98-bc3ccd03137f/'),
 
   // Maker Stage
-  () => ev('col-maker', 11,10,11,30, 'col-maker', 'From kickoff to canvas: Google Workspace + Figma', '11:10–11:30 AM', 'Addison Rodomista · Chloe Fagan-Tucker · Google'),
-  () => ev('col-maker', 11,50,12,10, 'col-maker', 'How to build content systems for AI product workflows', '11:50 AM–12:10 PM', 'Jessica Ouyang · Jolena Ma · Ditto'),
-  () => ev('col-maker', 12,30,12,50, 'col-maker', 'From concept to confidence with Dscout AI', '12:30–12:50 PM', 'Lauren Madura · Michael Winnick'),
-  () => ev('col-maker', 13,50,14,10, 'col-maker', 'Hacking AI for creative operations at scale', '1:50–2:10 PM', 'Rory Flynn · Systematiq Ai'),
-  () => ev('col-maker', 14,30,14,50, 'col-maker', 'How structured thinking gives your AI superpowers', '2:30–2:50 PM', 'Carola Pescio Canale · Atlassian'),
-  () => ev('col-maker', 15,10,15,30, 'col-maker', 'Build like it\'s 2030. Listen like you mean it.', '3:10–3:30 PM', 'Ned Dwyer · Great Question'),
+  ()=>ev('col-maker', 11,10,11,30,'col-maker','From kickoff to canvas: Google Workspace + Figma','11:10–11:30 AM','Addison Rodomista · Chloe Fagan-Tucker','https://config.figma.com/san-francisco/session/ee548465-66ff-48ed-a86b-ee55e0be22f2/'),
+  ()=>ev('col-maker', 11,50,12,10,'col-maker','How to build content systems for AI product workflows','11:50 AM–12:10 PM','Jessica Ouyang · Jolena Ma · Ditto','https://config.figma.com/san-francisco/session/520fcaa6-76e0-4703-89b0-9f4dfb9a91de/'),
+  ()=>ev('col-maker', 12,30,12,50,'col-maker','From concept to confidence with Dscout AI','12:30–12:50 PM','Lauren Madura · Michael Winnick','https://config.figma.com/san-francisco/session/a9ed6f89-a852-48bf-9f6c-245dab895b87/'),
+  ()=>ev('col-maker', 13,50,14,10,'col-maker','Hacking AI for creative operations at scale','1:50–2:10 PM','Rory Flynn · Systematiq Ai','https://config.figma.com/san-francisco/session/e49d78e2-a2ff-4b10-98bc-47bd6cec2d48/'),
+  ()=>ev('col-maker', 14,30,14,50,'col-maker','How structured thinking gives your AI superpowers','2:30–2:50 PM','Carola Pescio Canale · Atlassian','https://config.figma.com/san-francisco/session/ca0448a6-6274-455e-b32e-7ed465ed8e7a/'),
+  ()=>ev('col-maker', 15,10,15,30,'col-maker','Build like it\'s 2030. Listen like you mean it.','3:10–3:30 PM','Ned Dwyer · Great Question','https://config.figma.com/san-francisco/session/24762e47-798d-47d7-83fd-7ae7c2d0d412/'),
 
   // Community Stage
-  () => ev('col-community', 14,10,14,30, 'col-community', 'The most important component: community', '2:10–2:30 PM', 'Alicia Kranjc · Figma'),
-  () => ev('col-community', 14,40,15,0,  'col-community', 'Human methods, new material: AI for the classroom', '2:40–3:00 PM', 'Mubarak "Moby" Marafa · Wendy Liao · Goodnotes'),
-  () => ev('col-community', 15,10,15,30, 'col-community', 'When to prototype; when to perfect', '3:10–3:30 PM', 'Noah Finer · Figma'),
+  ()=>ev('col-community', 14,10,14,30,'col-community','The most important component: community','2:10–2:30 PM','Alicia Kranjc · Figma','https://config.figma.com/san-francisco/session/b8b2cb7e-706f-4d96-aa85-24c40ab6c9d9/'),
+  ()=>ev('col-community', 14,40,15,0, 'col-community','Human methods, new material: AI for the classroom','2:40–3:00 PM','Mubarak "Moby" Marafa · Wendy Liao','https://config.figma.com/san-francisco/session/571df27c-3044-4342-96d2-ae016ce9c3b4/'),
+  ()=>ev('col-community', 15,10,15,30,'col-community','Prototypes, failures, and unexpected breakthroughs','3:10–3:30 PM','Noah Finer · Figma','https://config.figma.com/san-francisco/session/b9992211-46a6-4f20-b7b1-358a8d23e352/'),
 ];
 
-// ═══════════════════════════════════════
-// JUNE 25 DATA
-// ═══════════════════════════════════════
+// ══════════════════════════════════════════════
+// JUNE 25
+// ══════════════════════════════════════════════
 const d25 = [
   // Main Stage
-  () => ev('col-main',  9,0, 10,0,  'col-keynote',  'Opening keynotes: Designing math + Patterns for restarting the world', '9:00–10:00 AM', 'Grant Sanderson (3Blue1Brown) · Switch Angel + LO.FI.SCI.FI · Doors 8:15 AM'),
-  () => ev('col-main', 10,15,11,15, 'col-deepdive', 'Figma deep dive', '10:15–11:15 AM', 'Details TBA'),
-  () => ev('col-main', 12,15,13,0,  'col-deepdive', 'Figma deep dive: inside the Weave workflow', '12:15–1:00 PM', 'Gal Sharir · Ron Baranov · Figma'),
-  () => ev('col-main', 13,45,14,15, 'col-deepdive', 'Figma deep dive', '1:45–2:15 PM', 'Details TBA'),
-  () => ev('col-main', 14,15,14,45, 'col-deepdive', 'Figma deep dive', '2:15–2:45 PM', 'Details TBA'),
-  () => ev('col-main', 16,0, 17,0,  'col-closing',  'Closing keynote: Death of the finished state + It used to be hard to be average', '4:00–5:00 PM', 'Brent David Freaney · André Anjos (RAC) · Doors 3:40 PM'),
+  ()=>ev('col-main',  9,0, 10,0, 'col-keynote', 'Opening keynotes: Designing math + Patterns for restarting the world','9:00–10:00 AM','Grant Sanderson · Switch Angel + LO.FI.SCI.FI · Doors 8:15 AM','https://config.figma.com/san-francisco/session/6c5a7b92-88f7-42d7-9ddc-b67cb35ec4ab/'),
+  ()=>ev('col-main', 10,15,11,15,'col-deepdive','Figma deep dive','10:15–11:15 AM','Elle Shwer · Iris Lin · Nikolas Klein · Ben Chen','https://config.figma.com/san-francisco/session/2be8862e-bfbd-4276-851d-d10facbe1e1d/'),
+  ()=>ev('col-main', 12,15,13,0, 'col-deepdive','Figma deep dive: inside the Weave workflow','12:15–1:00 PM','Gal Sharir · Ron Baranov','https://config.figma.com/san-francisco/session/82e928ab-95f0-46a3-b6f1-157a5f6fff00/'),
+  ()=>ev('col-main', 13,45,14,15,'col-deepdive','Figma deep dive','1:45–2:15 PM','Brett McMillin · Laura Fehre','https://config.figma.com/san-francisco/session/3f389393-0c3a-4c27-af5d-3af9e962d6fb/'),
+  ()=>ev('col-main', 14,15,14,45,'col-deepdive','Figma deep dive','2:15–2:45 PM','Jake Albaugh','https://config.figma.com/san-francisco/session/07a28549-f6a7-4621-8dca-504608ad449b/'),
+  ()=>ev('col-main', 16,0, 17,0, 'col-closing', 'Closing keynote: Death of the finished state + It used to be hard to be average','4:00–5:00 PM','Brent David Freaney · André Anjos (RAC) · Doors 3:40 PM','https://config.figma.com/san-francisco/session/2327c9de-d189-4b98-b49c-79bffa38b723/'),
 
   // Learning Labs
-  () => ev('col-labs', 10,15,11,0,  'col-labs', 'Lab: Upskill on skills and agentic workflows', '10:15–11:00 AM', 'Laura Fehre · Manish Kumar · Intermediate/Advanced'),
-  () => ev('col-labs', 11,30,12,15, 'col-labs', 'Lab: Express yourself with Figma Draw', '11:30 AM–12:15 PM', 'Laura Butvinik · Rachel Platt · Kristen Bates · All levels'),
-  () => ev('col-labs', 12,45,13,30, 'col-labs', 'Lab: Workflow tips—from slow to flow', '12:45–1:30 PM', 'Chad Bergman · Michel Ferreira · Beginner'),
-  () => ev('col-labs', 14,0, 15,0,  'col-labs', 'Lab: Build your first Weave workflow', '2:00–3:00 PM', 'Moran Dankner · Ken Vreman · Beginner/Intermediate'),
+  ()=>ev('col-labs', 10,15,11,0, 'col-labs','Lab: Upskill on skills and agentic workflows','10:15–11:00 AM','Laura Fehre · Manish Kumar · Intermediate/Advanced','https://config.figma.com/san-francisco/session/1b7a9cce-f147-4d99-8755-717fc70b8575/'),
+  ()=>ev('col-labs', 11,30,12,15,'col-labs','Lab: Express yourself with Figma Draw','11:30 AM–12:15 PM','Laura Butvinik · Rachel Platt · Kristen Bates · All levels','https://config.figma.com/san-francisco/session/9db83287-aa02-4fb5-9a5f-b18916098e8f/'),
+  ()=>ev('col-labs', 12,45,13,30,'col-labs','Lab: Workflow tips—from slow to flow','12:45–1:30 PM','Chad Bergman · Michel Ferreira · Beginner','https://config.figma.com/san-francisco/session/cdacc08f-a60e-4ece-bb3b-6b186a3a9dfc/'),
+  ()=>ev('col-labs', 14,0, 15,0, 'col-labs','Lab: Build your first Weave workflow','2:00–3:00 PM','Moran Dankner · Ken Vreman · Beginner/Intermediate','https://config.figma.com/san-francisco/session/f94f6215-0d25-4b2e-8b14-7e00a74588e6/'),
 
   // Level 2 Stage
-  () => ev('col-l2', 10,30,10,50, 'col-l2', 'The invisible mechanisms in your interfaces', '10:30–10:50 AM', 'Johannes Mutter'),
-  () => ev('col-l2', 10,50,11,10, 'col-l2', 'Dense by design', '10:50–11:10 AM', 'Matthew Ström-Awn'),
-  () => ev('col-l2', 11,10,11,30, 'col-l2', 'Usernames on Instagram: how a craft fix became an identity crisis', '11:10–11:30 AM', 'Rose McManus · Instagram/Meta'),
-  () => ev('col-l2', 11,30,11,50, 'col-l2', 'The future is low-tech: lessons from the early 2000s', '11:30–11:50 AM', 'Jésabel DC'),
-  () => ev('col-l2', 12,50,13,10, 'col-l2', 'Everyone\'s still eating: building Notion\'s design system', '12:50–1:10 PM', 'Tamara Chu · Shauna Sapper · Notion'),
-  () => ev('col-l2', 13,10,13,30, 'col-l2', 'Preparing Rocket for the AI era', '1:10–1:30 PM', 'Emily Strobl · Will Hobick · Rocket'),
-  () => ev('col-l2', 13,30,13,50, 'col-l2', 'Designed to be read: making a system AI can actually use', '1:30–1:50 PM', 'Harvey Whiting · Meta'),
-  () => ev('col-l2', 14,15,14,35, 'col-l2', '300GB story: how to inspire action when data isn\'t enough', '2:15–2:35 PM', 'Luke Fiorante · Sirinda Limsong · Harvard'),
-  () => ev('col-l2', 14,35,14,55, 'col-l2', 'The marathon designer: creative endurance', '2:35–2:55 PM', 'Socrates Charisis'),
-  () => ev('col-l2', 14,55,15,15, 'col-l2', 'Design systems anarchy', '2:55–3:15 PM', 'Lauren LoPrete · Mercury'),
+  ()=>ev('col-l2', 10,30,10,50,'col-l2','The invisible mechanisms in your interfaces','10:30–10:50 AM','Johannes Mutter','https://config.figma.com/san-francisco/session/cb25f8b3-31db-4849-a799-d02a2f052f5c/'),
+  ()=>ev('col-l2', 10,50,11,10,'col-l2','Dense by design','10:50–11:10 AM','Matthew Ström-Awn','https://config.figma.com/san-francisco/session/69636242-b6b2-4b27-a831-bfd73eed654f/'),
+  ()=>ev('col-l2', 11,10,11,30,'col-l2','Usernames on Instagram: how a craft fix became an identity crisis','11:10–11:30 AM','Rose McManus · Instagram/Meta','https://config.figma.com/san-francisco/session/5d1f7e2d-c6f5-4001-b2c7-23f70a9f92d9/'),
+  ()=>ev('col-l2', 11,30,11,50,'col-l2','The future is low-tech: lessons from the early 2000s','11:30–11:50 AM','Jésabel DC','https://config.figma.com/san-francisco/session/79c76468-0c48-41ae-8775-7a46d4409bb3/'),
+  ()=>ev('col-l2', 12,50,13,10,'col-l2','Everyone\'s still eating: building Notion\'s design system','12:50–1:10 PM','Tamara Chu · Shauna Sapper · Notion','https://config.figma.com/san-francisco/session/9bbf68e9-0644-48df-9b6c-f4ad1827a146/'),
+  ()=>ev('col-l2', 13,10,13,30,'col-l2','Preparing Rocket for the AI era','1:10–1:30 PM','Emily Strobl · Will Hobick','https://config.figma.com/san-francisco/session/cc9f82eb-31cd-4bd3-93db-bb060c95a6ac/'),
+  ()=>ev('col-l2', 13,30,13,50,'col-l2','Designed to be read: making a system AI can actually use','1:30–1:50 PM','Harvey Whiting · Meta','https://config.figma.com/san-francisco/session/c856c21b-317e-482c-8a3f-f01280aeed56/'),
+  ()=>ev('col-l2', 14,15,14,35,'col-l2','300GB story: how to inspire action when data isn\'t enough','2:15–2:35 PM','Luke Fiorante · Sirinda Limsong · Harvard','https://config.figma.com/san-francisco/session/e2b0051f-0b4a-4860-bca5-71e668b04bd9/'),
+  ()=>ev('col-l2', 14,35,14,55,'col-l2','The marathon designer: creative endurance','2:35–2:55 PM','Socrates Charisis','https://config.figma.com/san-francisco/session/7856aab8-4ce1-430a-8066-efae860ffa60/'),
+  ()=>ev('col-l2', 14,55,15,15,'col-l2','Design systems anarchy','2:55–3:15 PM','Lauren LoPrete · Mercury','https://config.figma.com/san-francisco/session/ace52d61-6725-4338-80c9-cd8b0e8757e4/'),
 
   // Mezzanine Stage
-  () => ev('col-mezz', 10,20,10,40, 'col-mezz', '10 years of daily sketching', '10:20–10:40 AM', 'Zach Lieberman · MIT Media Lab'),
-  () => ev('col-mezz', 10,40,11,0,  'col-mezz', 'The world of street art and care-filled design', '10:40–11:00 AM', 'Ella Rochelle-Lawton'),
-  () => ev('col-mezz', 11,0, 11,20, 'col-mezz', 'Managing multiple creative passions in a world that tells you to specialize', '11:00–11:20 AM', 'Lauren Hom'),
-  () => ev('col-mezz', 12,25,12,45, 'col-mezz', 'The learning curve: turning real-world motion into design', '12:25–12:45 PM', 'Patrick Flaherty · Microsoft'),
-  () => ev('col-mezz', 12,45,13,5,  'col-mezz', 'The canvas is not dead', '12:45–1:05 PM', 'Catt Small · Dropbox'),
-  () => ev('col-mezz', 14,5, 14,25, 'col-mezz', 'Own the loop: how designers and researchers win with AI evals', '2:05–2:25 PM', 'Setor Zilevu · Figma'),
-  () => ev('col-mezz', 14,25,14,45, 'col-mezz', 'Design for the future of apps', '2:25–2:45 PM', 'Craig Labenz · Google'),
-  () => ev('col-mezz', 14,45,15,5,  'col-mezz', 'Designing money: trustworthy brand in the age of AI', '2:45–3:05 PM', 'Chris Warner · Plaid'),
-  () => ev('col-mezz', 15,5, 15,25, 'col-mezz', 'Legibility by design', '3:05–3:25 PM', 'Ryan Powell · Waymo'),
+  ()=>ev('col-mezz', 10,20,10,40,'col-mezz','10 years of daily sketching','10:20–10:40 AM','Zach Lieberman · MIT Media Lab','https://config.figma.com/san-francisco/session/702164d5-9654-468e-9e8a-eeb3ef609fe7/'),
+  ()=>ev('col-mezz', 10,40,11,0, 'col-mezz','The world of street art and care-filled design','10:40–11:00 AM','Ella Rochelle-Lawton','https://config.figma.com/san-francisco/session/d4956efb-26bd-4c93-97c6-9ef7fdd72305/'),
+  ()=>ev('col-mezz', 11,0, 11,20,'col-mezz','Managing multiple creative passions in a world that tells you to specialize','11:00–11:20 AM','Lauren Hom','https://config.figma.com/san-francisco/session/320859cb-ec55-495e-aeef-2cb7beea60cd/'),
+  ()=>ev('col-mezz', 12,25,12,45,'col-mezz','The learning curve: turning real-world motion into design','12:25–12:45 PM','Patrick Flaherty · Microsoft','https://config.figma.com/san-francisco/session/e8ea736f-5159-46d9-bed5-49855d992a91/'),
+  ()=>ev('col-mezz', 12,45,13,5, 'col-mezz','The canvas is not dead','12:45–1:05 PM','Catt Small · Dropbox','https://config.figma.com/san-francisco/session/3a3146f3-98c6-40e7-a09b-ff3c606bf5c1/'),
+  ()=>ev('col-mezz', 14,5, 14,25,'col-mezz','Own the loop: how designers and researchers win with AI evals','2:05–2:25 PM','Setor Zilevu · Figma','https://config.figma.com/san-francisco/session/2bb4e5de-dbaf-47c5-8c12-b58e5728ab62/'),
+  ()=>ev('col-mezz', 14,25,14,45,'col-mezz','Design for the future of apps','2:25–2:45 PM','Craig Labenz · Google','https://config.figma.com/san-francisco/session/d942bacb-600a-437f-817a-6d61794a930d/'),
+  ()=>ev('col-mezz', 14,45,15,5, 'col-mezz','Designing money: trustworthy brand in the age of AI','2:45–3:05 PM','Chris Warner · Plaid','https://config.figma.com/san-francisco/session/a2fa6160-4f88-4215-a6e9-f91c78ee3d51/'),
+  ()=>ev('col-mezz', 15,5, 15,25,'col-mezz','Legibility by design','3:05–3:25 PM','Ryan Powell · Waymo','https://config.figma.com/san-francisco/session/b2201a51-7000-4303-a371-ce00f5d9e2ed/'),
 
   // Maker Stage
-  () => ev('col-maker', 10,15,10,35, 'col-maker', 'Designing in the age of the 10x engineer', '10:15–10:35 AM', 'Andy Zhang · Google'),
-  () => ev('col-maker', 10,50,11,10, 'col-maker', 'Building real-time user insights into your design workflow', '10:50–11:10 AM', 'Prayag Narula · HeyMarvin'),
-  () => ev('col-maker', 11,25,11,45, 'col-maker', 'AI will upend your process—for the better', '11:25–11:45 AM', 'Justin Meyer · Bitovi'),
-  () => ev('col-maker', 12,45,13,5,  'col-maker', 'Quirk up your workplace', '12:45–1:05 PM', 'Darby Thomas · GitHub'),
-  () => ev('col-maker', 13,20,13,40, 'col-maker', 'Designing with confidence in an AI-powered world', '1:20–1:40 PM', 'Bobby Meixner · UserTesting'),
+  ()=>ev('col-maker', 10,15,10,35,'col-maker','Designing in the age of the 10x engineer','10:15–10:35 AM','Andy Zhang · Google','https://config.figma.com/san-francisco/session/49406317-eda9-427a-84f6-c88b24857ed8/'),
+  ()=>ev('col-maker', 10,50,11,10,'col-maker','Building real-time user insights into your design workflow','10:50–11:10 AM','Prayag Narula · HeyMarvin','https://config.figma.com/san-francisco/session/ddcc3459-4bc6-43d4-8aba-103c1870e703/'),
+  ()=>ev('col-maker', 11,25,11,45,'col-maker','AI will upend your process—for the better','11:25–11:45 AM','Justin Meyer · Bitovi','https://config.figma.com/san-francisco/session/b751e092-79d1-4082-9c8f-aeeba6ec3b0e/'),
+  ()=>ev('col-maker', 12,45,13,5, 'col-maker','Quirk up your workplace','12:45–1:05 PM','Darby Thomas · GitHub','https://config.figma.com/san-francisco/session/8d8c083f-75c5-4595-ba5d-c8c2809ec350/'),
+  ()=>ev('col-maker', 13,20,13,40,'col-maker','Designing with confidence in an AI-powered world','1:20–1:40 PM','Bobby Meixner · UserTesting','https://config.figma.com/san-francisco/session/f9a5d27e-b1c3-4674-92ee-0545d7822fc0/'),
 
   // Community Stage
-  () => ev('col-community', 13,10,13,30, 'col-community', 'In praise of dark mode', '1:10–1:30 PM', 'Mehmet Aydın Baytaş · Attio'),
-  () => ev('col-community', 13,40,14,0,  'col-community', 'Designing brand intelligence: from rules to expression', '1:40–2:00 PM', 'Nicole Martinez · Let\'s Jetty'),
-  () => ev('col-community', 14,10,14,30, 'col-community', 'Gnarly by design: building systems with grit', '2:10–2:30 PM', 'Beau Wingfield'),
-  () => ev('col-community', 14,40,15,0,  'col-community', 'Don\'t forget the feeling: a critique of software in 2026', '2:40–3:00 PM', 'Luis Ouriach · Figma'),
+  ()=>ev('col-community', 13,10,13,30,'col-community','In praise of dark mode','1:10–1:30 PM','Mehmet Aydın Baytaş · Attio','https://config.figma.com/san-francisco/session/404d5692-4463-4304-b74c-723a71e491a1/'),
+  ()=>ev('col-community', 13,40,14,0, 'col-community','Designing brand intelligence: from rules to expression','1:40–2:00 PM','Nicole Martinez · Let\'s Jetty','https://config.figma.com/san-francisco/session/b14b91d9-50d9-4081-a943-51f331a2b4b4/'),
+  ()=>ev('col-community', 14,10,14,30,'col-community','Gnarly by design: building systems with grit','2:10–2:30 PM','Beau Wingfield','https://config.figma.com/san-francisco/session/c6c9fdb6-0e45-4b0e-b966-76675517b045/'),
+  ()=>ev('col-community', 14,40,15,0, 'col-community','Don\'t forget the feeling: a critique of software in 2026','2:40–3:00 PM','Luis Ouriach · Figma','https://config.figma.com/san-francisco/session/4b523a98-9e0e-4b9e-8783-c405ab892602/'),
 
   // Happy hour
-  () => ev('col-main', 17,0, 18,30, 'col-event', 'Closing happy hour — Config Commons', '5:00–6:30 PM', 'Toast to new connections'),
+  ()=>ev('col-main', 17,0, 18,30,'col-event','Closing happy hour — Config Commons','5:00–6:30 PM','Toast to new connections','https://config.figma.com/san-francisco/event/789dfa39-dfdf-4f0b-9c6b-b52fefe7b975/'),
 ];
-
-let currentDay = 'd24';
-let rendered = { d24: false, d25: false };
 
 function renderDay(dayKey) {
   const events = dayKey === 'd24' ? d24 : d25;
-  // Clear columns
   COLS.forEach(id => {
     const col = document.getElementById(id);
     Array.from(col.querySelectorAll('.ev')).forEach(e => e.remove());
@@ -442,13 +368,11 @@ function renderDay(dayKey) {
 }
 
 function showDay(dayKey, btn) {
-  currentDay = dayKey;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   renderDay(dayKey);
 }
 
-// Initial render
 renderDay('d24');
 </script>
 </body>
