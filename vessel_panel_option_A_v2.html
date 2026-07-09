@@ -128,6 +128,7 @@
   .signal-box .lbl{color:var(--ink-soft); font-size:11px; margin-bottom:2px;}
 
   .footer-link{display:flex; align-items:center; gap:5px; color:var(--teal-accent); font-size:12.5px; font-weight:600; cursor:pointer; margin-top:4px;}
+  .footer-link.active-link{background:#eef6f6; padding:4px 6px; margin:4px -6px; border-radius:4px;}
 
   .event-row{display:flex; gap:8px; padding:7px 6px; border-radius:4px; cursor:pointer; align-items:flex-start;}
   .event-row:hover{background:#f2f8f8;}
@@ -226,16 +227,10 @@
     background:linear-gradient(90deg,#c0392b,#e67e22,#f1c40f,#2ecc71,#178a97,#5b3ea5);
   }
 
-  /* ---- Tracks & Events tab: toggles a docked side panel, distinct from pane tabs ---- */
-  .tab.side-toggle{position:relative;}
-  .tab.side-toggle.open{color:var(--teal-dark); font-weight:600; background:#eef6f6;}
-  .tab.side-toggle.open::after{
-    content:""; position:absolute; left:50%; bottom:2px; transform:translateX(-50%);
-    width:5px; height:5px; border-radius:50%; background:var(--teal-accent);
-  }
-
   .side-panel{
     position:absolute;
+    left:14px; top:64px; bottom:60px;
+    width:420px;
     background:var(--panel-bg);
     border-radius:8px;
     box-shadow:0 4px 18px rgba(0,0,0,.18);
@@ -345,7 +340,6 @@
 
       <div class="tabs">
         <div class="tab active" data-pane="overview">Overview</div>
-        <div class="tab side-toggle" id="tracksToggle">Tracks &amp; Events</div>
         <div class="tab" data-pane="registry">Registry &amp; Sources</div>
       </div>
 
@@ -372,6 +366,7 @@
             Associated with a potential oil slick — SkyTruth Cerulean ↗
           </div>
 
+          <div class="footer-link" id="tracksToggle">📊 View Tracks &amp; Events ↗</div>
           <div class="footer-link" data-goto="registry">Show data sources ↗</div>
           <div class="footer-link" data-goto="vdp">Open full Vessel Details page ↗</div>
         </div>
@@ -444,9 +439,9 @@
     </div>
 
     <div class="hint">
-      <b>Try it:</b> click <b>Tracks &amp; Events</b> to dock a table beside the panel — it follows
-      the panel if you drag or resize it. Drag the header to move, the corner to resize, or
-      collapse with ▾.
+      <b>Try it:</b> in Overview, click <b>View Tracks &amp; Events</b> — it opens as its own
+      panel docked to the left edge of the window. Drag the main panel's header to move it,
+      the corner to resize it, or collapse it with ▾.
     </div>
 
     <div class="legend" id="legend">
@@ -527,39 +522,15 @@
     r.addEventListener('click', ()=> setHotEvent(r.dataset.event));
   });
 
-  // ---- docked side panel: opens beside the main panel, follows it when moved/resized ----
-  const SIDE_GAP = 10;
-  const SIDE_WIDTH = 420;
-
-  function positionSidePanel(){
-    const parentRect = mapWrap.getBoundingClientRect();
-    const panelRect = vpanel.getBoundingClientRect();
-    let left = (panelRect.right - parentRect.left) + SIDE_GAP;
-    let top = panelRect.top - parentRect.top;
-    let height = panelRect.height;
-    let width = SIDE_WIDTH;
-
-    // if there's not enough room to the right, dock to the left of the main panel instead
-    if(left + width > parentRect.width){
-      left = (panelRect.left - parentRect.left) - width - SIDE_GAP;
-    }
-    // last resort: clamp inside the map if neither side fits
-    left = Math.max(0, Math.min(left, parentRect.width - width));
-
-    sidePanel.style.left = left + 'px';
-    sidePanel.style.top = top + 'px';
-    sidePanel.style.height = height + 'px';
-    sidePanel.style.width = width + 'px';
-  }
+  // ---- docked side panel: opens on the left side of the browser window, independent of the main panel ----
 
   function openSidePanel(){
     sidePanel.classList.add('open');
-    tracksToggle.classList.add('open');
-    positionSidePanel();
+    tracksToggle.classList.add('active-link');
   }
   function closeSidePanel(){
     sidePanel.classList.remove('open');
-    tracksToggle.classList.remove('open');
+    tracksToggle.classList.remove('active-link');
   }
 
   tracksToggle.addEventListener('click', (e)=>{
@@ -628,7 +599,6 @@
     newTop = Math.max(0, Math.min(newTop, parentRect.height - vpanel.offsetHeight));
     vpanel.style.left = newLeft + 'px';
     vpanel.style.top = newTop + 'px';
-    if(sidePanel.classList.contains('open')) positionSidePanel();
   });
 
   window.addEventListener('mouseup', ()=>{
@@ -667,7 +637,6 @@
     let newH = Math.max(220, Math.min(startH + dy, maxH));
     vpanel.style.width = newW + 'px';
     vpanel.style.height = newH + 'px';
-    if(sidePanel.classList.contains('open')) positionSidePanel();
   });
 
   window.addEventListener('mouseup', ()=>{
