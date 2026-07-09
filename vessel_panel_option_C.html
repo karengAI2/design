@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Skylight — Option C: Bottom Drawer</title>
+<style>
+  :root{
+    --teal-dark:#0b5a63; --teal-header:#12707c; --teal-accent:#178a97;
+    --ocean:#d3e9ea; --land:#e6e6e3; --ink:#1c2b33; --ink-soft:#5b6b70;
+    --line:#c7d6d7; --panel-bg:#ffffff; --dash:#9aa7ab;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%; margin:0;}
+  body{font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; color:var(--ink); background:#f4f6f6;}
+  .app{display:flex; flex-direction:column; height:100vh;}
+
+  .topbar{
+    background:#fff; color:var(--ink);
+    display:flex; align-items:center; gap:16px;
+    padding:0 20px; height:52px; flex-shrink:0; font-size:14px;
+    border-bottom:1px solid var(--line);
+  }
+  .topbar .logo{font-weight:700; letter-spacing:.5px; font-size:16px; color:var(--ink); display:flex; align-items:center; gap:8px;}
+  .topbar .logo .mark{width:20px; height:20px; background:var(--teal-accent); border-radius:4px; flex-shrink:0;}
+  .topbar .logo span{opacity:.55; font-weight:400; margin-left:2px; font-size:12px;}
+  .topbar .chip{background:rgba(255,255,255,.15); border-radius:4px; padding:5px 10px; font-size:12.5px;}
+  .topbar .spacer{flex:1;}
+  .topbar .search{display:flex; align-items:center; gap:6px; color:var(--ink-soft); font-size:12.5px; cursor:text;}
+  .topbar .search .ic{color:var(--teal-accent);}
+  .topbar .info-ic{color:var(--ink-soft); font-size:12px; border:1px solid var(--line); border-radius:50%; width:15px; height:15px; display:inline-flex; align-items:center; justify-content:center;}
+  .topbar .account{display:flex; align-items:center; gap:6px; color:var(--ink); font-size:12.5px; font-weight:600;}
+  .direction-tag{background:#eef6f6; color:var(--teal-dark); font-weight:700; font-size:12px; padding:4px 10px; border-radius:4px; border:1px solid var(--line);}
+
+  .stage{flex:1; position:relative; overflow:hidden; min-height:0;}
+
+  .map-wrap{position:absolute; inset:0; background:var(--ocean);}
+  .land{position:absolute; background:var(--land); border-radius:40% 60% 55% 45%;}
+  .land.l1{width:280px; height:340px; left:-80px; top:-40px;}
+  .land.l2{width:220px; height:200px; right:-60px; bottom:-40px; border-radius:60% 40% 50% 50%;}
+  .vessel{position:absolute; width:16px; height:16px; transform:translate(-50%,-50%);}
+  .vessel svg{width:100%; height:100%;}
+  .vessel.dim polygon{fill:#8fa3a6;}
+  .vessel.selected polygon{fill:var(--teal-dark);}
+  .vessel-label{position:absolute; transform:translate(-50%,8px); font-size:10.5px; color:var(--ink-soft); white-space:nowrap; pointer-events:none;}
+  .track-line{position:absolute; border-left:2px dashed var(--teal-dark); opacity:.55;}
+  .event-pt{position:absolute; width:9px; height:9px; border-radius:50%; background:var(--teal-dark); border:2px solid #fff; transform:translate(-50%,-50%); cursor:pointer;}
+  .event-pt.hot{background:#d9622a; transform:translate(-50%,-50%) scale(1.5); box-shadow:0 0 0 4px rgba(217,98,42,.25);}
+  .map-controls{position:absolute; top:60px; left:14px; display:flex; flex-direction:column; gap:6px;}
+  .map-controls button{width:28px; height:28px; background:#fff; border:1px solid var(--line); border-radius:4px; font-size:14px; color:var(--ink);}
+
+  .float-cluster{position:absolute; top:14px; display:flex; gap:8px; z-index:3; flex-wrap:wrap;}
+  .float-cluster.left{left:14px;}
+  .float-cluster.right{right:14px; justify-content:flex-end;}
+  .float-btn{
+    background:var(--teal-header); color:#fff; border:none; border-radius:6px;
+    padding:8px 12px; font-size:12.5px; font-weight:600;
+    display:flex; align-items:center; gap:6px;
+    box-shadow:0 1px 4px rgba(0,0,0,.12); white-space:nowrap;
+  }
+  .float-btn.ghost{background:#fff; color:var(--ink); border:1px solid var(--line);}
+
+  /* ---- bottom drawer ---- */
+  .c-panel{
+    position:absolute; left:0; right:0; bottom:0;
+    background:var(--panel-bg); box-shadow:0 -4px 16px rgba(0,0,0,.18);
+    border-radius:10px 10px 0 0;
+    height:300px;
+    overflow:hidden;
+    z-index:5;
+    display:flex;
+    flex-direction:column;
+    transition:height .18s ease;
+  }
+  .c-panel.no-transition{transition:none;}
+
+  .c-resize-handle{
+    height:14px; flex-shrink:0; cursor:row-resize;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .c-resize-handle:hover .grip, .c-resize-handle.active .grip{background:var(--teal-accent);}
+  .c-resize-handle .grip{width:36px; height:4px; border-radius:2px; background:var(--line);}
+
+  .c-peek{display:flex; align-items:center; gap:10px; padding:0 16px; height:56px; flex-shrink:0; cursor:pointer;}
+  .c-peek .flag{width:22px; height:15px; background:#c8b45a; border-radius:2px; flex-shrink:0;}
+  .c-peek .vname{font-weight:700; font-size:14px;}
+  .c-peek .vsub{font-size:11px; color:var(--ink-soft);}
+  .c-peek .chev{margin-left:auto; color:var(--ink-soft); font-size:15px;}
+
+  .c-body-wrap{display:flex; flex:1; min-height:0;}
+  .c-col{flex:1; border-right:1px solid var(--line); display:flex; flex-direction:column; min-width:0;}
+  .c-col:first-child{flex:0 0 260px;}
+  .c-col:last-child{border-right:none;}
+
+  .tabs{display:flex; border-bottom:1px solid var(--line); background:#fafcfc; flex-shrink:0;}
+  .tab{flex:1; text-align:center; padding:9px 4px; font-size:12px; color:var(--ink-soft); cursor:pointer; border-bottom:2px solid transparent;}
+  .tab.active{color:var(--teal-dark); font-weight:600; border-bottom:2px solid var(--teal-dark); background:#fff;}
+
+  .vpanel-body{flex:1; overflow-y:auto; padding:12px; font-size:13px; min-height:0;}
+  .pane{display:none;}
+  .pane.active{display:block;}
+
+  .field-grid{display:grid; grid-template-columns:88px 1fr; row-gap:7px; column-gap:8px;}
+  .field-grid .k{color:var(--ink-soft); font-size:12px;}
+  .field-grid .v{font-size:12.5px; font-weight:500;}
+  .field-grid .v.dash{color:var(--dash);}
+  .signal-box{background:#f2f8f8; border:1px solid var(--line); border-radius:6px; padding:8px 10px; font-size:12px;}
+  .signal-box.note{border-color:#e0b98a; background:#fdf6ec;}
+  .signal-box .lbl{color:var(--ink-soft); font-size:11px; margin-bottom:2px;}
+  .footer-link{display:flex; align-items:center; gap:5px; color:var(--teal-accent); font-size:12.5px; font-weight:600; cursor:pointer;}
+
+  .event-row{display:flex; gap:8px; padding:7px 6px; border-radius:4px; cursor:pointer;}
+  .event-row:hover{background:#f2f8f8;}
+  .event-row.hot{background:#fdf1ea;}
+  .event-row .dot{width:8px; height:8px; border-radius:50%; background:var(--teal-dark); margin-top:4px; flex-shrink:0;}
+  .event-row.hot .dot{background:#d9622a;}
+  .event-row .etxt{font-size:12px;}
+  .event-row .etxt .etitle{font-weight:600;}
+  .event-row .etxt .emeta{color:var(--ink-soft); font-size:11px;}
+  .srclink{display:flex; align-items:center; justify-content:space-between; padding:7px 0; border-bottom:1px solid #eef2f2; font-size:12.5px;}
+  .srclink a{color:var(--teal-accent); text-decoration:none; font-weight:600;}
+
+  .hint{position:absolute; top:14px; right:14px; background:rgba(255,255,255,.94); border:1px solid var(--line); border-radius:6px; padding:8px 12px; font-size:11.5px; color:var(--ink-soft); max-width:300px; line-height:1.4; z-index:4;}
+  .hint b{color:var(--ink);}
+
+  /* ---- collapsible legend ---- */
+  .legend{
+    position:absolute; top:60px; right:14px; width:220px;
+    background:#fff; border-radius:6px; box-shadow:0 2px 10px rgba(0,0,0,.15);
+    font-size:12px; z-index:3; overflow:hidden;
+  }
+  .legend-header{
+    background:var(--teal-header); color:#fff; padding:8px 12px; font-weight:700; font-size:12.5px;
+    display:flex; align-items:center; justify-content:space-between; cursor:pointer;
+  }
+  .legend-body{padding:10px 12px; max-height:220px; overflow-y:auto;}
+  .legend.collapsed .legend-body{display:none;}
+  .legend-section-title{color:var(--ink-soft); font-size:10.5px; font-weight:700; letter-spacing:.3px; margin:8px 0 4px;}
+  .legend-section-title:first-child{margin-top:0;}
+  .legend-row{display:flex; align-items:center; gap:7px; padding:3px 0; color:var(--ink);}
+  .legend-swatch{width:12px; height:12px; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; font-size:10px;}
+  .legend-gradient{height:8px; border-radius:4px; margin:4px 0 2px; background:linear-gradient(90deg,#c0392b,#e67e22,#f1c40f,#2ecc71,#178a97,#5b3ea5);}
+
+  /* ---- full-width bottom time slider ---- */
+  .timeslider{
+    flex-shrink:0; height:42px; background:var(--teal-header);
+    display:flex; align-items:center; padding:0 18px; position:relative;
+  }
+  .ts-track{position:relative; flex:1; height:6px; margin:0 14px; background:rgba(255,255,255,.35); border-radius:3px;}
+  .ts-fill{position:absolute; left:8%; right:8%; top:0; bottom:0; background:rgba(255,255,255,.75); border-radius:3px;}
+  .ts-handle{position:absolute; top:50%; width:14px; height:14px; background:#fff; border-radius:50%; transform:translate(-50%,-50%); box-shadow:0 1px 3px rgba(0,0,0,.35);}
+  .ts-label{color:#fff; font-size:11.5px; opacity:.9; flex-shrink:0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="logo"><div class="mark"></div>SKYLIGHT <span>By Ai2</span></div>
+    <div class="spacer"></div>
+    <div class="search"><span class="ic">🔍</span> Search for vessel <span class="info-ic">i</span></div>
+    <div class="account">👤 My Skylight ▾</div>
+    <div class="direction-tag">Option C — Bottom drawer</div>
+  </div>
+
+  <div class="stage">
+    <div class="map-wrap">
+      <div class="land l1"></div>
+      <div class="land l2"></div>
+      <div class="map-controls"><button>+</button><button>–</button><button>▤</button></div>
+
+      <div class="float-cluster left">
+        <div class="float-btn">📍 Events (6) ▾</div>
+        <div class="float-btn">🧭 Vessels</div>
+      </div>
+      <div class="float-cluster right">
+        <div class="float-btn ghost">▭ Areas</div>
+        <div class="float-btn ghost">▽ Filters (0) &nbsp;Clear ✕</div>
+        <div class="float-btn ghost">🕒 Jul 6 – Jul 8, 2026 &nbsp;Reset ✕</div>
+        <div class="float-btn">☰ Events List</div>
+      </div>
+
+      <div class="legend" id="legend">
+        <div class="legend-header" id="legendHeader">
+          Legend
+          <span id="legendChev">▾</span>
+        </div>
+        <div class="legend-body">
+          <div class="legend-section-title">EVENTS · EVENT ICON</div>
+          <div class="legend-row"><span class="legend-swatch">➤</span> Fishing</div>
+          <div class="legend-row"><span class="legend-swatch">⇄</span> Standard Rendezvous</div>
+          <div class="legend-row"><span class="legend-swatch">⇄</span> Dark Rendezvous</div>
+          <div class="legend-row"><span class="legend-swatch">◎</span> Entry</div>
+          <div class="legend-section-title">VESSELS · MMSI</div>
+          <div class="legend-gradient"></div>
+          <div style="font-size:10.5px; color:var(--ink-soft);">Unique color per MMSI</div>
+        </div>
+      </div>
+
+      <div class="track-line" style="left:520px; top:120px; height:200px;"></div>
+      <div class="event-pt" data-event="1" style="left:520px; top:320px;"></div>
+      <div class="event-pt" data-event="2" style="left:520px; top:250px;"></div>
+      <div class="event-pt hot" data-event="3" style="left:520px; top:180px;"></div>
+      <div class="event-pt" data-event="4" style="left:520px; top:120px;"></div>
+
+      <div class="vessel dim" style="left:280px; top:100px;"><svg viewBox="0 0 10 10"><polygon points="5,0 10,10 5,7 0,10"/></svg></div>
+      <div class="vessel dim" style="left:180px; top:260px;"><svg viewBox="0 0 10 10"><polygon points="5,0 10,10 5,7 0,10"/></svg></div>
+      <div class="vessel dim" style="left:700px; top:300px;"><svg viewBox="0 0 10 10"><polygon points="5,0 10,10 5,7 0,10"/></svg></div>
+
+      <div class="vessel selected" style="left:520px; top:120px;"><svg viewBox="0 0 10 10"><polygon points="5,0 10,10 5,7 0,10"/></svg></div>
+      <div class="vessel-label" style="left:520px; top:120px;">FRONT ORKLA</div>
+
+      <div class="hint"><b>Click the drawer</b> at the bottom to expand it.</div>
+    </div>
+
+    <div class="c-panel" id="cPanel">
+      <div class="c-resize-handle" id="cResize"><div class="grip"></div></div>
+      <div class="c-peek" id="cPeek">
+        <div class="flag"></div>
+        <div>
+          <div class="vname">FRONT ORKLA</div>
+          <div class="vsub">Tanker · Cyprus · click to collapse</div>
+        </div>
+        <div class="chev" id="cChev">▾</div>
+      </div>
+
+      <div class="c-body-wrap">
+        <div class="c-col">
+          <div class="tabs">
+            <div class="tab active" data-pane="overview">Overview</div>
+            <div class="tab" data-pane="registry">Registry &amp; Sources</div>
+          </div>
+          <div class="vpanel-body">
+            <div class="pane active" data-pane="overview">
+              <div class="field-grid">
+                <div class="k">Name</div><div class="v">Front Orkla</div>
+                <div class="k">Flag</div><div class="v">Cyprus</div>
+                <div class="k">MMSI</div><div class="v">209838000</div>
+                <div class="k">IMO</div><div class="v">9933664</div>
+                <div class="k">Vessel Type</div><div class="v">Tanker</div>
+                <div class="k">Gear Type</div><div class="v dash">–</div>
+                <div class="k">Length</div><div class="v">330 m</div>
+              </div>
+              <div style="height:10px;"></div>
+              <div class="signal-box">
+                <div class="lbl">LAST KNOWN POSITION</div>
+                27.8956°, ‑77.6483° · 2026‑05‑04 23:12 Z
+              </div>
+              <div style="height:8px;"></div>
+              <div class="signal-box note">
+                <div class="lbl">OF NOTE</div>
+                Associated with a potential oil slick — SkyTruth Cerulean ↗
+              </div>
+            </div>
+            <div class="pane" data-pane="registry">
+              <div class="srclink"><span>GFW &amp; TMT Vessel Viewer</span><a href="#">Open ↗</a></div>
+              <div class="srclink"><span>C4ADS Triton</span><a href="#">Open ↗</a></div>
+              <div class="srclink"><span>CRAVT</span><a href="#">Open ↗</a></div>
+              <div class="srclink"><span>VesselFinder</span><a href="#">Open ↗</a></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="c-col">
+          <div style="padding:12px 12px 4px; font-size:11.5px; color:var(--ink-soft); font-weight:600; letter-spacing:.3px;">
+            EVENTS (6) &nbsp;·&nbsp; Apr 5 – May 5, 2026
+          </div>
+          <div class="vpanel-body" style="padding-top:4px;">
+            <div class="event-row" data-event="4"><div class="dot"></div><div class="etxt"><div class="etitle">Vessel Detections</div><div class="emeta">2026‑05‑04 23:12 Z · Sentinel‑1</div></div></div>
+            <div class="event-row hot" data-event="3"><div class="dot"></div><div class="etxt"><div class="etitle">Standard Rendezvous</div><div class="emeta">2026‑04‑29 20:09 Z · 35m · AET Partnership</div></div></div>
+            <div class="event-row" data-event="2"><div class="dot"></div><div class="etxt"><div class="etitle">Vessel Detections</div><div class="emeta">2026‑04‑25 17:16 Z · Sentinel‑2</div></div></div>
+            <div class="event-row" data-event="1"><div class="dot"></div><div class="etxt"><div class="etitle">Vessel Detections</div><div class="emeta">2026‑04‑21 09:03 Z · Sentinel‑1</div></div></div>
+            <div class="footer-link" style="margin-top:8px;">Open full Vessel Details page ↗</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="timeslider">
+    <div class="ts-label">Jul 7</div>
+    <div class="ts-track">
+      <div class="ts-fill"></div>
+      <div class="ts-handle" style="left:8%;"></div>
+      <div class="ts-handle" style="left:92%;"></div>
+    </div>
+    <div class="ts-label">Jul 8</div>
+  </div>
+</div>
+
+<script>
+  const cPanel = document.getElementById('cPanel');
+  const cChev = document.getElementById('cChev');
+  const cResize = document.getElementById('cResize');
+  const stage = document.querySelector('.stage');
+
+  const COLLAPSED_H = 56;
+  let lastOpenHeight = 300;
+  let isCollapsed = false;
+
+  function setLabel(){
+    document.querySelector('.c-peek .vsub').textContent =
+      'Tanker · Cyprus · click to ' + (isCollapsed ? 'expand' : 'collapse') + ', drag the grip to resize';
+    cChev.textContent = isCollapsed ? '▲' : '▾';
+  }
+  setLabel();
+
+  document.getElementById('cPeek').addEventListener('click', ()=>{
+    if(isCollapsed){
+      cPanel.style.height = lastOpenHeight + 'px';
+      isCollapsed = false;
+    } else {
+      lastOpenHeight = cPanel.getBoundingClientRect().height;
+      cPanel.style.height = COLLAPSED_H + 'px';
+      isCollapsed = true;
+    }
+    setLabel();
+  });
+
+  // drag-to-resize
+  let dragging = false, startY = 0, startHeight = 0;
+
+  cResize.addEventListener('mousedown', (e)=>{
+    dragging = true;
+    startY = e.clientY;
+    startHeight = cPanel.getBoundingClientRect().height;
+    cPanel.classList.add('no-transition');
+    cResize.classList.add('active');
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  window.addEventListener('mousemove', (e)=>{
+    if(!dragging) return;
+    const dy = startY - e.clientY; // dragging up = taller
+    const maxHeight = stage.getBoundingClientRect().height - 40;
+    let newHeight = Math.max(COLLAPSED_H, Math.min(startHeight + dy, maxHeight));
+    cPanel.style.height = newHeight + 'px';
+    isCollapsed = newHeight <= COLLAPSED_H;
+    setLabel();
+  });
+
+  window.addEventListener('mouseup', ()=>{
+    if(dragging){
+      dragging = false;
+      cPanel.classList.remove('no-transition');
+      cResize.classList.remove('active');
+      document.body.style.userSelect = '';
+      if(!isCollapsed) lastOpenHeight = cPanel.getBoundingClientRect().height;
+    }
+  });
+
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelector(`.pane[data-pane="${tab.dataset.pane}"]`).classList.add('active');
+    });
+  });
+
+  function setHotEvent(id){
+    document.querySelectorAll('.event-row').forEach(r=>r.classList.toggle('hot', r.dataset.event===id));
+    document.querySelectorAll('.event-pt').forEach(p=>p.classList.toggle('hot', p.dataset.event===id));
+  }
+  document.querySelectorAll('.event-row, .event-pt').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      setHotEvent(el.dataset.event);
+    });
+  });
+
+  const legend = document.getElementById('legend');
+  const legendHeader = document.getElementById('legendHeader');
+  const legendChev = document.getElementById('legendChev');
+  legendHeader.addEventListener('click', ()=>{
+    legend.classList.toggle('collapsed');
+    legendChev.textContent = legend.classList.contains('collapsed') ? '▸' : '▾';
+  });
+</script>
+</body>
+</html>
