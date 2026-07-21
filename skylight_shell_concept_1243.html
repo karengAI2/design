@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Skylight — Shell Concept: Collapsible Rails</title>
+<style>
+  :root{
+    --teal-dark:#0b5a63; --teal-header:#12707c; --teal-accent:#178a97;
+    --ocean:#d3e9ea; --land:#e6e6e3; --ink:#1c2b33; --ink-soft:#5b6b70;
+    --line:#c7d6d7; --panel-bg:#ffffff; --dash:#9aa7ab;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%; margin:0;}
+  body{font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; color:var(--ink); background:#f4f6f6;}
+  .app{display:flex; flex-direction:column; height:100vh;}
+
+  .topbar{
+    background:#fff; color:var(--ink); display:flex; align-items:center; gap:16px;
+    padding:0 20px; height:52px; flex-shrink:0; font-size:14px; border-bottom:1px solid var(--line);
+  }
+  .topbar .logo{font-weight:700; font-size:16px; display:flex; align-items:center; gap:8px;}
+  .topbar .logo .mark{width:20px; height:20px; background:var(--teal-accent); border-radius:4px;}
+  .topbar .logo span{opacity:.55; font-weight:400; margin-left:2px; font-size:12px;}
+  .topbar .spacer{flex:1;}
+  .topbar .search{display:flex; align-items:center; gap:6px; color:var(--ink-soft); font-size:12.5px;}
+  .topbar .account{display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600;}
+  .direction-tag{background:#eef6f6; color:var(--teal-dark); font-weight:700; font-size:11.5px; padding:4px 9px; border-radius:4px; border:1px solid var(--line);}
+
+  .stage{flex:1; display:flex; position:relative; overflow:hidden; min-height:0;}
+
+  /* ===== LEFT RAIL ===== */
+  .rail{
+    width:52px; flex-shrink:0; background:var(--teal-header);
+    display:flex; flex-direction:column; align-items:center; padding-top:12px; gap:6px; z-index:6;
+  }
+  .rail-btn{
+    width:38px; height:38px; border-radius:8px; border:none; background:transparent; color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:17px; cursor:pointer;
+    position:relative;
+  }
+  .rail-btn:hover{background:rgba(255,255,255,.12);}
+  .rail-btn.active{background:rgba(255,255,255,.22);}
+  .rail-btn .label{
+    position:absolute; left:46px; top:50%; transform:translateY(-50%);
+    background:var(--ink); color:#fff; font-size:11px; padding:4px 8px; border-radius:4px;
+    white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .1s;
+  }
+  .rail-btn.right .label{left:auto; right:46px;}
+  .rail-btn:hover .label{opacity:1;}
+  .rail-btn .badge{
+    position:absolute; top:2px; right:2px; width:8px; height:8px; border-radius:50%;
+    background:#d9622a; display:none;
+  }
+  .rail-btn.has-badge .badge{display:block;}
+  .rail-spacer{flex:1;}
+
+  .side-panel{
+    width:0; flex-shrink:0; background:#fff; overflow:hidden;
+    border-right:1px solid var(--line); display:flex; flex-direction:column;
+    transition:width .16s ease;
+  }
+  .side-panel.right-panel{border-right:none; border-left:1px solid var(--line);}
+  .side-panel.open{width:300px;}
+
+  .panel-header{
+    padding:12px 14px; border-bottom:1px solid var(--line); flex-shrink:0;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .panel-header h3{margin:0; font-size:13.5px; font-weight:700;}
+  .panel-header button{background:none; border:none; color:var(--ink-soft); cursor:pointer; font-size:14px;}
+  .panel-body{flex:1; overflow-y:auto; padding:12px 14px; font-size:13px; min-height:0;}
+
+  /* list-of-lists items */
+  .list-item{
+    display:flex; align-items:center; gap:10px; padding:9px 8px; border-radius:6px; cursor:pointer;
+  }
+  .list-item:hover{background:#f2f8f8;}
+  .list-item .ic{width:28px; height:28px; border-radius:6px; background:#eef6f6; color:var(--teal-dark); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;}
+  .list-item .meta .name{font-weight:600; font-size:12.5px;}
+  .list-item .meta .sub{font-size:11px; color:var(--ink-soft);}
+  .list-item .action{margin-left:auto; font-size:11px; color:var(--teal-accent); font-weight:600; flex-shrink:0;}
+  .note{font-size:11px; color:var(--ink-soft); background:#f7f7f5; border-left:3px solid #d9c56a; padding:6px 8px; margin-top:10px; line-height:1.4;}
+  .area-pick .pick-check{opacity:0; color:var(--teal-dark); font-weight:700;}
+  .area-pick.picked{background:#eef6f6;}
+  .area-pick.picked .pick-check{opacity:1;}
+  .daterange-preset.active{background:#eef6f6; color:var(--teal-dark); font-weight:700;}
+
+  .edit-icon-btn{
+    background:none; border:none; color:var(--ink-soft); font-size:13px; cursor:pointer;
+    padding:4px 6px; border-radius:4px; flex-shrink:0;
+  }
+  .edit-icon-btn:hover{background:#eef2f2; color:var(--teal-dark);}
+
+  .area-edit-panel{
+    background:#fafcfc; border:1px solid var(--line); border-radius:6px;
+    padding:10px; margin:2px 0 10px;
+  }
+  .edit-label{display:block; font-size:11px; color:var(--ink-soft); font-weight:600; margin-bottom:3px;}
+  .edit-input{
+    width:100%; border:1px solid var(--line); border-radius:5px; padding:6px 8px;
+    font-size:12.5px; margin-bottom:9px; color:var(--ink);
+  }
+  .edit-actions-row{display:flex; gap:6px; margin-bottom:9px;}
+  .edit-action-btn{
+    flex:1; background:#fff; border:1px solid var(--line); border-radius:5px;
+    padding:6px 4px; font-size:11.5px; font-weight:600; color:var(--ink); cursor:pointer;
+  }
+  .edit-action-btn:hover{background:#f2f8f8;}
+  .edit-action-btn:disabled{color:var(--ink-soft); cursor:default; opacity:.7;}
+  .edit-action-btn:disabled:hover{background:#fff;}
+  .edit-action-btn.danger{color:var(--ink); border-color:var(--ink-soft); font-weight:700;}
+  .edit-action-btn.danger:hover{background:#f2f2f0;}
+  .edit-save-row{display:flex; justify-content:flex-end; gap:8px;}
+  .edit-cancel-btn{background:none; border:none; color:var(--ink-soft); font-size:12.5px; font-weight:600; cursor:pointer; padding:6px 8px;}
+  .edit-save-btn{background:var(--teal-header); color:#fff; border:none; border-radius:5px; padding:6px 14px; font-size:12.5px; font-weight:600; cursor:pointer;}
+  .new-list-btn{
+    width:100%; text-align:left; background:#eef6f6; color:var(--teal-dark); border:1px dashed var(--teal-accent);
+    border-radius:6px; padding:8px 10px; font-size:12.5px; font-weight:600; cursor:pointer; margin-bottom:10px;
+  }
+
+  .filter-row{display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eef2f2; font-size:12.5px;}
+
+  /* ===== Filters pane: section headers, fields, and controls ===== */
+  .filter-section-header{
+    background:#eef6f6; color:var(--teal-dark); font-weight:700; font-size:11px; letter-spacing:.3px;
+    padding:8px 14px; margin:14px -14px 12px; display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer;
+  }
+  .filter-field{margin-bottom:16px;}
+  .filter-field-label-row{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; gap:8px;}
+  .filter-field-label{font-size:12.5px; font-weight:600; color:var(--ink); flex-shrink:0;}
+
+  .incl-excl{display:flex; border:1px solid var(--ink); border-radius:5px; overflow:hidden; flex-shrink:0;}
+  .incl-excl button{
+    background:#fff; border:none; padding:3px 9px; cursor:pointer; color:var(--ink-soft);
+    font-size:10.5px; font-weight:700;
+  }
+  .incl-excl button:first-child{border-right:1px solid var(--ink);}
+  .incl-excl button.active{background:var(--ink); color:#fff;}
+
+  .typeahead-wrap{
+    border:1px solid var(--line); border-radius:5px; padding:6px 8px; display:flex;
+    flex-wrap:wrap; gap:5px; align-items:center;
+  }
+  .typeahead-wrap input{border:none; outline:none; font-size:12.5px; flex:1; min-width:80px; padding:2px;}
+  .chip{
+    background:#eef6f6; color:var(--teal-dark); font-size:11px; font-weight:600;
+    padding:3px 8px; border-radius:12px; display:flex; align-items:center; gap:4px; white-space:nowrap;
+  }
+  .chip .x{cursor:pointer; font-size:10px;}
+
+  .mini-slider-track{position:relative; height:4px; background:var(--line); border-radius:2px; margin:16px 6px 8px;}
+  .mini-slider-fill{position:absolute; top:0; bottom:0; background:var(--teal-accent); border-radius:2px;}
+  .mini-slider-handle{
+    position:absolute; top:50%; width:14px; height:14px; border-radius:50%; background:#fff;
+    border:2px solid var(--teal-accent); transform:translate(-50%,-50%); box-shadow:0 1px 2px rgba(0,0,0,.25);
+  }
+  .mini-slider-labels{display:flex; justify-content:space-between; font-size:11px; color:var(--ink-soft);}
+
+  .collapse-filters-row{
+    background:#f4f6f6; color:var(--ink-soft); font-size:11.5px; font-weight:700;
+    padding:8px 14px; margin:0 -14px 16px; display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer; border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  }
+
+  .checkbox-row{display:flex; gap:16px; font-size:12.5px; margin-top:4px;}
+  .checkbox-row label{display:flex; align-items:center; gap:5px; cursor:pointer;}
+
+  .source-tag{
+    font-size:9.5px; color:var(--teal-accent); border:1px solid var(--teal-accent); border-radius:4px;
+    padding:1px 6px; font-weight:700; flex-shrink:0; white-space:nowrap;
+  }
+
+  .speed-seg{display:flex; gap:6px;}
+  .speed-seg button{
+    flex:1; background:#f2f8f8; border:1px solid var(--line); border-radius:5px; padding:7px 4px;
+    font-size:10.5px; font-weight:600; color:var(--ink); cursor:pointer; text-align:center; line-height:1.4;
+  }
+  .speed-seg button.active{background:var(--teal-accent); color:#fff; border-color:var(--teal-accent);}
+
+  .filters-footer{
+    display:flex; align-items:center; justify-content:space-between; margin-top:18px;
+    padding-top:14px; border-top:1px solid var(--line);
+  }
+  .filters-sticky-top{
+    position:sticky; top:-12px; z-index:5; background:#fff;
+    margin:-12px -14px 14px; padding:12px 14px 12px;
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--line); box-shadow:0 2px 4px rgba(0,0,0,.04);
+  }
+  .clear-all-link{color:var(--ink-soft); font-size:12.5px; font-weight:600; cursor:pointer;}
+  .apply-btn{
+    background:var(--teal-header); color:#fff; border:none; border-radius:6px;
+    padding:9px 20px; font-size:12.5px; font-weight:700; cursor:pointer;
+  }
+  .filter-row input[type=checkbox]{margin:0;}
+
+  .settings-section{margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--line);}
+  .settings-section-header{font-size:12.5px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:6px;}
+  .settings-section-header .chev{color:var(--ink-soft); font-size:10px; cursor:pointer;}
+  .fake-select{
+    border:1.5px solid var(--teal-accent); border-radius:5px; padding:8px 10px; margin-top:5px;
+    font-size:12.5px; color:var(--ink); display:flex; align-items:center; justify-content:space-between;
+    background:#fff;
+  }
+  .fake-select-chev{color:var(--ink-soft); font-size:11px;}
+  .settings-row{display:flex; align-items:center; justify-content:space-between; font-size:12.5px; padding:8px 0; border-bottom:1px solid #eef2f2;}
+  .fake-toggle{width:34px; height:19px; border-radius:10px; background:#d7dede; position:relative; flex-shrink:0;}
+  .fake-toggle::after{content:""; position:absolute; top:2px; left:2px; width:15px; height:15px; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.25);}
+  .fake-toggle.on{background:var(--teal-accent);}
+  .fake-toggle.on::after{left:17px;}
+  .info-ic{
+    color:var(--ink-soft); font-size:11px; border:1px solid var(--line); border-radius:50%;
+    width:14px; height:14px; display:inline-flex; align-items:center; justify-content:center;
+    margin-left:3px; cursor:help;
+  }
+
+  /* working list on the right */
+  .work-item{display:flex; align-items:center; gap:8px; padding:7px 6px; border-radius:5px; font-size:12.5px;}
+  .work-item:hover{background:#f2f8f8;}
+  .work-item .dot{width:8px; height:8px; border-radius:50%; background:var(--teal-dark); flex-shrink:0;}
+  .work-item .x{margin-left:auto; color:var(--ink-soft); cursor:pointer; font-size:12px;}
+  .save-list-btn{
+    width:100%; background:var(--teal-header); color:#fff; border:none; border-radius:6px;
+    padding:9px; font-size:12.5px; font-weight:600; cursor:pointer; margin-top:10px;
+  }
+
+  /* compact merged vessel/event card */
+  .vcard-top{padding:12px 14px; border-bottom:1px solid var(--line);}
+  .vcard-top .flag{width:22px; height:15px; background:#c8b45a; border-radius:2px; margin-bottom:6px;}
+  .vcard-top .vname{font-weight:700; font-size:14px;}
+  .vcard-top .vsub{font-size:11.5px; color:var(--ink-soft); margin-bottom:8px;}
+  .field-grid{display:grid; grid-template-columns:70px 1fr; row-gap:5px; column-gap:6px; font-size:12px;}
+  .field-grid .k{color:var(--ink-soft);}
+  .add-work-btn{
+    margin-top:8px; background:#eef6f6; color:var(--teal-dark); border:1px solid var(--teal-accent);
+    border-radius:5px; padding:6px 10px; font-size:12px; font-weight:600; cursor:pointer;
+  }
+  .footer-link{display:flex; align-items:center; gap:5px; color:var(--teal-accent); font-size:12.5px; font-weight:600; cursor:pointer; margin-top:10px;}
+  .vcard-events-label{font-size:11px; color:var(--ink-soft); font-weight:700; letter-spacing:.3px; padding:10px 14px 4px;}
+  .event-row{display:flex; gap:8px; padding:7px 14px; cursor:pointer;}
+  .event-row:hover{background:#f2f8f8;}
+  .event-row.hot{background:#fdf1ea;}
+  .event-row .dot{width:8px; height:8px; border-radius:50%; background:var(--teal-dark); margin-top:4px; flex-shrink:0;}
+  .event-row.hot .dot{background:#d9622a;}
+  .event-row .etitle{font-weight:600; font-size:12px;}
+  .event-row .emeta{font-size:11px; color:var(--ink-soft);}
+
+  .dark-note{
+    margin:12px 14px; background:#fdf1ea; border:1px solid #e0b98a; border-radius:6px;
+    padding:8px 10px; font-size:11.5px; color:var(--ink-soft);
+  }
+
+  /* ===== MAP ===== */
+  .map-wrap{flex:1; position:relative; overflow:hidden; background:var(--ocean); min-width:0;}
+  .land{position:absolute; background:var(--land); border-radius:40% 60% 55% 45%;}
+  .land.l1{width:260px; height:320px; left:-70px; top:-40px;}
+  .land.l2{width:200px; height:180px; right:-50px; bottom:-40px; border-radius:60% 40% 50% 50%;}
+  .vessel{position:absolute; width:14px; height:14px; cursor:pointer; transform:translate(-50%,-50%);}
+  .vessel svg{width:100%; height:100%;}
+  .vessel.dim polygon{fill:#8fa3a6;}
+  .vessel.selected polygon{fill:var(--teal-dark);}
+  .vessel.dark polygon{fill:#c0392b;}
+  .vessel-label{position:absolute; transform:translate(-50%,6px); font-size:10.5px; color:var(--ink-soft); white-space:nowrap; pointer-events:none;}
+  .event-pt{position:absolute; width:9px; height:9px; border-radius:50%; background:var(--teal-dark); border:2px solid #fff; transform:translate(-50%,-50%); cursor:pointer;}
+  .event-pt.hot{background:#d9622a; transform:translate(-50%,-50%) scale(1.5); box-shadow:0 0 0 4px rgba(217,98,42,.25);}
+
+  .legend{
+    position:absolute; bottom:14px; left:14px; width:200px; background:#fff; border-radius:6px;
+    box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:12px; z-index:3; overflow:hidden;
+  }
+  .legend-header{background:var(--teal-header); color:#fff; padding:7px 11px; font-weight:700; font-size:12px; display:flex; justify-content:space-between; cursor:pointer;}
+  .legend-body{padding:9px 11px;}
+  .legend.collapsed .legend-body{display:none;}
+  .legend-row{display:flex; align-items:center; gap:6px; padding:2px 0; font-size:11.5px;}
+  .legend-swatch{width:10px; height:10px; border-radius:50%;}
+
+  /* ===== MAP TOOLS — canvas tools hug the canvas, kept separate from the nav rails ===== */
+  .map-tools{
+    position:absolute; top:14px; left:14px; z-index:3;
+    display:flex; flex-direction:column; gap:2px;
+    background:#fff; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,.15); overflow:hidden;
+  }
+  .map-tools button{
+    width:32px; height:32px; background:#fff; border:none; border-bottom:1px solid var(--line);
+    font-size:15px; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .map-tools button:last-child{border-bottom:none;}
+  .map-tools button:hover{background:#f2f8f8;}
+  .map-tools .divider{height:1px; background:var(--line); margin:2px 0;}
+  .map-tools button.active{background:#eef6f6; color:var(--teal-dark);}
+
+  .tryit-bar{
+    background:#eef6f6; border-bottom:1px solid var(--line); flex-shrink:0;
+    display:flex; align-items:center; gap:10px; padding:9px 20px;
+    font-size:12px; color:var(--ink-soft); line-height:1.4;
+  }
+  .tryit-bar b{color:var(--ink);}
+  .tryit-bar .spacer{flex:1;}
+  .tryit-bar button{background:none; border:none; color:var(--ink-soft); cursor:pointer; font-size:14px; flex-shrink:0;}
+  .tryit-bar.hidden{display:none;}
+
+  /* ===== SHIPPY: floating dock anchored to the launcher, not a full-edge overlay ===== */
+  .shippy-overlay{
+    position:fixed; right:20px; bottom:84px; top:24px; width:360px; background:#fff;
+    border-radius:12px; box-shadow:0 10px 32px rgba(0,0,0,.28);
+    transform:translateY(16px) scale(.97); transform-origin:bottom right; opacity:0;
+    transition:transform .16s ease, opacity .16s ease; pointer-events:none;
+    z-index:21; display:flex; flex-direction:column; overflow:hidden;
+  }
+  .shippy-overlay.open{transform:translateY(0) scale(1); opacity:1; pointer-events:auto;}
+  .shippy-header{background:var(--teal-dark); color:#fff; padding:12px 14px; display:flex; align-items:center; gap:8px; flex-shrink:0;}
+  .shippy-header .t{font-weight:700; font-size:14px; flex:1;}
+  .shippy-header button{background:none; border:none; color:#fff; font-size:14px; cursor:pointer;}
+  .shippy-body{flex:1; padding:14px; font-size:12.5px; color:var(--ink-soft); overflow-y:auto;}
+  .shippy-msg{background:#f2f8f8; border-radius:8px; padding:9px 11px; margin-bottom:10px; color:var(--ink); font-size:12.5px;}
+  .shippy-input{border-top:1px solid var(--line); padding:10px 12px; flex-shrink:0; display:flex; gap:8px;}
+  .shippy-input input{flex:1; border:1px solid var(--line); border-radius:6px; padding:7px 10px; font-size:12.5px;}
+
+  .shippy-launcher{
+    position:fixed; bottom:20px; right:20px; width:50px; height:50px; border-radius:50%;
+    background:linear-gradient(145deg,#178a97,#0b5a63); color:#fff; display:flex; align-items:center;
+    justify-content:center; font-size:22px; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,.28);
+    z-index:22; border:2px solid #fff;
+  }
+  .shippy-launcher .badge{
+    position:absolute; top:-2px; right:-2px; width:12px; height:12px; border-radius:50%;
+    background:#d9622a; border:2px solid #fff; display:none;
+  }
+  .shippy-launcher.has-badge .badge{display:block;}
+
+  /* ===== Sticky-note comments: annotation layer, not part of the real product ===== */
+  .comment-toolbar{
+    position:fixed; top:64px; right:16px; z-index:1000;
+    display:flex; flex-direction:column; gap:6px; align-items:flex-end;
+  }
+  .comment-toggle-btn, .comment-export-btn{
+    background:#fff; border:1px solid var(--line); border-radius:20px;
+    padding:8px 14px; font-size:12px; font-weight:600; color:var(--ink); cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,.15); display:flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+  .comment-toggle-btn.active{background:#fff59d; border-color:#d9a441;}
+  body.comment-mode-active{cursor:crosshair;}
+  body.comment-mode-active .rail-btn, body.comment-mode-active .float-btn,
+  body.comment-mode-active button, body.comment-mode-active input,
+  body.comment-mode-active .list-item, body.comment-mode-active .vessel,
+  body.comment-mode-active .event-pt{cursor:crosshair !important;}
+
+  .sticky-note{
+    position:fixed; width:210px; z-index:1001; background:#fff59d;
+    border-radius:3px; box-shadow:0 5px 16px rgba(0,0,0,.28);
+    display:flex; flex-direction:column; transform:rotate(-1deg);
+  }
+  .sticky-note:nth-of-type(even){transform:rotate(1deg); background:#c8f7c5;}
+  .sticky-note-header{
+    display:flex; align-items:center; justify-content:space-between; padding:5px 8px;
+    cursor:grab; font-size:10px; color:#7a6a1a; font-weight:700; letter-spacing:.3px;
+  }
+  .sticky-note:nth-of-type(even) .sticky-note-header{color:#2f6b2a;}
+  .sticky-note-header.grabbing{cursor:grabbing;}
+  .sticky-note-close{background:none; border:none; cursor:pointer; font-size:13px; color:inherit; opacity:.7;}
+  .sticky-note-close:hover{opacity:1;}
+  .sticky-note textarea{
+    flex:1; border:none; background:transparent; resize:none; outline:none;
+    font-family:inherit; font-size:12.5px; color:#3a3312; padding:0 9px 8px; min-height:74px;
+  }
+  .sticky-note:nth-of-type(even) textarea{color:#204a1c;}
+  .sticky-note-meta{font-size:9px; color:#8a7a2a; padding:0 9px 7px; opacity:.75;}
+  .sticky-note:nth-of-type(even) .sticky-note-meta{color:#3f6b3a;}
+
+  .timeslider{flex-shrink:0; height:42px; background:var(--teal-header); display:flex; align-items:center; padding:0 18px;}
+  .ts-track{position:relative; flex:1; height:6px; margin:0 14px; background:rgba(255,255,255,.35); border-radius:3px;}
+  .ts-fill{position:absolute; left:8%; right:8%; top:0; bottom:0; background:rgba(255,255,255,.75); border-radius:3px;}
+  .ts-handle{position:absolute; top:50%; width:14px; height:14px; background:#fff; border-radius:50%; transform:translate(-50%,-50%); box-shadow:0 1px 3px rgba(0,0,0,.35);}
+  .ts-label{color:#fff; font-size:11.5px; opacity:.9;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="tryit-bar" id="tryitBar">
+    <span><b>Try it:</b> left rail = navigation (Filters / Areas / My Lists), right rail = what
+    you're working on (Working List / a selected vessel or event). Map tools (zoom, layers, draw,
+    export) stay on the canvas itself, never mixed into the data panels. Click the teal vessel for
+    a normal card, the red one for a dark/uncorrelated detection, or a plain dot for a standalone
+    Event Details card.</span>
+    <div class="spacer"></div>
+    <button id="tryitClose" title="Dismiss">✕</button>
+  </div>
+  <div class="topbar">
+    <div class="logo"><div class="mark"></div>SKYLIGHT <span>by Ai2 — shell concept</span></div>
+    <div class="spacer"></div>
+    <div class="search">🔍 Search for vessel</div>
+    <div class="account">👤 My Skylight ▾</div>
+    <div class="direction-tag">Collapsible rails · one panel per side</div>
+  </div>
+
+  <div class="stage">
+
+    <!-- LEFT RAIL -->
+    <div class="rail">
+      <button class="rail-btn" data-panel="filters" title="Filters">
+        ▽<span class="label">Filters</span>
+      </button>
+      <button class="rail-btn" data-panel="daterange" title="Date Range">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <span class="label">Date Range</span>
+      </button>
+      <button class="rail-btn" data-panel="areas" title="Areas / AOIs">
+        ▭<span class="label">Areas</span>
+      </button>
+      <button class="rail-btn" data-panel="vessels" title="Vessels">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+        <span class="label">Vessels</span>
+      </button>
+      <button class="rail-btn active" data-panel="lists" title="My Lists">
+        ☰<span class="label">My Lists</span>
+      </button>
+      <button class="rail-btn" data-panel="settings" title="Settings">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span class="label">Settings</span>
+      </button>
+    </div>
+
+    <!-- LEFT PANEL: Filters / Areas / Vessels / My Lists / Settings -->
+    <div class="side-panel open" id="leftPanel">
+      <div class="panel-header">
+        <h3 id="leftTitle" style="flex:1;">My Lists</h3>
+        <span id="leftHeaderClear" style="display:none; color:var(--teal-accent); font-size:12px; font-weight:600; cursor:pointer; margin-right:8px;">Clear</span>
+        <button id="leftClose">✕</button>
+      </div>
+      <div class="panel-body">
+
+        <!-- Filters pane -->
+        <div class="left-pane" id="pane-filters" style="display:none;">
+
+          <div class="filters-sticky-top">
+            <span class="clear-all-link">Clear all</span>
+            <button class="apply-btn">Apply filters</button>
+          </div>
+
+          <!-- EVENTS -->
+          <div class="filter-section-header" style="margin-top:0;">EVENTS <span>▾</span></div>
+
+          <div class="filter-field">
+            <div class="filter-field-label-row">
+              <span class="filter-field-label">Event Type</span>
+              <div class="incl-excl"><button class="active">Include</button><button>Exclude</button></div>
+            </div>
+            <div class="fake-select">All event types <span class="fake-select-chev">▾</span></div>
+          </div>
+
+          <!-- VESSEL INFORMATION (AIS/GFW) -->
+          <div class="filter-section-header">VESSEL INFORMATION (AIS/GFW) <span>▾</span></div>
+
+          <div class="filter-field">
+            <div class="filter-field-label-row">
+              <span class="filter-field-label">Vessel Type</span>
+              <div class="incl-excl"><button class="active">Include</button><button>Exclude</button></div>
+            </div>
+            <div class="fake-select">All vessel types <span class="fake-select-chev">▾</span></div>
+          </div>
+
+          <div class="filter-field">
+            <div class="filter-field-label-row">
+              <span class="filter-field-label">Vessel Flag</span>
+              <div class="incl-excl"><button class="active">Include</button><button>Exclude</button></div>
+            </div>
+            <div class="typeahead-wrap">
+              <span class="chip">Panama <span class="x">✕</span></span>
+              <input type="text" placeholder="Search flags...">
+            </div>
+          </div>
+
+          <div class="filter-field">
+            <span class="filter-field-label">AIS Vessel Length</span>
+            <div class="mini-slider-track">
+              <div class="mini-slider-fill" style="left:0%; right:20%;"></div>
+              <div class="mini-slider-handle" style="left:0%;"></div>
+              <div class="mini-slider-handle" style="left:80%;"></div>
+            </div>
+            <div class="mini-slider-labels"><span>Min: 0</span><span>Max: 480 m</span></div>
+          </div>
+
+          <div class="collapse-filters-row" id="collapseFiltersRow">
+            <span>Collapse filters</span><span id="collapseFiltersChev">▲</span>
+          </div>
+
+          <div id="secondaryFilterFields">
+            <div class="filter-field">
+              <div class="filter-field-label-row">
+                <span class="filter-field-label">Vessel Name</span>
+                <div class="incl-excl"><button class="active">Include</button><button>Exclude</button></div>
+              </div>
+              <input type="text" class="edit-input" placeholder="Name..." style="margin-bottom:0;">
+            </div>
+
+            <div class="filter-field">
+              <div class="filter-field-label-row">
+                <span class="filter-field-label">MMSI</span>
+                <div class="incl-excl"><button class="active">Include</button><button>Exclude</button></div>
+              </div>
+              <input type="text" class="edit-input" placeholder="MMSI..." style="margin-bottom:0;">
+            </div>
+
+            <div class="filter-field">
+              <div class="filter-field-label-row">
+                <span class="filter-field-label">IMO</span>
+                <div class="incl-excl"><button class="active">Include</button><button>Exclude</button></div>
+              </div>
+              <input type="text" class="edit-input" placeholder="IMO..." style="margin-bottom:0;">
+            </div>
+
+            <div class="filter-field">
+              <div class="filter-field-label-row">
+                <span class="filter-field-label">Gear Type</span>
+                <div class="incl-excl"><button class="active">Include</button><button>Exclude</button></div>
+              </div>
+              <div class="fake-select">All gear types <span class="fake-select-chev">▾</span></div>
+            </div>
+
+            <div class="filter-field">
+              <div class="filter-field-label-row">
+                <span class="filter-field-label">Partner Vessel Type</span>
+                <div class="incl-excl"><button class="active">Include</button><button>Exclude</button></div>
+              </div>
+              <div class="fake-select">All vessel types <span class="fake-select-chev">▾</span></div>
+            </div>
+
+            <div class="filter-field">
+              <div class="filter-field-label-row">
+                <span class="filter-field-label">Authorization List</span>
+                <div class="incl-excl"><button class="active">Include</button><button>Exclude</button></div>
+              </div>
+              <div class="fake-select">Select list... <span class="fake-select-chev">▾</span></div>
+            </div>
+
+            <div class="filter-field">
+              <div class="filter-field-label-row">
+                <span class="filter-field-label">Owner Name</span>
+                <div class="incl-excl"><button class="active">Include</button><button>Exclude</button></div>
+              </div>
+              <input type="text" class="edit-input" placeholder="Name..." style="margin-bottom:0;">
+            </div>
+
+            <div class="filter-field">
+              <div class="filter-field-label-row">
+                <span class="filter-field-label">Owner Flag</span>
+                <div class="incl-excl"><button class="active">Include</button><button>Exclude</button></div>
+              </div>
+              <div class="typeahead-wrap">
+                <input type="text" placeholder="Search flags...">
+              </div>
+            </div>
+          </div>
+
+          <!-- VESSEL DETECTIONS (SATELLITE) -->
+          <div class="filter-section-header">VESSEL DETECTIONS (SATELLITE) <span>▾</span></div>
+
+          <div class="filter-field">
+            <div class="filter-field-label-row">
+              <span class="filter-field-label">Detection Type</span>
+              <span class="footer-link" style="margin:0; font-size:11px;">More info</span>
+            </div>
+            <div class="fake-select">All detections <span class="fake-select-chev">▾</span></div>
+          </div>
+
+          <div class="filter-field">
+            <span class="filter-field-label">AIS Correlation</span>
+            <div class="checkbox-row">
+              <label><input type="checkbox"> Correlated</label>
+              <label><input type="checkbox" checked> Dark</label>
+            </div>
+          </div>
+
+          <div class="filter-field">
+            <div class="filter-field-label-row">
+              <span class="filter-field-label">Estimated Vessel Type</span>
+              <div class="incl-excl"><button class="active">Include</button><button>Exclude</button></div>
+            </div>
+            <div class="fake-select">All vessel types <span class="fake-select-chev">▾</span></div>
+          </div>
+
+          <div class="filter-field">
+            <div class="filter-field-label-row">
+              <span class="filter-field-label">Estimated Vessel Length</span>
+              <span class="source-tag">S1 · S2 · Landsat</span>
+            </div>
+            <div class="mini-slider-track">
+              <div class="mini-slider-fill" style="left:20%; right:20%;"></div>
+              <div class="mini-slider-handle" style="left:20%;"></div>
+              <div class="mini-slider-handle" style="left:80%;"></div>
+            </div>
+            <div class="mini-slider-labels"><span>Min: 20</span><span>Max: 100 m</span></div>
+            <div class="note" style="margin-top:8px;">
+              Values under 50 m will display as "small" for Landsat, and "small" or "medium" for S2.
+            </div>
+          </div>
+
+          <div class="filter-field">
+            <div class="filter-field-label-row">
+              <span class="filter-field-label">Estimated Speed</span>
+              <span class="source-tag">S1 · Landsat</span>
+            </div>
+            <div class="speed-seg">
+              <button>Stationary<br>0–2 kn</button>
+              <button class="active">Medium<br>2–8 kn</button>
+              <button>Fast<br>8+ kn</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Date Range pane -->
+        <div class="left-pane" id="pane-daterange" style="display:none;">
+          <div class="list-item daterange-preset" data-preset="24h">
+            <div class="meta"><div class="name">Last 24 hours</div></div>
+          </div>
+          <div class="list-item daterange-preset" data-preset="7d">
+            <div class="meta"><div class="name">Last 7 days</div></div>
+          </div>
+          <div class="list-item daterange-preset active" data-preset="custom">
+            <div class="meta"><div class="name">Custom range</div></div>
+          </div>
+
+          <div class="settings-section" style="margin-top:10px;">
+            <label class="edit-label">Start date</label>
+            <input type="text" class="edit-input" value="Jul 18, 2026">
+            <label class="edit-label">End date</label>
+            <input type="text" class="edit-input" value="Jul 20, 2026" style="margin-bottom:0;">
+          </div>
+
+          <div class="filters-footer" style="margin-top:0; padding-top:0; border-top:none;">
+            <span class="clear-all-link">Reset</span>
+            <button class="apply-btn">Apply</button>
+          </div>
+
+          <div class="note">
+            Home for the date range picker that used to float over the map ("Jul 18, 2026 – Jul
+            20, 2026  Reset ✕"). Same underlying control, just relocated into the rail.
+          </div>
+        </div>
+
+        <!-- Areas pane -->
+        <div class="left-pane" id="pane-areas" style="display:none;">
+          <button class="new-list-btn">+ Draw new area</button>
+
+          <div class="area-block" data-area-block="gog">
+            <div class="list-item area-pick" data-area="Gulf of Guinea EEZ">
+              <div class="ic">▭</div>
+              <div class="meta"><div class="name">Gulf of Guinea EEZ</div><div class="sub">Custom area · 1,204 vessels inside</div></div>
+              <button class="edit-icon-btn" data-edit="gog" title="Edit this area">✎</button>
+              <div class="action pick-check">✓</div>
+            </div>
+            <div class="area-edit-panel" id="edit-gog" style="display:none;">
+              <label class="edit-label">Name</label>
+              <input type="text" class="edit-input" value="Gulf of Guinea EEZ">
+              <div class="edit-actions-row">
+                <button class="edit-action-btn" disabled title="Existing functionality — Area Info / Events / Saved Filters & Alerts tabs, not detailed in this pass">📋 Saved Filters &amp; Alerts</button>
+                <button class="edit-action-btn danger">Delete area</button>
+              </div>
+              <div class="edit-save-row">
+                <button class="edit-cancel-btn" data-cancel="gog">Cancel</button>
+                <button class="edit-save-btn" data-save="gog">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="area-block" data-area-block="pos">
+            <div class="list-item area-pick" data-area="Port of Seattle buffer">
+              <div class="ic">▭</div>
+              <div class="meta"><div class="name">Port of Seattle buffer</div><div class="sub">5 nm radius · 38 vessels inside</div></div>
+              <button class="edit-icon-btn" data-edit="pos" title="Edit this area">✎</button>
+              <div class="action pick-check">✓</div>
+            </div>
+            <div class="area-edit-panel" id="edit-pos" style="display:none;">
+              <label class="edit-label">Name</label>
+              <input type="text" class="edit-input" value="Port of Seattle buffer">
+              <div class="edit-actions-row">
+                <button class="edit-action-btn" disabled title="Existing functionality — Area Info / Events / Saved Filters & Alerts tabs, not detailed in this pass">📋 Saved Filters &amp; Alerts</button>
+                <button class="edit-action-btn danger">Delete area</button>
+              </div>
+              <div class="edit-save-row">
+                <button class="edit-cancel-btn" data-cancel="pos">Cancel</button>
+                <button class="edit-save-btn" data-save="pos">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="note">
+            Choose one area to mark as active, or none — this no longer links into Filters
+            since the "Within area" row was removed from that pane. Use the pencil to rename
+            or delete a saved area. Each area's existing Saved Filters &amp; Alerts (like
+            "East of Seychelles Alert #1") aren't detailed here — hand-wave placeholder for now,
+            not a redesign of that surface.
+          </div>
+        </div>
+
+        <!-- My Lists pane -->
+        <div class="left-pane" id="pane-lists">
+          <button class="new-list-btn">+ New list</button>
+          <div class="list-item">
+            <div class="ic">🚢</div>
+            <div class="meta"><div class="name">Vessels of interest — Gulf of Guinea</div><div class="sub">7 vessels · edited 2d ago</div></div>
+          </div>
+          <div class="list-item">
+            <div class="ic">🚢</div>
+            <div class="meta"><div class="name">Suspicious loitering — Q3</div><div class="sub">12 vessels · shared</div></div>
+          </div>
+          <div class="list-item">
+            <div class="ic">📍</div>
+            <div class="meta"><div class="name">Live event list — Port of Seattle, last 10</div><div class="sub">10 events · from Shippy · not persisted</div></div>
+            <div class="action">⬇ Download</div>
+          </div>
+          <div class="note">
+            Today's board: Saved → vessels get a full save; events lean toward download instead
+            of a persistent list. Reflected above — worth confirming before it's built either way.
+          </div>
+        </div>
+
+        <!-- Vessels pane -->
+        <div class="left-pane" id="pane-vessels" style="display:none;">
+          <div class="settings-section">
+            <div class="settings-section-header">Vessels <span class="chev" id="vesselsChev">▲</span></div>
+            <label class="edit-label" style="margin-top:8px;">Vessel icon shows</label>
+            <div class="fake-select">MMSI <span class="fake-select-chev">▾</span></div>
+          </div>
+          <div class="filter-row" style="border-bottom:none; padding-bottom:0;">
+            <input type="text" placeholder="Search vessels in view..." style="width:100%; border:1px solid var(--line); border-radius:5px; padding:7px 9px; font-size:12.5px;">
+          </div>
+          <div style="font-size:11.5px; color:var(--ink-soft); margin:10px 0 6px;">
+            42 AIS vessels currently in view
+          </div>
+          <div class="list-item vessel-in-view" data-vessel="Front Orkla">
+            <div class="ic">🚢</div>
+            <div class="meta"><div class="name">Front Orkla</div><div class="sub">Tanker · MMSI 209838000</div></div>
+          </div>
+          <div class="list-item vessel-in-view" data-vessel="Zhong Xie 8">
+            <div class="ic">🚢</div>
+            <div class="meta"><div class="name">Zhong Xie 8</div><div class="sub">Cargo · MMSI 352001673</div></div>
+          </div>
+          <div class="list-item vessel-in-view" data-vessel="Cape Endeavor">
+            <div class="ic">🚢</div>
+            <div class="meta"><div class="name">Cape Endeavor</div><div class="sub">Fishing · MMSI 431029884</div></div>
+          </div>
+          <div class="note">
+            This is AIS-broadcasting vessels currently in view — a different population from
+            vessels tied to a detected Event (which can include dark/uncorrelated vessels with
+            no AIS at all). Clicking a vessel here opens its Vessel Details card, same as clicking
+            it on the map.
+          </div>
+          <div class="note">
+            <b style="color:var(--ink);">Known overlap, flagged for the team:</b> "Vessel icon shows" here controls the
+            color-coding of vessel icons on the map. Settings' Track Options is related but
+            broader — it applies to tracks for vessels both with and without events, not just
+            icon color. Two related-but-distinct controls, not a duplicate.
+          </div>
+        </div>
+
+        <!-- Settings pane -->
+        <div class="left-pane" id="pane-settings" style="display:none;">
+          <div class="settings-section">
+            <div class="settings-section-header">Events</div>
+            <div class="fake-select" style="margin-top:8px;">Event Icon <span class="fake-select-chev">▾</span></div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-header">Track Options</div>
+            <div class="fake-select" style="margin-top:8px;">MMSI <span class="fake-select-chev">▾</span></div>
+          </div>
+          <div class="settings-row">
+            <span>— Track Lines</span>
+            <div class="fake-toggle on"></div>
+          </div>
+          <div class="settings-row">
+            <span>••• Connect Gaps <span class="info-ic" title="Draws a dotted line across gaps in AIS coverage, instead of leaving them blank">ⓘ</span></span>
+            <div class="fake-toggle"></div>
+          </div>
+          <div class="settings-row" style="border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:14px;">
+            <span>↝ Speed &amp; Course</span>
+            <div class="fake-toggle on"></div>
+          </div>
+
+          <div class="settings-section-header" style="margin-bottom:8px;">General</div>
+          <div class="settings-row"><span>Units</span><div class="fake-select">Nautical (nm, kt) <span class="fake-select-chev">▾</span></div></div>
+          <div class="settings-row" style="margin-top:10px;"><span>Time format</span><div class="fake-select">Zulu / GMT <span class="fake-select-chev">▾</span></div></div>
+          <div class="settings-row" style="margin-top:10px;"><span>Interface mode</span><div class="fake-select">Advanced UI <span class="fake-select-chev">▾</span></div></div>
+          <div class="note">
+            "Interface mode" is a placeholder for the Basic/low-bandwidth UI toggle — still an
+            open gap, not designed yet. Sitting here for now as the most likely home for it.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MAP -->
+    <div class="map-wrap" id="mapWrap">
+      <div class="land l1"></div>
+      <div class="land l2"></div>
+
+      <div class="map-tools">
+        <button title="Zoom in">+</button>
+        <button title="Zoom out">–</button>
+        <div class="divider"></div>
+        <button title="Layers">▤</button>
+        <button title="Draw / measure">✎</button>
+        <button title="Screenshot / export">⤓</button>
+      </div>
+
+      <div class="event-pt" data-event="1" style="left:560px; top:380px;"></div>
+      <div class="event-pt hot" data-event="2" style="left:560px; top:300px;"></div>
+      <div class="event-pt" data-event="3" style="left:560px; top:220px;"></div>
+
+      <div class="vessel dim" style="left:300px; top:150px;"><svg viewBox="0 0 10 10"><polygon points="5,0 10,10 5,7 0,10"/></svg></div>
+      <div class="vessel dim" style="left:200px; top:360px;"><svg viewBox="0 0 10 10"><polygon points="5,0 10,10 5,7 0,10"/></svg></div>
+
+      <div class="vessel selected" id="normalVessel" style="left:560px; top:220px;"><svg viewBox="0 0 10 10"><polygon points="5,0 10,10 5,7 0,10"/></svg></div>
+      <div class="vessel-label" style="left:560px; top:220px;">FRONT ORKLA</div>
+
+      <div class="vessel dark" id="darkVessel" style="left:730px; top:440px;"><svg viewBox="0 0 10 10"><polygon points="5,0 10,10 5,7 0,10"/></svg></div>
+      <div class="vessel-label" style="left:730px; top:440px;">Uncorrelated detection</div>
+
+      <div class="event-pt" id="standaloneEvent" style="left:420px; top:480px; width:11px; height:11px;"></div>
+      <div class="vessel-label" style="left:420px; top:480px;">Standalone event</div>
+
+      <div class="legend" id="legend">
+        <div class="legend-header" id="legendHeader">Legend <span id="legendChev">▾</span></div>
+        <div class="legend-body">
+          <div class="legend-row"><span class="legend-swatch" style="background:var(--teal-dark);"></span> Correlated vessel</div>
+          <div class="legend-row"><span class="legend-swatch" style="background:#c0392b;"></span> Dark / uncorrelated</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: Working List / Vessel card (mutually exclusive with left tab logic, independent state) -->
+    <div class="side-panel right-panel open" id="rightPanel">
+      <div class="panel-header"><h3 id="rightTitle">Working List</h3><button id="rightClose">✕</button></div>
+      <div class="panel-body" id="rightBody">
+        <!-- default: working list view -->
+        <div id="workingListView">
+          <div style="font-size:11.5px; color:var(--ink-soft); margin-bottom:8px;">
+            3 items selected this session — not saved yet.
+          </div>
+          <div class="work-item"><div class="dot"></div> Front Orkla (MMSI 209838000) <span class="x">✕</span></div>
+          <div class="work-item"><div class="dot"></div> Zhong Xie 8 (MMSI 352001673) <span class="x">✕</span></div>
+          <div class="work-item"><div class="dot"></div> Event: Standard Rendezvous, 04-29 <span class="x">✕</span></div>
+          <button class="save-list-btn">Save as a list</button>
+        </div>
+
+        <!-- normal vessel compact card (hidden by default) -->
+        <div id="vesselCardView" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT RAIL -->
+    <div class="rail">
+      <button class="rail-btn right active" data-panel="work" title="Working List">
+        📋<span class="badge"></span><span class="label">Working List</span>
+      </button>
+    </div>
+
+    <!-- SHIPPY OVERLAY (slides on top, not beside) -->
+    <div class="shippy-overlay" id="shippyOverlay">
+      <div class="shippy-header">
+        <div class="t">Shippy</div>
+        <button id="shippyClose" title="Close">✕</button>
+      </div>
+      <div class="shippy-body">
+        <div class="shippy-msg">I found 10 vessels matching "Port of Seattle, last 10 days." Want me to save this as a list?</div>
+      </div>
+      <div class="shippy-input">
+        <input type="text" placeholder="Ask Shippy...">
+      </div>
+    </div>
+  </div>
+
+  <div class="timeslider">
+    <div class="ts-label">Jul 7</div>
+    <div class="ts-track">
+      <div class="ts-fill"></div>
+      <div class="ts-handle" style="left:8%;"></div>
+      <div class="ts-handle" style="left:92%;"></div>
+    </div>
+    <div class="ts-label">Jul 8</div>
+  </div>
+</div>
+
+<button class="shippy-launcher has-badge" id="shippyLauncher" title="Ask Shippy">
+  💬<span class="badge"></span>
+</button>
+
+<div class="comment-toolbar">
+  <button class="comment-toggle-btn" id="commentToggleBtn">📝 Add Comment</button>
+  <button class="comment-export-btn" id="commentExportBtn">📋 Copy all comments</button>
+</div>
+
+<script>
+  // ---- left rail: mutually exclusive panel, click again to close ----
+  const leftPanel = document.getElementById('leftPanel');
+  const leftTitle = document.getElementById('leftTitle');
+  const leftRailBtns = document.querySelectorAll('.rail-btn:not(.right)');
+
+  function showLeftPane(panelKey){
+    document.querySelectorAll('.left-pane').forEach(p=> p.style.display = 'none');
+    document.getElementById('pane-'+panelKey).style.display = 'block';
+    const titles = {
+      filters: 'Filters (8)', daterange: 'Date Range', areas: 'Areas / AOIs', vessels: 'Vessels', lists: 'My Lists', settings: 'Settings'
+    };
+    leftTitle.textContent = titles[panelKey] || 'My Lists';
+    document.getElementById('leftHeaderClear').style.display = (panelKey === 'filters') ? 'inline' : 'none';
+    leftRailBtns.forEach(b=> b.classList.toggle('active', b.dataset.panel === panelKey));
+    leftPanel.classList.add('open');
+  }
+
+  leftRailBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const isActive = btn.classList.contains('active') && leftPanel.classList.contains('open');
+      if(isActive){
+        leftPanel.classList.remove('open');
+        leftRailBtns.forEach(b=>b.classList.remove('active'));
+      } else {
+        showLeftPane(btn.dataset.panel);
+      }
+    });
+  });
+  document.getElementById('leftClose').addEventListener('click', ()=>{
+    leftPanel.classList.remove('open');
+    leftRailBtns.forEach(b=>b.classList.remove('active'));
+  });
+
+  // Areas picking: still tracks which area is "active," but no longer reflects into
+  // Filters since the "Within area" row was removed from that pane. setWithinArea is kept
+  // as a safe no-op in case that link comes back in a future pass.
+  function setWithinArea(areaName){
+    // intentionally empty for now — no Filters-side element to update
+  }
+
+  document.querySelectorAll('.area-pick').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      const alreadyPicked = item.classList.contains('picked');
+      document.querySelectorAll('.area-pick').forEach(i=>i.classList.remove('picked'));
+      if(alreadyPicked){
+        setWithinArea(null); // clicking the picked one again clears it — "one or none"
+      } else {
+        item.classList.add('picked');
+        setWithinArea(item.dataset.area);
+      }
+    });
+  });
+
+  // ---- editing a saved area: rename, delete ----
+  document.querySelectorAll('.edit-icon-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const key = btn.dataset.edit;
+      const panel = document.getElementById('edit-' + key);
+      const isOpen = panel.style.display === 'block';
+      document.querySelectorAll('.area-edit-panel').forEach(p=> p.style.display = 'none');
+      panel.style.display = isOpen ? 'none' : 'block';
+      if(!isOpen) panel.querySelector('.edit-input').focus();
+    });
+  });
+
+  document.querySelectorAll('.edit-cancel-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      document.getElementById('edit-' + btn.dataset.cancel).style.display = 'none';
+    });
+  });
+
+  document.querySelectorAll('.edit-save-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const key = btn.dataset.save;
+      const panel = document.getElementById('edit-' + key);
+      const newName = panel.querySelector('.edit-input').value.trim();
+      const block = document.querySelector('[data-area-block="' + key + '"]');
+      const nameEl = block.querySelector('.name');
+      const pickItem = block.querySelector('.area-pick');
+
+      if(newName){
+        nameEl.textContent = newName;
+        pickItem.dataset.area = newName;
+        if(pickItem.classList.contains('picked')) setWithinArea(newName);
+      }
+      panel.style.display = 'none';
+    });
+  });
+
+  document.querySelectorAll('.edit-action-btn.danger').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const block = btn.closest('.area-block');
+      const pickItem = block.querySelector('.area-pick');
+      if(pickItem.classList.contains('picked')) setWithinArea(null);
+      block.style.display = 'none';
+    });
+  });
+
+  // Saved Filters & Alerts placeholder button is intentionally disabled — no handler needed;
+  // it's a hand-wave nod to existing functionality (Area Info / Events / Saved Filters & Alerts
+  // tabs), not something we're redesigning in this pass.
+
+  // ---- Filters pane interactions ----
+  document.querySelectorAll('.incl-excl').forEach(group=>{
+    group.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        group.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  });
+
+  const collapseFiltersRow = document.getElementById('collapseFiltersRow');
+  const secondaryFilterFields = document.getElementById('secondaryFilterFields');
+  const collapseFiltersChev = document.getElementById('collapseFiltersChev');
+  collapseFiltersRow.addEventListener('click', ()=>{
+    const collapsed = secondaryFilterFields.style.display === 'none';
+    secondaryFilterFields.style.display = collapsed ? 'block' : 'none';
+    collapseFiltersRow.querySelector('span').textContent = collapsed ? 'Collapse filters' : 'Show more filters';
+    collapseFiltersChev.textContent = collapsed ? '▲' : '▼';
+  });
+
+  document.querySelectorAll('.speed-seg').forEach(group=>{
+    group.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        group.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  });
+
+  document.querySelectorAll('.chip .x').forEach(x=>{
+    x.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      x.closest('.chip').remove();
+    });
+  });
+
+  document.querySelectorAll('.filter-section-header').forEach(header=>{
+    header.addEventListener('click', ()=>{
+      // in this wireframe, section collapse is a hand-wave — real version would hide the fields below
+      const chev = header.querySelector('span');
+      chev.textContent = chev.textContent === '▾' ? '▸' : '▾';
+    });
+  });
+
+  document.querySelectorAll('.daterange-preset').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      document.querySelectorAll('.daterange-preset').forEach(i=>i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+
+  // start with My Lists pane visible (matches the rail's default active state)
+  showLeftPane('lists');
+
+  // ---- right rail / panel ----
+  const rightPanel = document.getElementById('rightPanel');
+  const rightTitle = document.getElementById('rightTitle');
+  const workingListView = document.getElementById('workingListView');
+  const vesselCardView = document.getElementById('vesselCardView');
+  const workRailBtn = document.querySelector('.rail-btn.right');
+
+  function showWorkingList(){
+    rightTitle.textContent = 'Working List';
+    workingListView.style.display = 'block';
+    vesselCardView.style.display = 'none';
+    rightPanel.classList.add('open');
+    workRailBtn.classList.add('active');
+  }
+
+  function showVesselCard(name, sub, mmsi, isDark){
+    rightTitle.textContent = isDark ? 'Uncorrelated Detection' : name;
+    workingListView.style.display = 'none';
+    vesselCardView.style.display = 'block';
+    rightPanel.classList.add('open');
+    workRailBtn.classList.remove('active');
+
+    if(isDark){
+      vesselCardView.innerHTML = `
+        <div class="dark-note" style="margin:0 0 10px;">
+          <b>No AIS correlation.</b> This is an optical/radar detection with no matched vessel
+          identity — showing the expanded event only, no vessel identity header.
+        </div>
+        <div class="event-row hot" style="padding-left:0;">
+          <div class="dot"></div>
+          <div>
+            <div class="etitle">Optical Imagery Detection</div>
+            <div class="emeta">2026-05-06 14:02 Z · 29.11, -93.4 · possible match: 2 nearby AIS tracks</div>
+          </div>
+        </div>
+        <button class="add-work-btn">+ Add to Working List</button>
+      `;
+    } else {
+      vesselCardView.innerHTML = `
+        <div style="margin:-12px -14px 0;">
+          <div class="vcard-top">
+            <div class="flag"></div>
+            <div class="vname">${name}</div>
+            <div class="vsub">${sub}</div>
+            <div class="field-grid">
+              <div class="k">MMSI</div><div>${mmsi}</div>
+              <div class="k">IMO</div><div>9933664</div>
+              <div class="k">Flag</div><div>Cyprus</div>
+              <div class="k">Type</div><div>Tanker</div>
+              <div class="k">Gear Type</div><div>–</div>
+              <div class="k">Length</div><div>330 m</div>
+            </div>
+            <button class="add-work-btn">+ Add to Working List</button>
+          </div>
+          <div class="vcard-events-label">EVENTS (3) — scrolled to selection</div>
+          <div class="event-row" data-event="1"><div class="dot"></div><div><div class="etitle">Vessel Detections</div><div class="emeta">04-21 09:03 Z</div></div></div>
+          <div class="event-row hot" data-event="2"><div class="dot"></div><div><div class="etitle">Standard Rendezvous</div><div class="emeta">04-29 20:09 Z · 35m</div></div></div>
+          <div class="event-row" data-event="3"><div class="dot"></div><div><div class="etitle">Vessel Detections</div><div class="emeta">05-04 23:12 Z</div></div></div>
+          <div style="padding:0 14px;">
+            <div class="footer-link">Show data sources ↗</div>
+            <div class="footer-link">Open full Vessel Details page ↗</div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  workRailBtn.addEventListener('click', ()=>{
+    if(workRailBtn.classList.contains('active') && rightPanel.classList.contains('open')){
+      rightPanel.classList.remove('open');
+      workRailBtn.classList.remove('active');
+    } else {
+      showWorkingList();
+    }
+  });
+  document.getElementById('rightClose').addEventListener('click', ()=>{
+    rightPanel.classList.remove('open');
+    workRailBtn.classList.remove('active');
+  });
+
+  document.getElementById('normalVessel').addEventListener('click', ()=>{
+    showVesselCard('FRONT ORKLA', 'Tanker · Cyprus', '209838000', false);
+  });
+  document.getElementById('darkVessel').addEventListener('click', ()=>{
+    showVesselCard('', '', '', true);
+  });
+
+  // Vessels tab: clicking a vessel-in-view opens the same compact card as clicking on the map
+  document.getElementById('vesselsChev').addEventListener('click', (e)=>{
+    const chev = e.target;
+    const select = chev.closest('.settings-section').querySelector('.fake-select');
+    const collapsed = chev.textContent === '▼';
+    chev.textContent = collapsed ? '▲' : '▼';
+    select.style.display = collapsed ? 'flex' : 'none';
+  });
+
+  const vesselsInViewData = {
+    'Front Orkla': {name:'FRONT ORKLA', sub:'Tanker · Cyprus', mmsi:'209838000'},
+    'Zhong Xie 8': {name:'ZHONG XIE 8', sub:'Cargo · Panama', mmsi:'352001673'},
+    'Cape Endeavor': {name:'CAPE ENDEAVOR', sub:'Fishing · United States', mmsi:'431029884'}
+  };
+  document.querySelectorAll('.vessel-in-view').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      const d = vesselsInViewData[row.dataset.vessel];
+      if(d) showVesselCard(d.name, d.sub, d.mmsi, false);
+    });
+  });
+
+  function showEventDetailsCard(){
+    rightTitle.textContent = 'Event Details';
+    workingListView.style.display = 'none';
+    vesselCardView.style.display = 'block';
+    rightPanel.classList.add('open');
+    workRailBtn.classList.remove('active');
+    vesselCardView.innerHTML = `
+      <div class="note" style="margin-top:0;">
+        Event Details, on its own — no vessel context yet. Distinct from the merged
+        Vessel Details card per today's board (these were listed as two separate items).
+      </div>
+      <div class="event-row hot" style="padding-left:0;">
+        <div class="dot"></div>
+        <div>
+          <div class="etitle">Loitering (AIS)</div>
+          <div class="emeta">2026-05-02 03:40 Z · 26.5, -95.2 · 4h 20m</div>
+        </div>
+      </div>
+      <button class="add-work-btn">+ Add to Working List</button>
+    `;
+  }
+  document.getElementById('standaloneEvent').addEventListener('click', showEventDetailsCard);
+
+  // ---- try it bar ----
+  document.getElementById('tryitClose').addEventListener('click', ()=>{
+    document.getElementById('tryitBar').classList.add('hidden');
+  });
+
+  // ---- legend collapse ----
+  const legend = document.getElementById('legend');
+  document.getElementById('legendHeader').addEventListener('click', ()=>{
+    legend.classList.toggle('collapsed');
+    document.getElementById('legendChev').textContent = legend.classList.contains('collapsed') ? '▸' : '▾';
+  });
+
+  // ---- Shippy overlay: slides on top of whatever's on the right, not beside it ----
+  const shippyOverlay = document.getElementById('shippyOverlay');
+  const shippyLauncher = document.getElementById('shippyLauncher');
+  shippyLauncher.addEventListener('click', ()=>{
+    shippyOverlay.classList.add('open');
+    shippyLauncher.classList.remove('has-badge');
+  });
+  document.getElementById('shippyClose').addEventListener('click', ()=>{
+    shippyOverlay.classList.remove('open');
+  });
+
+  // ==== Sticky-note comments — annotation layer for design review, not part of the real product ====
+  let commentModeActive = false;
+  let noteCounter = 0;
+
+  const commentToggleBtn = document.getElementById('commentToggleBtn');
+  const commentExportBtn = document.getElementById('commentExportBtn');
+
+  commentToggleBtn.addEventListener('click', ()=>{
+    commentModeActive = !commentModeActive;
+    document.body.classList.toggle('comment-mode-active', commentModeActive);
+    commentToggleBtn.classList.toggle('active', commentModeActive);
+    commentToggleBtn.textContent = commentModeActive ? '📝 Click anywhere to drop a note' : '📝 Add Comment';
+  });
+
+  document.addEventListener('click', (e)=>{
+    if(!commentModeActive) return;
+    if(e.target.closest('.sticky-note') || e.target.closest('.comment-toolbar')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    createStickyNote(e.clientX, e.clientY);
+  }, true); // capture phase so this fires before the click reaches buttons/panels underneath
+
+  function createStickyNote(x, y, presetText){
+    noteCounter++;
+    const note = document.createElement('div');
+    note.className = 'sticky-note';
+    note.style.left = x + 'px';
+    note.style.top = y + 'px';
+    note.innerHTML = `
+      <div class="sticky-note-header">
+        <span>Note #${noteCounter}</span>
+        <button class="sticky-note-close" title="Delete">✕</button>
+      </div>
+      <textarea placeholder="Type your comment..."></textarea>
+      <div class="sticky-note-meta"></div>
+    `;
+    document.body.appendChild(note);
+
+    const meta = note.querySelector('.sticky-note-meta');
+    meta.textContent = new Date().toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+
+    const textarea = note.querySelector('textarea');
+    if(presetText) textarea.value = presetText;
+    textarea.focus();
+
+    note.querySelector('.sticky-note-close').addEventListener('click', (e)=>{
+      e.stopPropagation();
+      note.remove();
+    });
+
+    // drag by the header
+    const header = note.querySelector('.sticky-note-header');
+    let dragging = false, startX = 0, startY = 0, startLeft = 0, startTop = 0;
+    header.addEventListener('mousedown', (e)=>{
+      dragging = true;
+      startX = e.clientX; startY = e.clientY;
+      startLeft = note.offsetLeft; startTop = note.offsetTop;
+      header.classList.add('grabbing');
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    window.addEventListener('mousemove', (e)=>{
+      if(!dragging) return;
+      note.style.left = (startLeft + e.clientX - startX) + 'px';
+      note.style.top = (startTop + e.clientY - startY) + 'px';
+    });
+    window.addEventListener('mouseup', ()=>{
+      if(dragging){ dragging = false; header.classList.remove('grabbing'); }
+    });
+  }
+
+  commentExportBtn.addEventListener('click', ()=>{
+    const notes = document.querySelectorAll('.sticky-note');
+    if(notes.length === 0){
+      alert('No comments yet — turn on "Add Comment" and click anywhere to leave one.');
+      return;
+    }
+    let out = 'Comments — Skylight shell wireframe\n\n';
+    notes.forEach((n, i)=>{
+      const text = n.querySelector('textarea').value.trim();
+      out += (i + 1) + '. ' + (text || '(empty note)') + '\n';
+    });
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(out).then(()=>{
+        alert('Copied ' + notes.length + ' comment(s) to your clipboard.');
+      }).catch(()=>{
+        alert(out);
+      });
+    } else {
+      alert(out);
+    }
+  });
+</script>
+
+</body>
+</html>
